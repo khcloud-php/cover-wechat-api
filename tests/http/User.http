@@ -1,0 +1,8 @@
+### 三方登陆测试
+POST http://localhost:8000/users/register
+Content-Type: application/json
+
+{
+    "mobile": "13006789517",
+    "password": "debug2023"
+}
