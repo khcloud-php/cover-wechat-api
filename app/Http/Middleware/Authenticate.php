@@ -43,7 +43,7 @@ class Authenticate extends BaseService
             $this->throwBusinessException(ApiCodeEnum::CLIENT_HTTP_UNAUTHORIZED_EXPIRED);
         }
 
-        $token = $request->header('token');
+        $token = str_replace('Bearer ', '', $request->header('Authorization'));
 
         if (!$token) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_TOKEN_UNAVAILABLE);
