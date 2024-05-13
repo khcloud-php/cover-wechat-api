@@ -29,6 +29,8 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
 
     $router->group(['prefix' => 'friends'], function ($router) {
         $router->get('/list', 'FriendController@list');
+        $router->get('/apply-list', 'FriendController@applyList');
+        $router->delete('/delete-apply/{id}', 'FriendController@deleteApply');
         $router->get('/search/{keywords}', 'FriendController@search');
         $router->post('/apply', 'FriendController@apply');
         $router->post('/verify', 'FriendController@verify');

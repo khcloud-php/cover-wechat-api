@@ -33,6 +33,33 @@ class FriendController extends Controller
         return $this->success($friendList, $request);
     }
 
+
+    /**
+     * 好友申请列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @author yjf
+     * @date 2024-05-13 17:37
+     */
+    public function applyList(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $applyList = $this->friendService->applyList($this->params);
+        return $this->success($applyList, $request);
+    }
+
+    /**
+     * 删除好友申请
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @author yjf
+     * @date 2024-05-13 18:18
+     */
+    public function deleteApply($id, Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->friendService->deleteApply($id);
+        return $this->success([], $request);
+    }
     /**
      * 查找好友
      * @param $keywords

@@ -26,7 +26,7 @@ if (!function_exists('group_by_first_char')) {
     {
         $grouped = [];
         foreach ($array as $item) {
-            $str = $item[$field];
+            $str = $item['friend'][$field];
             $firstChar = '';
             if (preg_match('/^[\x{4e00}-\x{9fa5}]/u', $str)) { // 匹配中文字符
                 $str = (string)Pinyin::sentence($str);

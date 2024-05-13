@@ -11,19 +11,45 @@ use Illuminate\Support\Facades\DB;
 
 class FriendService extends BaseService
 {
-    public function list(array $params)
+    public function list(array $params): array
     {
-        $friendList = Friend::query()->with(['friend' => function($query){
+        $friendList = Friend::query()->with(['friend' => function ($query) {
             $query->select('id', 'nickname', 'avatar');
         }])->where('owner', $params['user']->id)->where('type', FriendEnum::TYPE_VERIFY)->where('status', FriendEnum::STATUS_PASS)->get();
         $friendList = $friendList ? $friendList->toArray() : [];
-        foreach ( $friendList as &$friend) {
-            $friend['nickname'] = $friend['nickname'] ?: $friend['friend']['nickname'];
+        foreach ($friendList as &$friend) {
+            $friend['friend']['nickname'] = $friend['nickname'] ?: $friend['friend']['nickname'];
         }
         return group_by_first_char($friendList, 'nickname');
     }
 
-    public function search(array $params)
+    public function applyList(array $params): array
+    {
+        $applyList = Friend::query()->with(['friend' => function ($query) {
+            $query->select('id', 'nickname', 'avatar');
+        }])->where('owner', $params['user']->id)->where('display', 1)->get();
+        $applyList = $applyList ? $applyList->toArray() : [];
+        $day = 86400;
+        $threeDay = $overThreeDay = [];
+        foreach ($applyList as &$apply) {
+            $apply['friend']['nickname'] = $apply['nickname'] ?: $apply['friend']['nickname'];
+            $field = $apply['updated_at'] ? 'updated_at' : 'created_at';
+            $days = (time() - strtotime($apply[$field])) / $day;
+            if ($days > 3) {
+                $overThreeDay[] = $apply;
+            } else {
+                $threeDay[] = $apply;
+            }
+        }
+        return ['three_day' => $threeDay, 'over_three_day' => $overThreeDay];
+    }
+
+    public function deleteApply($id): int
+    {
+        return Friend::query()->where('id', $id)->update(['display' => 0]);
+    }
+
+    public function search(array $params): array
     {
         $keywords = $params['keywords'];
         $userId = $params['user']->id;
@@ -39,7 +65,7 @@ class FriendService extends BaseService
         return $friend ? $friend->toArray() : [];
     }
 
-    public function apply(array $params)
+    public function apply(array $params): array
     {
         //黑名单
 
@@ -52,34 +78,21 @@ class FriendService extends BaseService
             if (!$friend->deleted_at && ($owner && !$owner->deleted_at)) {
                 throw new BusinessException(ApiCodeEnum::SERVICE_FRIEND_ALREADY_EXISTS);
             }
-
-            //对方没你好友或者把你删了 需要重新申请验证
-            if (!$owner || ($owner->deleted_at)) {
-                $friend->type = FriendEnum::TYPE_APPLY;
-                $friend->status = FriendEnum::STATUS_CHECK;
-                $friend->nickname = $params['nickname'];
-                $friend->remark = $params['remark'];
-                $friend->setting = $params['setting'];
-                $friend->deleted_at = null;
-                $friend->save();
-            }
+            $friend->type = FriendEnum::TYPE_APPLY;
+            $friend->status = FriendEnum::STATUS_CHECK;
+            $friend->deleted_at = null;
+            $friend->display = 1;
+            $friend->nickname = $params['nickname'];
+            $friend->remark = $params['remark'];
+            $friend->setting = $params['setting'];
 
             //对方有你好友
             if ($owner && !$owner->deleted_at) {
-                $friend->nickname = $params['nickname'];
-                $friend->remark = $params['remark'];
-                $friend->setting = $params['setting'];
-                $friend->deleted_at = null;
-                $friend->save();
+                $friend->type = FriendEnum::TYPE_VERIFY;
+                $friend->status = FriendEnum::STATUS_PASS;
             }
 
-            //对方没你好友或者把你删了 需要重新申请验证
-            if (!$owner || ($owner->deleted_at)) {
-                $friend->type = FriendEnum::TYPE_APPLY;
-                $friend->status = FriendEnum::STATUS_CHECK;
-                $friend->deleted_at = null;
-                $friend->save();
-            }
+            $friend->save();
         } else {
             //没申请过
             $friend = new Friend($params);
