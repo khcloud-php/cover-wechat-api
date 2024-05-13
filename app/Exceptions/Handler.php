@@ -55,29 +55,27 @@ class Handler extends ExceptionHandler
             $exString = sprintf(" %s \n code: %s \n file: %s \n line: %s", $message, $code, $file, $line);
             $request = request();
             switch (class_basename(get_class($exception))) {
-//                case 'PayException':
-//                    $title = "支付异常";
-//                    break;
-//                case 'SocialiteException':
-//                    $title = "社区化异常";
-//                    break;
+                    //                case 'PayException':
+                    //                    $title = "支付异常";
+                    //                    break;
+                    //                case 'SocialiteException':
+                    //                    $title = "社区化异常";
+                    //                    break;
                 default:
                     $title = "系统异常";
             }
             $data = [
                 'env' => config('app.env'),
                 'project' => config('app.name'),
-                'time' => time(),
                 'url' => $request->fullUrl(),
                 'request_ip' => $request->getClientIp(),
                 'request_id' => $request->offsetGet('request_id'),
                 'exception' => $exString,
+                'created_at' => time()
             ];
-            var_dump($data);
-            exit();
-            (new ExceptionLog())->newQuery()->create($data);
-//            $title = '**<font color="darkred"> ' . $title . ' </font>**';
-//            (new Robot())->notify(new Warning($title . "  \n\n  " . implode("  \n\n  ", $messageArray)));
+            ExceptionLog::create($data);
+            //            $title = '**<font color="darkred"> ' . $title . ' </font>**';
+            //            (new Robot())->notify(new Warning($title . "  \n\n  " . implode("  \n\n  ", $messageArray)));
         }
     }
 

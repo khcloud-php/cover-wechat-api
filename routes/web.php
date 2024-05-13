@@ -26,19 +26,11 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->get('/info', 'UserController@info');
         $router->get('/{id}/home', 'UserController@home');
     });
-    // $router->group(['prefix' => 'groups'], function ($router) {
-    //     $router->get('/', 'GroupController@index');
-    //     $router->post('/', 'GroupController@store');
-    //     $router->get('/{id}', 'GroupController@show');
-    //     $router->put('/{id}', 'GroupController@update');
-    //     $router->delete('/{id}', 'GroupController@destroy');
-    // });
 
-    // $router->group(['prefix' => 'messages'], function ($router) {
-    //     $router->get('/', 'MessageController@index');
-    //     $router->post('/', 'MessageController@store');
-    //     $router->get('/{id}', 'MessageController@show');
-    //     $router->put('/{id}', 'MessageController@update');
-    //     $router->delete('/{id}', 'MessageController@destroy');
-    // });
+    $router->group(['prefix' => 'friends'], function ($router) {
+        $router->get('/list', 'FriendController@list');
+        $router->get('/search/{keywords}', 'FriendController@search');
+        $router->post('/apply', 'FriendController@apply');
+        $router->post('/verify', 'FriendController@verify');
+    });
 });

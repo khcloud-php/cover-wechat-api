@@ -70,6 +70,7 @@ class ApiCodeEnum
     const SERVICE_ACCOUNT_CANCEL = 500207; //账号已注销.
     const SERVICE_CODE_ERROR = 500208; // 验证码不正确
     const SERVICE_ACCOUNT_ALREADY_EXISTS = '500209|账号已存在'; // 账号已存在.
+    const SERVICE_FRIEND_ALREADY_EXISTS = '500210|好友已存在'; // 好友已存在.
 
     // 400 支付
     const PAY_TIME_ERROR = 500404; // 时间异常

@@ -28,4 +28,8 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
         'password',
         'salt'
     ];
+
+    protected $casts = [
+        'setting' => 'json'
+    ];
 }

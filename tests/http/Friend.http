@@ -1,0 +1,30 @@
+### 好友列表
+GET http://localhost:8000/friends/list
+Authorization: Bearer eyJpdiI6IkJ0aVJPN2FmQjZVQ1lpWlR4MWhoZ2c9PSIsInZhbHVlIjoiUkFiR29UWTk3eElwSGM5bjZhRzNVZz09IiwibWFjIjoiYzZhNGFkNjQyYWY4YTBhYTBlNDRmMTMwZTAwZDIwMzgyZTk4ZWJiZGQ2OTJmOWRmOTQwYzJjNTM4YWI2YjljNyIsInRhZyI6IiJ9
+Content-Type: application/json
+### 查找好友
+GET http://localhost:8000/friends/search/13006789517
+Authorization: Bearer eyJpdiI6ImxYRHVJQXV4WHgraDBiV29oZjlwM2c9PSIsInZhbHVlIjoiQXlNM0JlL0RGQWdONkJ3Z3E5ZjlvZz09IiwibWFjIjoiZWM1ZmQyNmI0ZjBmNTcyNzRkYTlhNmNjYjBlNjUyZWVhNjUwNDUwMWE1ZmE1YTNjODMzNTAyODRhYTFmMzYxNSIsInRhZyI6IiJ9
+Content-Type: application/json
+
+### 申请添加好友
+POST http://localhost:8000/friends/apply
+Authorization: Bearer eyJpdiI6ImxYRHVJQXV4WHgraDBiV29oZjlwM2c9PSIsInZhbHVlIjoiQXlNM0JlL0RGQWdONkJ3Z3E5ZjlvZz09IiwibWFjIjoiZWM1ZmQyNmI0ZjBmNTcyNzRkYTlhNmNjYjBlNjUyZWVhNjUwNDUwMWE1ZmE1YTNjODMzNTAyODRhYTFmMzYxNSIsInRhZyI6IiJ9
+
+{
+    "friend":"5",
+    "nickname":"",
+    "remark": "",
+    "setting": {"SettingFriendPerm":"ALL","MomentAndStatus":{"DontLetHimSeeIt":0,"DontSeeHim":0}}
+}
+
+### 通过好友申请
+POST http://localhost:8000/friends/verify
+Authorization: Bearer eyJpdiI6ImxYRHVJQXV4WHgraDBiV29oZjlwM2c9PSIsInZhbHVlIjoiQXlNM0JlL0RGQWdONkJ3Z3E5ZjlvZz09IiwibWFjIjoiZWM1ZmQyNmI0ZjBmNTcyNzRkYTlhNmNjYjBlNjUyZWVhNjUwNDUwMWE1ZmE1YTNjODMzNTAyODRhYTFmMzYxNSIsInRhZyI6IiJ9
+
+{
+    "friend":"5",
+    "nickname":"",
+    "remark": "",
+    "setting": {"SettingFriendPerm":"ALL","MomentAndStatus":{"DontLetHimSeeIt":0,"DontSeeHim":0}}
+}

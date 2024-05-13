@@ -61,7 +61,7 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('auth');
-
+$app->configure('user');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware

@@ -11,7 +11,16 @@ class Friend extends Base
      *
      * @var string[]
      */
-    protected $fillable = ['status','unread','setting'];
+    protected $fillable = ['nickname', 'type', 'status', 'unread', 'remark', 'setting'];
 
-    use SoftDeletes;
+     use SoftDeletes;
+
+    protected $casts = [
+        'setting' => 'json'
+    ];
+
+    public function friend(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'friend', 'id');
+    }
 }

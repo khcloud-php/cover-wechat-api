@@ -14,4 +14,8 @@ class Group extends Base
     protected $fillable = ['name', 'owner', 'notice_user', 'notice', 'noticed_at', 'setting'];
 
     use SoftDeletes;
+
+    protected $casts = [
+        'setting' => 'json'
+    ];
 }

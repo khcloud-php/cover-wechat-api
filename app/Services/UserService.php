@@ -19,7 +19,7 @@ class UserService extends BaseService
         if ($user && $user->mobile == $params['mobile']) $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_ALREADY_EXISTS);
         if ($user && $user->wechat == $params['wechat']) $this->throwBusinessException(ApiCodeEnum::SERVICE_WECHAT_ALREADY_EXISTS);
         $params['salt'] = Str::password(10);
-        $params['setting'] = json_encode([]);
+        $params['setting'] = config('user.owner.setting');
         $params['password'] = Hash::make($params['salt'] . $params['password']);
         empty($params['avatar']) && $params['avatar'] = rand_avatar($params['mobile']);
         $user = new User($params);
@@ -64,7 +64,6 @@ class UserService extends BaseService
     {
         if ($params['user_id'] == $params['user']->id) {
             //查看自己主页
-            var_dump(1111);
         } else {
             //查看朋友主页
         }

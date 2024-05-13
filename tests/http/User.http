@@ -1,8 +1,27 @@
-### 三方登陆测试
+### 注册
 POST http://localhost:8000/users/register
 Content-Type: application/json
 
 {
-    "mobile": "13006789517",
-    "password": "debug2023"
+    "nickname":"测试用户002",
+    "wechat":"test_002",
+    "mobile": "13006789515",
+    "password": "123456"
 }
+
+### 登陆
+POST http://localhost:8000/users/login
+Content-Type: application/json
+
+{
+    "mobile": "13006789517",
+    "password": "123456",
+    "code": "1234"
+}
+
+### 注销
+POST http://localhost:8000/users/logout
+Authorization: Bearer eyJpdiI6IkRaMFdCcTJDZnBEdnk3R3lOcWp5T1E9PSIsInZhbHVlIjoiVkYwYThWNDlLc3o1b1Z4eW55R2FhQT09IiwibWFjIjoiZGQwZjgyNGNjYWFlZDRhZDNkNjE4NWQ0YWU5M2JhYjFkOGMzMzBjZGNmODJiOTEyMTgwNjc4MTIzZDgyNjAyNSIsInRhZyI6IiJ9
+Content-Type: application/json
+
+{}
