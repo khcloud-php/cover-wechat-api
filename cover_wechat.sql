@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 13/05/2024 17:22:42
+ Date: 13/05/2024 18:38:24
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `cw_exception_logs`  (
   `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_files
@@ -69,6 +69,7 @@ CREATE TABLE `cw_friends`  (
   `unread` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `setting` json NOT NULL,
+  `display` tinyint(1) UNSIGNED NOT NULL DEFAULT 1,
   `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `deleted_at` int(10) UNSIGNED NULL DEFAULT NULL,
   `updated_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
