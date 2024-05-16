@@ -89,6 +89,7 @@ class FriendController extends Controller
     {
         $this->validate($request, [
             'friend' => 'required',
+            'nickname' => 'required',
             'setting' => 'required'
         ]);
         $apply = $this->friendService->apply($this->params);

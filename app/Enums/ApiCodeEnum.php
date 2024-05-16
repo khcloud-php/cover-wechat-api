@@ -33,7 +33,7 @@ class ApiCodeEnum
     // 客户端错误码：400 ~ 499 开头，后拼接 3 位
     const CLIENT_PARAMETER_ERROR = 400002; //参数有误
     const CLIENT_DATA_EXIST = 400003; //数据已存在
-    const CLIENT_DATA_NOT_FOUND = 400004; //数据不存在
+    const CLIENT_DATA_NOT_FOUND = '400004|数据不存在'; //数据不存在
     const CLIENT_TOKEN_UNAVAILABLE = '400006|token无效'; //token无效
     const CLIENT_NOT_FOUND_HTTP_ERROR = 400007; //请求失败
     const CLIENT_TRANSFER_ERROR = 400203; //数据转换失败

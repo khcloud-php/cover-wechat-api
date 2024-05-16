@@ -24,7 +24,7 @@ $router->group(['prefix' => 'users'], function ($router) {
 $router->group(['middleware' => 'auth:api'], function ($router) {
     $router->group(['prefix' => 'users'], function ($router) {
         $router->get('/info', 'UserController@info');
-        $router->get('/{id}/home', 'UserController@home');
+        $router->get('/{keywords}/home', 'UserController@home');
     });
 
     $router->group(['prefix' => 'friends'], function ($router) {

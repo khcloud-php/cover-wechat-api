@@ -57,12 +57,18 @@ class FriendService extends BaseService
 
         $isMobile = is_mobile($keywords);
         if ($isMobile) {
-            $friend = User::where('mobile', $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => ['Mobile' => 1]]])->first();
+            $friend = User::query()->where('mobile', $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => ['Mobile' => 1]]])->get();
         } else {
-            $friend = User::where('wechat', $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => ['Wechat' => 1]]])->first();
+            $friend = User::query()->where('wechat', $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => ['Wechat' => 1]]])->get();
         }
-
-        return $friend ? $friend->toArray() : [];
+        if ($friend) {
+            $friend = $friend->toArray();
+            foreach ($friend as &$v) {
+                $v['source'] = $isMobile ? 'mobile' : 'wechat';
+                unset($v['token'], $v['token_expire_in']);
+            }
+        }
+        return $friend ?: [];
     }
 
     public function apply(array $params): array
