@@ -20,5 +20,10 @@ return [
                 "DontSeeHim" => 0
             ]
         ]
+    ],
+    'source' => [
+        'mobile' => '手机号',
+        'wechat' => '微信号',
+        'qrcode' => '扫一扫'
     ]
 ];
