@@ -60,6 +60,7 @@ class FriendController extends Controller
         $this->friendService->deleteApply($id);
         return $this->success([], $request);
     }
+
     /**
      * 查找好友
      * @param $keywords
@@ -75,6 +76,14 @@ class FriendController extends Controller
         return $this->success($friend, $request);
     }
 
+    public function showConfirm(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'source' => 'required|string',
+        ]);
+        $confirm = $this->friendService->showConfirm($this->params);
+        return $this->success($confirm, $request);
+    }
 
     /**
      * 申请添加好友
@@ -88,9 +97,9 @@ class FriendController extends Controller
     public function apply(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'friend' => 'required',
-            'nickname' => 'required',
-            'setting' => 'required'
+            'friend' => 'required|int',
+            'nickname' => 'required|string',
+            'setting' => 'required|array'
         ]);
         $apply = $this->friendService->apply($this->params);
         return $this->success($apply, $request);
@@ -107,8 +116,9 @@ class FriendController extends Controller
     public function verify(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'friend' => 'required',
-            'setting' => 'required'
+            'friend' => 'required|int',
+            'nickname' => 'required|string',
+            'setting' => 'required|array'
         ]);
         $verify = $this->friendService->verify($this->params);
         return $this->success($verify, $request);

@@ -32,6 +32,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->get('/apply-list', 'FriendController@applyList');
         $router->delete('/delete-apply/{id}', 'FriendController@deleteApply');
         $router->get('/search/{keywords}', 'FriendController@search');
+        $router->post('/show-confirm', 'FriendController@showConfirm');
         $router->post('/apply', 'FriendController@apply');
         $router->post('/verify', 'FriendController@verify');
     });

@@ -76,7 +76,7 @@ class UserService extends BaseService
         $self = $user->id == $userId;
         $relationship = 'owner';
         $source = $isMobile ? 'mobile' : 'wechat';
-        $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'setting' => []];
+        $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'setting' => [], 'keywords' => $params['keywords']];
         $homeInfo = array_merge($homeInfo, $user->toArray());
         $sourceConfig = config('user.source');
         if (!$self) {

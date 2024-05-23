@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Workerman;
-
+use GatewayWorker\Lib\Gateway;
 class Events
 {
 

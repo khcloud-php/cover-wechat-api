@@ -71,6 +71,29 @@ class FriendService extends BaseService
         return $friend ?: [];
     }
 
+    public function showConfirm(array $params): array
+    {
+        $confirm = [];
+        $source = $params['source'];
+        if (empty($params['keywords'])) {
+            $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+        }
+        $user = User::query()->where($source, $params['keywords'])->first(['id', 'nickname']);
+        if (empty($user)) $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_NOT_FOUND);
+        $confirm['friend'] = $user->toArray();
+        $confirm['nickname'] = $user->nickname;
+        $confirm['setting'] = config('user.friend.setting');
+        if (empty($params['id'])) {
+            $confirm['type'] = FriendEnum::TYPE_APPLY;
+            $confirm['remark'] = "我是{$params['user']['nickname']}";
+
+        } else {
+            $confirm['type'] = FriendEnum::TYPE_VERIFY;
+            $confirm['remark'] = '';
+        }
+        return $confirm;
+    }
+
     public function apply(array $params): array
     {
         //黑名单
@@ -119,7 +142,6 @@ class FriendService extends BaseService
                 $friend->type = FriendEnum::TYPE_VERIFY;
                 $friend->status = FriendEnum::STATUS_PASS;
                 $friend->nickname = $params['nickname'];
-                $friend->remark = $params['remark'];
                 $friend->setting = $params['setting'];
                 $friend->deleted_at = null;
                 $friend->save();

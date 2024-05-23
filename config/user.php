@@ -14,7 +14,7 @@ return [
     ],
     'friend' => [
         'setting' => [
-            'SettingFriendPerm' => 'ALL',
+            'SettingFriendPerm' => 'ALLOW_ALL',
             'MomentAndStatus' => [
                 "DontLetHimSeeIt" => 0,
                 "DontSeeHim" => 0

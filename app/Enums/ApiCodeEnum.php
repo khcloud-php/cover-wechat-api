@@ -31,7 +31,7 @@ class ApiCodeEnum
     const PAY_SUCCESS = 200106; //支付成功
 
     // 客户端错误码：400 ~ 499 开头，后拼接 3 位
-    const CLIENT_PARAMETER_ERROR = 400002; //参数有误
+    const CLIENT_PARAMETER_ERROR = '400002|参数有误'; //参数有误
     const CLIENT_DATA_EXIST = 400003; //数据已存在
     const CLIENT_DATA_NOT_FOUND = '400004|数据不存在'; //数据不存在
     const CLIENT_TOKEN_UNAVAILABLE = '400006|token无效'; //token无效
