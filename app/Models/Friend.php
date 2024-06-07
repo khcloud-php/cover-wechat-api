@@ -23,4 +23,9 @@ class Friend extends Base
     {
         return $this->belongsTo(User::class, 'friend', 'id');
     }
+
+    public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner', 'id');
+    }
 }

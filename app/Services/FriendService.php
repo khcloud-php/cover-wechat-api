@@ -25,13 +25,28 @@ class FriendService extends BaseService
 
     public function applyList(array $params): array
     {
+        $userId = $params['user']->id;
         $applyList = Friend::query()->with(['friend' => function ($query) {
-            $query->select('id', 'nickname', 'avatar');
-        }])->where('owner', $params['user']->id)->where('display', 1)->get();
+            $query->select('id', 'nickname', 'avatar', 'mobile', 'wechat');
+        }, 'owner' => function ($query) {
+            $query->select('id', 'nickname', 'avatar', 'mobile', 'wechat');
+        }])->where('display', 1)->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")->get();
         $applyList = $applyList ? $applyList->toArray() : [];
         $day = 86400;
         $threeDay = $overThreeDay = [];
         foreach ($applyList as &$apply) {
+            if ($apply['friend']['id'] == $userId) {
+                $owner = $apply['owner'];
+                $friend = $apply['friend'];
+                $apply['owner'] = $friend;
+                $apply['friend'] = $owner;
+                $apply['status'] = 'go_check';
+
+            } elseif ($apply['status'] == FriendEnum::STATUS_CHECK) {
+                $apply['status'] = 'wait_check';
+            }
+            $apply['keywords'] = $apply['friend'][$apply['source']];
+            unset($apply['friend']['mobile'],$apply['friend']['wechat'],$apply['owner']['mobile'],$apply['owner']['wechat']);
             $apply['friend']['nickname'] = $apply['nickname'] ?: $apply['friend']['nickname'];
             $field = $apply['updated_at'] ? 'updated_at' : 'created_at';
             $days = (time() - strtotime($apply[$field])) / $day;

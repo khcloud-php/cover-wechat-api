@@ -98,7 +98,7 @@ class UserService extends BaseService
             if ($friend && $friend->status == FriendEnum::STATUS_CHECK) {
                 $relationship = 'wait_check';
                 $homeInfo['remark'] = $friend->remark;
-                $homeInfo['source_text'] = '通过' . $sourceConfig[$owner->source] . '搜索';
+                $homeInfo['source_text'] = '通过' . $sourceConfig[$friend->source] . '搜索';
             }
             if ($friend && $friend->nickname) $homeInfo['nickname'] = $friend->nickname;
             if ($friend) {
