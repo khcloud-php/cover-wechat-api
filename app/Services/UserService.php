@@ -62,21 +62,21 @@ class UserService extends BaseService
         return User::query()->where('id', $userId)->update(['token' => '', 'token_expire_in' => 0]);
     }
 
+    /**
+     * @throws BusinessException
+     */
     public function home(array $params): array
     {
         $isMobile = is_mobile($params['keywords']);
-        if ($isMobile) {
-            $user = User::query()->where('mobile', $params['keywords'])->first(['id', 'nickname', 'wechat', 'avatar', 'gender', 'sign']);
-        } else {
-            $user = User::query()->where('wechat', $params['keywords'])->first(['id', 'nickname', 'wechat', 'avatar', 'gender', 'sign']);
-        }
+        $field = $isMobile ? 'mobile' : 'wechat';
+        $user = User::query()->where($field, $params['keywords'])->first(['id', 'nickname', 'wechat', 'avatar', 'gender', 'sign']);;
 
         if (!$user) $this->throwBusinessException(ApiCodeEnum::CLIENT_DATA_NOT_FOUND);
         $userId = $params['user']->id;
         $self = $user->id == $userId;
         $relationship = 'owner';
         $source = $isMobile ? 'mobile' : 'wechat';
-        $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'setting' => [], 'keywords' => $params['keywords']];
+        $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'setting' => [], 'keywords' => $params['keywords'], 'final_nickname' => $user->nickname];
         $homeInfo = array_merge($homeInfo, $user->toArray());
         $sourceConfig = config('user.source');
         if (!$self) {
@@ -84,10 +84,12 @@ class UserService extends BaseService
             $friend = Friend::query()->where('owner', $userId)->where('friend', $user->id)->first();
             $owner = Friend::query()->where('owner', $user->id)->where('friend', $userId)->first();
             $homeInfo['source_text'] = '通过' . $sourceConfig[$source] . '搜索';
+            $homeInfo['check_msg'] = '';
             if ($owner && $owner->status == FriendEnum::STATUS_CHECK) {
                 $relationship = 'go_check';
                 $homeInfo['source_text'] = '对方通过' . $sourceConfig[$owner->source] . '搜索';
                 $homeInfo['remark'] = $owner->remark;
+                $homeInfo['check_msg'] = "{$owner->nickname}：{$owner->remark}";
             }
             if ($friend && $friend->status == FriendEnum::STATUS_PASS) {
                 $relationship = 'friend';
@@ -99,8 +101,9 @@ class UserService extends BaseService
                 $relationship = 'wait_check';
                 $homeInfo['remark'] = $friend->remark;
                 $homeInfo['source_text'] = '通过' . $sourceConfig[$friend->source] . '搜索';
+                $homeInfo['check_msg'] = "我：{$friend->remark}";
             }
-            if ($friend && $friend->nickname) $homeInfo['nickname'] = $friend->nickname;
+            if ($friend && $friend->nickname != $homeInfo['nickname']) $homeInfo['final_nickname'] = $friend->nickname;
             if ($friend) {
                 $homeInfo['source'] = $friend->source;
             }
@@ -109,5 +112,10 @@ class UserService extends BaseService
         }
         $homeInfo['relationship'] = $relationship;
         return $homeInfo;
+    }
+
+    public function me(int $userId): array
+    {
+        return User::query()->find($userId, ['wechat', 'mobile', 'avatar', 'gender', 'sign', 'setting'])->toArray();
     }
 }

@@ -23,7 +23,7 @@ $router->group(['prefix' => 'users'], function ($router) {
 
 $router->group(['middleware' => 'auth:api'], function ($router) {
     $router->group(['prefix' => 'users'], function ($router) {
-        $router->get('/info', 'UserController@info');
+        $router->get('/me', 'UserController@me');
         $router->get('/{keywords}/home', 'UserController@home');
     });
 
@@ -35,5 +35,6 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->post('/show-confirm', 'FriendController@showConfirm');
         $router->post('/apply', 'FriendController@apply');
         $router->post('/verify', 'FriendController@verify');
+        $router->put('/update', 'FriendController@update');
     });
 });

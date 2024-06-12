@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ApiCodeEnum;
+use App\Exceptions\BusinessException;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 
@@ -77,6 +78,7 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws BusinessException
      * @author yjf
      * @date 2024-05-10 11:33
      */
@@ -85,5 +87,17 @@ class UserController extends Controller
         $this->params['keywords'] = $keywords;
         $home = $this->userService->home($this->params);
         return $this->success($home, $request);
+    }
+
+    /**
+     * 我
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $userId = $this->params['user']->id;
+        $me = $this->userService->me($userId);
+        return $this->success($me, $request);
     }
 }

@@ -3,6 +3,7 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use App\Enums\RedisEnum;
 
 return [
 
@@ -81,7 +82,7 @@ return [
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
         ],
 
@@ -107,6 +108,13 @@ return [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
         ],
+
+        RedisEnum::LOG_CHANNEL => [
+            'driver' => RedisEnum::LOG_CHANNEL,
+            'level' => 'debug',
+            'path' => storage_path('logs/redis.log'),
+            'days' => 180,
+        ]
     ],
 
 ];

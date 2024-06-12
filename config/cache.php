@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Str;
+use App\Enums\Redis\UserEnum;
+use App\Enums\Redis\FriendEnum;
+use App\Enums\Redis\GroupEnum;
 
 return [
 
@@ -17,7 +20,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_DRIVER', 'file'),
+    'default' => env('CACHE_DRIVER', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -75,6 +78,20 @@ return [
             'connection' => env('CACHE_REDIS_CONNECTION', 'cache'),
         ],
 
+        UserEnum::STORE => [
+            'driver' => 'redis',
+            'connection' => env('CACHE_REDIS_CONNECTION', UserEnum::STORE),
+        ],
+
+        FriendEnum::STORE => [
+            'driver' => 'redis',
+            'connection' => env('CACHE_REDIS_CONNECTION', FriendEnum::STORE),
+        ],
+
+        GroupEnum::STORE => [
+            'driver' => 'redis',
+            'connection' => env('CACHE_REDIS_CONNECTION', GroupEnum::STORE),
+        ],
     ],
 
     /*
@@ -88,9 +105,9 @@ return [
     |
     */
 
-    'prefix' => env(
-        'CACHE_PREFIX',
-        Str::slug(env('APP_NAME', 'lumen'), '_') . '_cache'
-    ),
+//    'prefix' => env(
+//        'CACHE_PREFIX',
+//        Str::slug(env('APP_NAME', 'lumen'), '_') . '_cache'
+//    ),
 
 ];
