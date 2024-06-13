@@ -11,23 +11,47 @@ use Workerman\Worker;
 class Workerman extends Command
 {
 
-    protected $signature = 'workerman {action} {--d}';
+    protected $signature = 'workerman
+                            {action : action}
+                            {--start=all : start}
+                            {--d : daemon mode}';
 
     protected $description = 'Start a Workerman server.';
 
-    public function handle()
+    public function handle(): void
     {
         global $argv;
         $action = $this->argument('action');
 
-        $argv[0] = 'wk';
+        /**
+         * 针对 Windows 一次执行，无法注册多个协议的特殊处理
+         */
+        if ($action === 'single') {
+            $start = $this->option('start');
+            if ($start === 'register') {
+                $this->startRegister();
+            } elseif ($start === 'gateway') {
+                $this->startGateWay();
+            } elseif ($start === 'worker') {
+                $this->startBusinessWorker();
+            }
+            Worker::runAll();
+
+            return;
+        }
+
+        /**
+         * argv[0] 默认是，当前文件，可以不修改
+         */
+        //$argv[0] = 'wk';
         $argv[1] = $action;
+        // 控制是否进入 daemon 模式
         $argv[2] = $this->option('d') ? '-d' : '';
 
         $this->start();
     }
 
-    private function start()
+    private function start(): void
     {
         $this->startGateWay();
         $this->startBusinessWorker();
@@ -35,62 +59,29 @@ class Workerman extends Command
         Worker::runAll();
     }
 
-    private function startBusinessWorker()
+    private function startBusinessWorker(): void
     {
-        // bussinessWorker 进程
         $worker = new BusinessWorker();
-        // worker名称
-        $worker->name = 'YourAppBusinessWorker';
-        // bussinessWorker进程数量
-        $worker->count = 4;
-        // 服务注册地址
+        $worker->name = 'BusinessWorker';
+        $worker->count = 1;
         $worker->registerAddress = '127.0.0.1:1236';
         $worker->eventHandler = \App\Workerman\Events::class;
     }
 
-    private function startGateWay()
+    private function startGateWay(): void
     {
-        // gateway 进程，这里使用Text协议，可以用telnet测试
-        $gateway = new Gateway("Websocket://0.0.0.0:8282");
-        // gateway名称，status方便查看
-        $gateway->name = 'YourAppGateway';
-        // gateway进程数
-        $gateway->count = 4;
-        // 本机ip，分布式部署时使用内网ip
+        $gateway = new Gateway("websocket://0.0.0.0:2346");
+        $gateway->name = 'Gateway';
+        $gateway->count = 1;
         $gateway->lanIp = '127.0.0.1';
-        // 内部通讯起始端口，假如$gateway->count=4，起始端口为4000
-        // 则一般会使用4000 4001 4002 4003 4个端口作为内部通讯端口
-        $gateway->startPort = 2900;
-        // 服务注册地址
+        $gateway->startPort = 2300;
+        $gateway->pingInterval = 30;
+        $gateway->pingNotResponseLimit = 0;
+        $gateway->pingData = '{"type":"@heart@"}';
         $gateway->registerAddress = '127.0.0.1:1236';
-
-        session_start();
-
-        // 心跳间隔
-        //$gateway->pingInterval = 10;
-        // 心跳数据
-        //$gateway->pingData = '{"type":"ping"}';
-
-        /*
-        // 当客户端连接上来时，设置连接的onWebSocketConnect，即在websocket握手时的回调
-        $gateway->onConnect = function($connection)
-        {
-            $connection->onWebSocketConnect = function($connection , $http_header)
-            {
-                // 可以在这里判断连接来源是否合法，不合法就关掉连接
-                // $_SERVER['HTTP_ORIGIN']标识来自哪个站点的页面发起的websocket链接
-                if($_SERVER['HTTP_ORIGIN'] != 'http://kedou.workerman.net')
-                {
-                    $connection->close();
-                }
-                // onWebSocketConnect 里面$_GET $_SERVER是可用的
-                // var_dump($_GET, $_SERVER);
-            };
-        };
-        */
     }
 
-    private function startRegister()
+    private function startRegister(): void
     {
         new Register('text://0.0.0.0:1236');
     }

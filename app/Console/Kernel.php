@@ -26,6 +26,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //
-        $schedule->command('Friend:apply:overdue')->everyMinute()->runInBackground();
+        $schedule->command('Friend:apply:overdue')->everyMinute()->runInBackground()->withoutOverlapping(1);
     }
 }
