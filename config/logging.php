@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\WorkerManEnum;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -110,10 +111,17 @@ return [
         ],
 
         RedisEnum::LOG_CHANNEL => [
-            'driver' => RedisEnum::LOG_CHANNEL,
+            'driver' => 'daily',
             'level' => 'debug',
             'path' => storage_path('logs/redis.log'),
-            'days' => 180,
+            'days' => 14,
+        ],
+
+        WorkerManEnum::LOG_CHANNEL => [
+            'driver' => 'daily',
+            'level' => 'debug',
+            'path' => storage_path('logs/workerman.log'),
+            'days' => 14,
         ]
     ],
 
