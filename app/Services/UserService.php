@@ -76,36 +76,36 @@ class UserService extends BaseService
         $self = $user->id == $userId;
         $relationship = 'owner';
         $source = $isMobile ? 'mobile' : 'wechat';
-        $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'setting' => [], 'keywords' => $params['keywords'], 'final_nickname' => $user->nickname];
+        $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'setting' => [], 'keywords' => $params['keywords'], 'display_nickname' => $user->nickname];
         $homeInfo = array_merge($homeInfo, $user->toArray());
         $sourceConfig = config('user.source');
         if (!$self) {
             $relationship = FriendEnum::TYPE_APPLY;
-            $friend = Friend::query()->where('owner', $userId)->where('friend', $user->id)->first();
-            $owner = Friend::query()->where('owner', $user->id)->where('friend', $userId)->first();
+            $owner = Friend::query()->where('owner', $userId)->where('friend', $user->id)->first();
+            $friend = Friend::query()->where('owner', $user->id)->where('friend', $userId)->first();
             $homeInfo['source_text'] = '通过' . $sourceConfig[$source] . '搜索';
             $homeInfo['check_msg'] = '';
-            if ($owner && $owner->status == FriendEnum::STATUS_CHECK) {
-                $relationship = 'go_check';
-                $homeInfo['source_text'] = '对方通过' . $sourceConfig[$owner->source] . '搜索';
-                $homeInfo['remark'] = $owner->remark;
-                $homeInfo['check_msg'] = "{$owner->nickname}：{$owner->remark}";
-            }
-            if ($friend && $friend->status == FriendEnum::STATUS_PASS) {
-                $relationship = 'friend';
-                $prefix = $owner->created_at > $friend->created_at ? '' : '对方';
-                $homeInfo['source_text'] = $prefix . '通过搜索' . $sourceConfig[$friend->source] . '添加';
-                $homeInfo['setting'] = $friend->setting;
-            }
             if ($friend && $friend->status == FriendEnum::STATUS_CHECK) {
-                $relationship = 'wait_check';
+                $relationship = 'go_check';
+                $homeInfo['source_text'] = '对方通过' . $sourceConfig[$friend->source] . '搜索';
                 $homeInfo['remark'] = $friend->remark;
-                $homeInfo['source_text'] = '通过' . $sourceConfig[$friend->source] . '搜索';
-                $homeInfo['check_msg'] = "我：{$friend->remark}";
+                $homeInfo['check_msg'] = "{$friend->nickname}：{$friend->remark}";
             }
-            if ($friend && $friend->nickname != $homeInfo['nickname']) $homeInfo['final_nickname'] = $friend->nickname;
-            if ($friend) {
-                $homeInfo['source'] = $friend->source;
+            if ($owner && $owner->status == FriendEnum::STATUS_PASS) {
+                $relationship = 'friend';
+                $prefix = $friend->created_at > $owner->created_at ? '' : '对方';
+                $homeInfo['source_text'] = $prefix . '通过搜索' . $sourceConfig[$owner->source] . '添加';
+                $homeInfo['setting'] = $owner->setting;
+            }
+            if ($owner && $owner->status == FriendEnum::STATUS_CHECK) {
+                $relationship = 'wait_check';
+                $homeInfo['remark'] = $owner->remark;
+                $homeInfo['source_text'] = '通过' . $sourceConfig[$owner->source] . '搜索';
+                $homeInfo['check_msg'] = "我：{$owner->remark}";
+            }
+            if ($owner && $owner->nickname != $homeInfo['nickname']) $homeInfo['display_nickname'] = $owner->nickname;
+            if ($owner) {
+                $homeInfo['source'] = $owner->source;
             }
         } else {
             $homeInfo['setting'] = $user->setting;

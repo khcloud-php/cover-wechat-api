@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Workerman;
+namespace App\Workerman\Action;
 
 class Base
 {

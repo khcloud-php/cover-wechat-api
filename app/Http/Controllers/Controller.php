@@ -18,7 +18,7 @@ class Controller extends BaseController
     }
 
     //
-    public function success(array $data = [], Request $request, string|int $code = ApiCodeEnum::SUCCESS_DEFAULT)
+    public function success(array $data, Request $request, string|int $code = ApiCodeEnum::SUCCESS_DEFAULT): \Illuminate\Http\JsonResponse
     {
         $message = '';
         if (stripos($code, '|') !== false) {

@@ -27,6 +27,10 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->get('/{keywords}/home', 'UserController@home');
     });
 
+    $router->group(['prefix' => 'messages'], function ($router) {
+        $router->post('/send', 'MessageController@send');
+    });
+
     $router->group(['prefix' => 'friends'], function ($router) {
         $router->get('/list', 'FriendController@list');
         $router->get('/apply-list', 'FriendController@applyList');
