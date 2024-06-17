@@ -2,14 +2,13 @@
 
 /**
  *   const CLIENT_HTTP_UNAUTHORIZED_BLACKLISTED = 401201;//账号在其他设备登录，请重新登录
-const CLIENT_HTTP_UNAUTHORIZED = 401001; // 授权失败，请先登录
-const CLIENT_BOUND_ERROR = 400106; //已被绑定
-const CLIENT_NOT_FOUND_ERROR = 404001;//没有找到该页面
-const SERVICE_50023 = 50023;//付款连接失效，请到商品页面重新选择付款
+ * const CLIENT_HTTP_UNAUTHORIZED = 401001; // 授权失败，请先登录
+ * const CLIENT_BOUND_ERROR = 400106; //已被绑定
+ * const CLIENT_NOT_FOUND_ERROR = 404001;//没有找到该页面
+ * const SERVICE_50023 = 50023;//付款连接失效，请到商品页面重新选择付款
  *     const CLIENT_VALIDATION_ERROR = 422001; //表单验证错误
  *  const SYSTEM_CACHE_CONFIG_ERROR = 500003; //系统缓存配置出错
-const SYSTEM_CACHE_MISSED_ERROR = 500004; //系统缓存失效出错
-
+ * const SYSTEM_CACHE_MISSED_ERROR = 500004; //系统缓存失效出错
  */
 
 namespace App\Enums;
@@ -71,7 +70,8 @@ class ApiCodeEnum
     const SERVICE_CODE_ERROR = 500208; // 验证码不正确
     const SERVICE_ACCOUNT_ALREADY_EXISTS = '500209|账号已存在'; // 账号已存在.
     const SERVICE_FRIEND_ALREADY_EXISTS = '500210|好友已存在'; // 好友已存在.
-
+    const SERVICE_FRIEND_NOT_EXISTS = '500211|对方不是你的好友'; // 对方不是你的好友.
+    const SERVICE_GROUP_MEMBER_NOT_EXISTS = '500212|你不是群成员';
     // 400 支付
     const PAY_TIME_ERROR = 500404; // 时间异常
     const PAY_TIMEOUT_ERROR = 500405; // 超过限定时间

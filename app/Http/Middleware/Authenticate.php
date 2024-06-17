@@ -3,13 +3,14 @@
 namespace App\Http\Middleware;
 
 use App\Enums\ApiCodeEnum;
-use App\Services\BaseService;
+use App\Support\Traits\ServiceException;
 use Closure;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Support\Facades\Crypt;
 
-class Authenticate extends BaseService
+class Authenticate
 {
+    use ServiceException;
     /**
      * The authentication guard factory instance.
      *

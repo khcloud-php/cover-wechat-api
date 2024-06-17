@@ -14,7 +14,7 @@
 */
 
 //用户模块路由
-$router->group(['prefix' => 'users'], function ($router) {
+$router->group(['prefix' => 'user'], function ($router) {
     $router->post('/register', 'UserController@register');
     $router->post('/login', 'UserController@login');
     $router->post('/logout', 'UserController@logout');
@@ -22,16 +22,22 @@ $router->group(['prefix' => 'users'], function ($router) {
 
 
 $router->group(['middleware' => 'auth:api'], function ($router) {
-    $router->group(['prefix' => 'users'], function ($router) {
+    $router->group(['prefix' => 'user'], function ($router) {
         $router->get('/me', 'UserController@me');
         $router->get('/{keywords}/home', 'UserController@home');
     });
 
-    $router->group(['prefix' => 'messages'], function ($router) {
-        $router->post('/send', 'MessageController@send');
+    $router->group(['prefix' => 'chat'], function ($router) {
+        $router->get('/list', 'ChatController@list');
     });
 
-    $router->group(['prefix' => 'friends'], function ($router) {
+    $router->group(['middleware' => 'message', 'prefix' => 'message'], function ($router) {
+        $router->post('/send', 'MessageController@send');
+        $router->put('/read', 'MessageController@read');
+    });
+    $router->get('message/list', 'MessageController@list');
+
+    $router->group(['prefix' => 'friend'], function ($router) {
         $router->get('/list', 'FriendController@list');
         $router->get('/apply-list', 'FriendController@applyList');
         $router->delete('/delete-apply/{id}', 'FriendController@deleteApply');

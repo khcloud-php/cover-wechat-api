@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Database\FriendEnum;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Friend extends Base
@@ -13,7 +14,7 @@ class Friend extends Base
      */
     protected $fillable = ['nickname', 'type', 'status', 'unread', 'remark', 'setting'];
 
-     use SoftDeletes;
+    use SoftDeletes;
 
     protected $casts = [
         'setting' => 'json'
@@ -27,5 +28,15 @@ class Friend extends Base
     public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'owner', 'id');
+    }
+
+    public static function checkIsFriend(int|string $owner, int|string $friend, $returnFriend = false): bool|array
+    {
+        $friend = Friend::query()->where('friend', $owner)
+            ->where('owner', $friend)
+            ->where('status', FriendEnum::STATUS_PASS)
+            ->first(['nickname']);
+        $isFriend = $friend && !$friend->deleted;
+        return $returnFriend ? [$isFriend, $friend] : $isFriend;
     }
 }

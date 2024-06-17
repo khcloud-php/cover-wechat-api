@@ -55,12 +55,12 @@ class Handler extends ExceptionHandler
             $exString = sprintf(" %s \n code: %s \n file: %s \n line: %s", $message, $code, $file, $line);
             $request = request();
             switch (class_basename(get_class($exception))) {
-                    //                case 'PayException':
-                    //                    $title = "支付异常";
-                    //                    break;
-                    //                case 'SocialiteException':
-                    //                    $title = "社区化异常";
-                    //                    break;
+                //                case 'PayException':
+                //                    $title = "支付异常";
+                //                    break;
+                //                case 'SocialiteException':
+                //                    $title = "社区化异常";
+                //                    break;
                 default:
                     $title = "系统异常";
             }
@@ -109,16 +109,16 @@ class Handler extends ExceptionHandler
         }
 
         // 自定义错误异常抛出
-        if ($exception instanceof BusinessException) {
-            // Log::channel(LoggerEnum::LOGGER_DEFAULT)->error(sprintf('code:%s msg:%s', $exception->getCode(), $exception->getMessage()), $request->input());
-
-            return response()->json([
-                'code' => $exception->getCode(),
-                'msg' => $exception->getMessage(),
-                'data' => null,
-                'request_id' => $request->offsetGet('request_id')
-            ]);
-        }
+//        if ($exception instanceof BusinessException) {
+//            // Log::channel(LoggerEnum::LOGGER_DEFAULT)->error(sprintf('code:%s msg:%s', $exception->getCode(), $exception->getMessage()), $request->input());
+//
+//            return response()->json([
+//                'code' => $exception->getCode(),
+//                'msg' => $exception->getFile() . $exception->getLine() . ':' . $exception->getMessage(),
+//                'data' => null,
+//                'request_id' => $request->offsetGet('request_id')
+//            ]);
+//        }
         return parent::render($request, $exception);
     }
 }

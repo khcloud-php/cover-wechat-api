@@ -18,4 +18,9 @@ class Group extends Base
     protected $casts = [
         'setting' => 'json'
     ];
+
+    public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(GroupUser::class, 'user_id', 'id');
+    }
 }
