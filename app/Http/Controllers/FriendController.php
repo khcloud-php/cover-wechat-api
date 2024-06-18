@@ -82,6 +82,8 @@ class FriendController extends Controller
     {
         $this->validate($request, [
             'source' => 'required|string',
+            'relationship' => 'required|string',
+            'keywords' => 'required|string',
         ]);
         $confirm = $this->friendService->showConfirm($this->params);
         return $this->success($confirm, $request);
@@ -99,7 +101,7 @@ class FriendController extends Controller
     public function apply(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'friend' => 'required|int',
+            'keywords' => 'required|string',
             'nickname' => 'required|string',
             'setting' => 'required|array'
         ]);

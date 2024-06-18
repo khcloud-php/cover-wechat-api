@@ -81,40 +81,32 @@ class FriendService extends BaseService
     public function search(array $params): array
     {
         $keywords = $params['keywords'];
-        $userId = $params['user']->id;
         //黑名单
-
         $isMobile = is_mobile($keywords);
-        if ($isMobile) {
-            $friend = User::query()->where('mobile', $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => ['Mobile' => 1]]])->get();
-        } else {
-            $friend = User::query()->where('wechat', $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => ['Wechat' => 1]]])->get();
-        }
+        $source = $isMobile ? FriendEnum::SOURCE_MOBILE : FriendEnum::SOURCE_WECHAT;
+        $friend = User::query()->where($source, $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->get(['id', 'nickname', 'avatar']);
         if ($friend) {
             $friend = $friend->toArray();
             foreach ($friend as &$v) {
-                $v['source'] = $isMobile ? 'mobile' : 'wechat';
-                unset($v['token'], $v['token_expire_in']);
+                $v['keywords'] = $keywords;
             }
         }
         return $friend ?: [];
     }
 
+    /**
+     * @throws BusinessException
+     */
     public function showConfirm(array $params): array
     {
         $confirm = [];
         $source = $params['source'];
         $relationship = $params['relationship'];
-        if (empty($relationship) || $relationship == 'friend') {
-            $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
-        }
-        if (empty($params['keywords'])) {
+        if ($relationship == 'friend') {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
         $user = User::query()->where($source, $params['keywords'])->first(['id', 'nickname']);
         if (empty($user)) $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_NOT_FOUND);
-        $confirm['friend'] = $user->toArray();
-
         $confirm['nickname'] = $user->nickname;
         $confirm['setting'] = config('user.friend.setting');
         if ($relationship !== 'go_check') {
@@ -130,7 +122,11 @@ class FriendService extends BaseService
     public function apply(array $params): array
     {
         //黑名单
-
+        $keywords = $params['keywords'];
+        $isMobile = is_mobile($keywords);
+        $source = $isMobile ? FriendEnum::SOURCE_MOBILE : FriendEnum::SOURCE_WECHAT;
+        $params['friend'] = User::query()->where($source, $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->value('id');
+        if (!$params['friend']) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         $friend = Friend::query()->where('owner', $params['user']->id)->where('friend', $params['friend'])->first();
         $owner = Friend::query()->where('owner', $params['friend'])->where('friend', $params['user']->id)->first();
 
