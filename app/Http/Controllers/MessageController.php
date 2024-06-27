@@ -60,4 +60,17 @@ class MessageController extends Controller
         $this->messageService->read($this->params);
         return $this->success([], $request);
     }
+
+    /**
+     * 消息撤回
+     * @throws ValidationException
+     */
+    public function undo(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'id' => 'required'
+        ]);
+        $this->messageService->undo($this->params);
+        return $this->success([], $request);
+    }
 }

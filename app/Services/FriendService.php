@@ -18,13 +18,18 @@ class FriendService extends BaseService
         $userId = $params['user']->id;
         $friendList = Cache::store(RedisFriendEnum::STORE)->rememberForever(sprintf(RedisFriendEnum::LIST, $userId), function () use ($userId) {
             return Friend::query()->with(['friend' => function ($query) {
-                $query->select('id', 'nickname', 'avatar', 'mobile', 'wechat');
-            }])->where('owner', $userId)->where('type', FriendEnum::TYPE_VERIFY)->where('status', FriendEnum::STATUS_PASS)->get()->toArray();
+                $query->select('id', 'nickname', 'avatar', 'wechat', 'mobile');
+            }])->where('owner', $userId)
+                ->where('status', FriendEnum::STATUS_PASS)
+                ->get(['id', 'owner', 'friend', 'nickname', 'source'])->toArray();
         });
 
         foreach ($friendList as &$friend) {
-            $friend['friend']['nickname'] = $friend['nickname'] ?: $friend['friend']['nickname'];
+            $friend['nickname'] = $friend['nickname'] ?: $friend['to']['nickname'];
+            $friend['avatar'] = $friend['friend']['avatar'];
             $friend['keywords'] = $friend['friend'][$friend['source']];
+            $friend['checked'] = false;
+            $friend['friend'] = $friend['friend']['id'];
         }
         return group_by_first_char($friendList, 'nickname');
     }
@@ -37,7 +42,9 @@ class FriendService extends BaseService
                 $query->select('id', 'nickname', 'avatar', 'mobile', 'wechat');
             }, 'owner' => function ($query) {
                 $query->select('id', 'nickname', 'avatar', 'mobile', 'wechat');
-            }])->where('display', 1)->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")->get()->toArray();
+            }])->where('display', 1)
+                ->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")
+                ->get()->toArray();
         });
 
         $day = 86400;
@@ -105,7 +112,7 @@ class FriendService extends BaseService
         if ($relationship == 'friend') {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
-        $user = User::query()->where($source, $params['keywords'])->first(['id', 'nickname']);
+        $user = User::query()->where($source, $params['keywords'])->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->first(['id', 'nickname']);
         if (empty($user)) $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_NOT_FOUND);
         $confirm['nickname'] = $user->nickname;
         $confirm['setting'] = config('user.friend.setting');

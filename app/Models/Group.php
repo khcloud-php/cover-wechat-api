@@ -19,8 +19,13 @@ class Group extends Base
         'setting' => 'json'
     ];
 
-    public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function friend(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->hasMany(GroupUser::class, 'user_id', 'id');
+        return $this->belongsTo(Friend::class, 'send_user', 'friend');
+    }
+
+    public function send(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'send_user', 'id');
     }
 }

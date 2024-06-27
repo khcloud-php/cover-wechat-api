@@ -73,7 +73,7 @@ class Handler extends ExceptionHandler
                 'exception' => $exString,
                 'created_at' => time()
             ];
-            ExceptionLog::create($data);
+            ExceptionLog::query()->insert($data);
             //            $title = '**<font color="darkred"> ' . $title . ' </font>**';
             //            (new Robot())->notify(new Warning($title . "  \n\n  " . implode("  \n\n  ", $messageArray)));
         }
@@ -109,16 +109,16 @@ class Handler extends ExceptionHandler
         }
 
         // 自定义错误异常抛出
-//        if ($exception instanceof BusinessException) {
-//            // Log::channel(LoggerEnum::LOGGER_DEFAULT)->error(sprintf('code:%s msg:%s', $exception->getCode(), $exception->getMessage()), $request->input());
-//
-//            return response()->json([
-//                'code' => $exception->getCode(),
-//                'msg' => $exception->getFile() . $exception->getLine() . ':' . $exception->getMessage(),
-//                'data' => null,
-//                'request_id' => $request->offsetGet('request_id')
-//            ]);
-//        }
+        if ($exception instanceof BusinessException) {
+            // Log::channel(LoggerEnum::LOGGER_DEFAULT)->error(sprintf('code:%s msg:%s', $exception->getCode(), $exception->getMessage()), $request->input());
+
+            return response()->json([
+                'code' => $exception->getCode(),
+                'msg' => $exception->getFile() . $exception->getLine() . ':' . $exception->getMessage(),
+                'data' => null,
+                'request_id' => $request->offsetGet('request_id')
+            ]);
+        }
         return parent::render($request, $exception);
     }
 }

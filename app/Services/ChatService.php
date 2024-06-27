@@ -4,111 +4,125 @@ namespace App\Services;
 
 use App\Enums\Database\MessageEnum;
 use App\Models\Friend;
-use App\Models\Group;
 use App\Models\GroupUser;
-use App\Models\Message;
-use App\Models\User;
 
 class ChatService extends BaseService
 {
     public function list(array $params): array
     {
         $userId = $params['user']->id;
-        $chatList = [];
-        $lastMessages = Message::query()
-            ->whereRaw("(from_user = {$userId} OR to_user = {$userId})")
-            ->where('is_last', 1)
-            ->get(['id', 'from_user', 'to_user', 'content', 'type', 'is_group', 'is_undo', 'at_users', 'pid', 'created_at']);
-        if ($lastMessages->isEmpty()) return $chatList;
-        $privateTo = $groupTo = [];
-        foreach ($lastMessages as $message) {
-            if ($message['is_group'] == MessageEnum::GROUP) {
-                $groupTo[] = $message['to_user'];
-            } else {
-                $privateTo[] = $message['from_user'] == $userId ? $message['to_user'] : $message['from_user'];
-            }
-        }
-        $privateTo = array_unique($privateTo);
-        $groupTo = array_unique($groupTo);
-        $userList = $groupList = [];
-        //私聊处理
-        if ($privateTo) {
-            $unreadList = Message::query()
-                ->selectRaw('count(is_read) as unread,from_user')
-                ->whereIn('from_user', $privateTo)
-                ->where('to_user', $userId)
-                ->where('is_read', 0)
-                ->groupBy('from_user')
-                ->get()
-                ->toArray();
-            $unreadList = array_column($unreadList, null, 'from_user');
-            $userList = User::query()->whereIn('id', $privateTo)->get(['id', 'nickname', 'avatar'])->toArray();
-            $friendList = Friend::query()->where('owner', $userId)->whereIn('friend', $privateTo)->get(['friend', 'nickname'])->toArray();
-            $friendList = array_column($friendList, null, 'friend');
-            $userList = array_column($userList, null, 'id');
-            foreach ($userList as $key => &$user) {
-                $user['unread'] = 0;
-                $user['avatars'] = [$user['avatar']];
-                unset($user['avatar'], $user['id']);
-                isset($friendList[$key]) && $user['nickname'] = $friendList[$key]['nickname'] ?: $user['nickname'];
-                isset($unreadList[$key]) && $user['unread'] = $unreadList[$key]['unread'];
 
-            }
-            unset($user);
-        }
+        //私聊
+        $privateChatList = Friend::query()
+            ->with(['friend' => function ($query) {
+                return $query->select(['id', 'avatar']);
+            }])
+            ->select(['content', 'time', 'unread', 'top', 'nickname', 'friend'])
+            ->where('owner', $userId)
+            ->where('display', 1)
+            ->get()->toArray();
 
-        //群聊处理
-        if ($groupTo) {
-            $groupUserList = GroupUser::query()->whereIn('group_id', $groupTo)
-                ->where('user_id', $userId)->get(['group_id', 'name', 'unread'])->toArray();
-            $groupUserList = array_column($groupUserList, null, 'group_id');
-            $groupList = Group::query()->with(['users' => function ($query) {
-                $query->with(['user' => function ($query) {
-                    $query->select(['avatar']);
-                }])->orderBy('role')->orderBy('created_at', 'desc')
-                    ->limit(4)->get(['group_id', 'user_id'])->toArray();
-            }])->whereIn('id', $groupTo)->get(['id', 'name'])->toArray();
-            $groupList = array_column($groupList, null, 'id');
-            foreach ($groupList as $key => &$group) {
-                $group['unread'] = 0;
-                $group['nickname'] = $group['name'];
-                if (isset($groupUserList[$key])) {
-                    $groupUser = $groupUserList[$key];
-                    $group['unread'] = $groupUser['unread'];
-                    $group['nickname'] = $groupUser['name'] ?: $group['name'];
-                }
-                $group['avatars'] = [];
-                foreach ($group['users'] as $user) {
-                    $group['avatars'][] = $user['user']['avatar'];
-                }
-                unset($group['users'], $group['id']);
-            }
-            unset($group);
+        foreach ($privateChatList as &$item) {
+            $item['to'] = $item['friend'];
+            $item['id'] = md5(MessageEnum::PRIVATE . $userId . $item['to']['id']);
+            $item['to']['avatars'] = [$item['to']['avatar']];
+            $item['from'] = $item['to'];
+            $item['to_user'] = $item['friend'];
+            $item['is_group'] = MessageEnum::PRIVATE;
+            $item['muted'] = false;
+            unset($item['to'], $item['from']['avatar'], $item['friend']);
         }
+        unset($item);
 
-        foreach ($lastMessages as $message) {
-            $item = [
-                'id' => $message['id'],
-                'owner' => $message['from_user'] == $userId ? $message['from_user'] : $message['to_user'],
-                'friend' => $message['from_user'] != $userId ? $message['from_user'] : $message['to_user'],
-                'avatars' => [],
-                'nickname' => '',
-                'content' => $message['content'],
-                'unread' => 0,
-                'time' => strtotime($message['created_at']),
-                'top' => 0,
-                'is_group' => $message['is_group'],
-                'muted' => false
+        //群聊
+        $groupChatList = GroupUser::query()
+            ->with(['group' => function ($query) {
+                return $query->with(['send' => function ($query) {
+                    return $query->select(['id', 'nickname']);
+                }, 'friend' => function ($query) {
+                    return $query->select(['friend', 'nickname']);
+                }])->select(['id', 'content', 'time', 'send_user']);
+            }])
+            ->select(['unread', 'top', 'group_id', 'user_id', 'name', 'nickname'])
+            ->where('user_id', $userId)
+            ->where('display', 1)
+            ->get()->toArray();
+
+        //群聊头像
+        $groupIds = array_column($groupChatList, 'group_id');
+        $groupUserList = GroupUser::query()
+            ->with(['user' => function ($query) {
+                return $query->select(['id', 'avatar']);
+            }])
+            ->where('group_id', $groupIds)
+            ->orderByDesc('group_id')
+            ->orderByDesc('created_at')
+            ->get(['group_id', 'user_id'])->toArray();
+        $groupAvatars = [];
+        foreach ($groupUserList as $groupUser) {
+            //群聊最多四个头像
+            if (isset($groupAvatars[$groupUser['group_id']]) && count($groupAvatars[$groupUser['group_id']]) > 3) {
+                continue;
+            }
+            $groupAvatars[$groupUser['group_id']][] = $groupUser['user']['avatar'];
+        }
+        unset($groupUserList, $groupUser);
+
+        foreach ($groupChatList as &$item) {
+            $item['id'] = md5(MessageEnum::GROUP . $userId . $item['group']['id']);
+            $nickname = $item['nickname'];
+            if (empty($nickname)) {
+                $nickname = $item['group']['friend']['nickname'] ?: $item['group']['send']['nickname'];
+            }
+            $item['nickname'] = $item['name'];
+            $item['content'] = $nickname . '：' . $item['group']['content'];
+            $item['time'] = $item['group']['time'];
+            $item['to_user'] = $item['group_id'];
+            $item['is_group'] = MessageEnum::GROUP;
+            $item['muted'] = false;
+            $item['from'] = [
+                'id' => $item['group_id'],
+                'avatars' => $groupAvatars[$item['group_id']] ?? []
             ];
-            if ($message['is_group'] == MessageEnum::GROUP) {
-                isset($groupList[$message['to_user']]) && $item = array_merge($item, $groupList[$message['to_user']]);
-            } else {
-                isset($userList[$message['to_user']]) && $item = array_merge($item, $userList[$message['to_user']]);
-                isset($userList[$message['from_user']]) && $item = array_merge($item, $userList[$message['from_user']]);
-            }
-            $chatList[] = $item;
+            unset($item['send'], $item['group'], $item['group_id'], $item['from_user'], $item['user_id'], $item['name']);
         }
 
-        return $chatList;
+        return array_merge($privateChatList, $groupChatList);
+    }
+
+    public function info(array $params): array
+    {
+        $fromUser = $params['user']->id;
+        $isGroup = $params['is_group'];
+        $toUser = $params['to_user'];
+        if ($isGroup == MessageEnum::GROUP) {
+            $groupUser = GroupUser::query()
+                ->with(['group' => function ($query) {
+                    return $query->select(['id', 'name', 'setting']);
+                }])
+                ->where('group_id', $toUser)
+                ->where('user_id', $fromUser)
+                ->first(['group_id', 'user_id', 'name', 'setting'])->toArray();
+            $userCnt = GroupUser::query()->where('group_id', $toUser)->count();
+            $chatInfo = [
+                'nickname' => ($groupUser['group']['name'] ?: $groupUser['name']) . "({$userCnt})",
+                'from_setting' => $groupUser['setting'],
+                'to_setting' => $groupUser['group']['setting'],
+            ];
+        } else {
+            $friend = Friend::query()
+                ->with(['to' => function ($query) {
+                    return $query->select(['id', 'nickname', 'setting']);
+                }])
+                ->where('owner', $fromUser)
+                ->where('friend', $toUser)
+                ->first(['owner', 'friend', 'nickname', 'setting'])->toArray();
+            $chatInfo = [
+                'nickname' => $friend['nickname'] ?: $friend['to']['nickname'],
+                'from_setting' => $friend['setting'],
+                'to_setting' => $friend['to']['setting']
+            ];
+        }
+        return $chatInfo;
     }
 }

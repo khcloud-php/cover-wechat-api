@@ -20,4 +20,14 @@ class ChatController extends Controller
         $list = $this->chatService->list($this->params);
         return $this->success($list, $request);
     }
+
+    public function info(Request $request)
+    {
+        $this->validate($request, [
+            'to_user' => 'required',
+            'is_group' => 'required'
+        ]);
+        $chatInfo = $this->chatService->info($this->params);
+        return $this->success($chatInfo, $request);
+    }
 }

@@ -21,7 +21,7 @@ class Events
     {
     }
 
-    public static function onMessage($clientId, $message)
+    public static function onMessage($clientId, $message): void
     {
         $data = json_decode($message, true);
         $who = ucfirst($data['who']);
@@ -29,15 +29,15 @@ class Events
         $action = $data['action'];
         Log::channel(WorkerManEnum::LOG_CHANNEL)->info("{$class}->{$action} 收到消息：{$message}");
         if (class_exists($class) && method_exists($class, $action)) {
-            $class::getInstance()->$action($clientId, $data['data']);
+            (new $class)->$action($clientId, $data['data']);
         } else {
             Log::channel(WorkerManEnum::LOG_CHANNEL)->error("{$class}->{$action} 类或方法不存在");
         }
     }
 
-    public static function onClose($clientId)
+    public static function onClose($clientId): void
     {
         echo "{$clientId} 离线了\n";
-        User::getInstance()->logout($clientId);
+        (new User)->logout($clientId);
     }
 }

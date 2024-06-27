@@ -82,11 +82,18 @@ class UserController extends Controller
      * @author yjf
      * @date 2024-05-10 11:33
      */
-    public function home($keywords, Request $request): \Illuminate\Http\JsonResponse
+    public function home(string $keywords, Request $request): \Illuminate\Http\JsonResponse
     {
         $this->params['keywords'] = $keywords;
         $home = $this->userService->home($this->params);
         return $this->success($home, $request);
+    }
+
+    public function info(int $id, Request $request)
+    {
+        $this->params['id'] = $id;
+        $info = $this->userService->info($this->params);
+        return $this->success($info, $request);
     }
 
     /**
@@ -96,7 +103,7 @@ class UserController extends Controller
      */
     public function me(Request $request): \Illuminate\Http\JsonResponse
     {
-        $userId = $this->params['user']->id;
+        $userId = $request->user()->id;
         $me = $this->userService->me($userId);
         return $this->success($me, $request);
     }

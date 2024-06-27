@@ -29,6 +29,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
 
     $router->group(['prefix' => 'chat'], function ($router) {
         $router->get('/list', 'ChatController@list');
+        $router->get('/info', 'ChatController@info');
     });
 
     $router->group(['middleware' => 'message', 'prefix' => 'message'], function ($router) {
@@ -36,6 +37,10 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->put('/read', 'MessageController@read');
     });
     $router->get('message/list', 'MessageController@list');
+
+    $router->group(['prefix' => 'group'], function ($router) {
+        $router->post('/create', 'GroupController@create');
+    });
 
     $router->group(['prefix' => 'friend'], function ($router) {
         $router->get('/list', 'FriendController@list');
