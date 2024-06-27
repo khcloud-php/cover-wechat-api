@@ -25,7 +25,7 @@ class FriendService extends BaseService
         });
 
         foreach ($friendList as &$friend) {
-            $friend['nickname'] = $friend['nickname'] ?: $friend['to']['nickname'];
+            $friend['nickname'] = $friend['nickname'] ?: $friend['friend']['nickname'];
             $friend['avatar'] = $friend['friend']['avatar'];
             $friend['keywords'] = $friend['friend'][$friend['source']];
             $friend['checked'] = false;

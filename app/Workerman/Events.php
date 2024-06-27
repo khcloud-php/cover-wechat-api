@@ -5,6 +5,7 @@ namespace App\Workerman;
 use App\Enums\WorkerManEnum;
 use App\Workerman\Action\User;
 use Illuminate\Support\Facades\Log;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class Events
 {
@@ -35,9 +36,12 @@ class Events
         }
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public static function onClose($clientId): void
     {
-        echo "{$clientId} 离线了\n";
+        echo "clientId:{$clientId} 离线了\n";
         (new User)->logout($clientId);
     }
 }
