@@ -15,7 +15,7 @@ class ChatService extends BaseService
         //私聊
         $privateChatList = Friend::query()
             ->with(['friend' => function ($query) {
-                return $query->select(['id', 'avatar']);
+                $query->select(['id', 'avatar']);
             }])
             ->select(['content', 'time', 'unread', 'top', 'nickname', 'friend'])
             ->where('owner', $userId)
@@ -23,11 +23,10 @@ class ChatService extends BaseService
             ->get()->toArray();
 
         foreach ($privateChatList as &$item) {
-            $item['to'] = $item['friend'];
-            $item['id'] = md5(MessageEnum::PRIVATE . $userId . $item['to']['id']);
-            $item['to']['avatars'] = [$item['to']['avatar']];
-            $item['from'] = $item['to'];
-            $item['to_user'] = $item['friend'];
+            $item['id'] = md5(MessageEnum::PRIVATE . $userId . $item['friend']['id']);
+            $item['friend']['avatars'] = [$item['friend']['avatar']];
+            $item['from'] = $item['friend'];
+            $item['to_user'] = $item['from']['id'];
             $item['is_group'] = MessageEnum::PRIVATE;
             $item['muted'] = false;
             unset($item['to'], $item['from']['avatar'], $item['friend']);
@@ -37,10 +36,10 @@ class ChatService extends BaseService
         //群聊
         $groupChatList = GroupUser::query()
             ->with(['group' => function ($query) {
-                return $query->with(['send' => function ($query) {
-                    return $query->select(['id', 'nickname']);
+                $query->with(['send' => function ($query) {
+                    $query->select(['id', 'nickname']);
                 }, 'friend' => function ($query) {
-                    return $query->select(['friend', 'nickname']);
+                    $query->select(['friend', 'nickname']);
                 }])->select(['id', 'content', 'time', 'send_user']);
             }])
             ->select(['unread', 'top', 'group_id', 'user_id', 'name', 'nickname'])
@@ -52,9 +51,9 @@ class ChatService extends BaseService
         $groupIds = array_column($groupChatList, 'group_id');
         $groupUserList = GroupUser::query()
             ->with(['user' => function ($query) {
-                return $query->select(['id', 'avatar']);
+                $query->select(['id', 'avatar']);
             }])
-            ->where('group_id', $groupIds)
+            ->whereIn('group_id', $groupIds)
             ->orderByDesc('group_id')
             ->orderByDesc('created_at')
             ->get(['group_id', 'user_id'])->toArray();
@@ -98,29 +97,31 @@ class ChatService extends BaseService
         if ($isGroup == MessageEnum::GROUP) {
             $groupUser = GroupUser::query()
                 ->with(['group' => function ($query) {
-                    return $query->select(['id', 'name', 'setting']);
+                    $query->select(['id', 'name', 'setting']);
                 }])
                 ->where('group_id', $toUser)
                 ->where('user_id', $fromUser)
-                ->first(['group_id', 'user_id', 'name', 'setting'])->toArray();
+                ->first(['group_id', 'user_id', 'name', 'unread', 'setting'])->toArray();
             $userCnt = GroupUser::query()->where('group_id', $toUser)->count();
             $chatInfo = [
                 'nickname' => ($groupUser['group']['name'] ?: $groupUser['name']) . "({$userCnt})",
                 'from_setting' => $groupUser['setting'],
                 'to_setting' => $groupUser['group']['setting'],
+                'unread' => $groupUser['unread'],
             ];
         } else {
             $friend = Friend::query()
                 ->with(['to' => function ($query) {
-                    return $query->select(['id', 'nickname', 'setting']);
+                    $query->select(['id', 'nickname', 'setting']);
                 }])
                 ->where('owner', $fromUser)
                 ->where('friend', $toUser)
-                ->first(['owner', 'friend', 'nickname', 'setting'])->toArray();
+                ->first(['owner', 'friend', 'nickname', 'unread', 'setting'])->toArray();
             $chatInfo = [
                 'nickname' => $friend['nickname'] ?: $friend['to']['nickname'],
                 'from_setting' => $friend['setting'],
-                'to_setting' => $friend['to']['setting']
+                'to_setting' => $friend['to']['setting'],
+                'unread' => $friend['unread'],
             ];
         }
         return $chatInfo;

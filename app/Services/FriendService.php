@@ -8,6 +8,7 @@ use App\Enums\Redis\FriendEnum as RedisFriendEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\User;
+use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ class FriendService extends BaseService
         $userId = $params['user']->id;
         $friendList = Cache::store(RedisFriendEnum::STORE)->rememberForever(sprintf(RedisFriendEnum::LIST, $userId), function () use ($userId) {
             return Friend::query()->with(['friend' => function ($query) {
-                $query->select('id', 'nickname', 'avatar', 'wechat', 'mobile');
+                $query->select(['id', 'nickname', 'avatar', 'wechat', 'mobile']);
             }])->where('owner', $userId)
                 ->where('status', FriendEnum::STATUS_PASS)
                 ->get(['id', 'owner', 'friend', 'nickname', 'source'])->toArray();
@@ -39,9 +40,9 @@ class FriendService extends BaseService
         $userId = $params['user']->id;
         $applyList = Cache::store(RedisFriendEnum::STORE)->rememberForever(sprintf(RedisFriendEnum::APPLY_LIST, $userId), function () use ($userId) {
             return Friend::query()->with(['friend' => function ($query) {
-                $query->select('id', 'nickname', 'avatar', 'mobile', 'wechat');
+                $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
             }, 'owner' => function ($query) {
-                $query->select('id', 'nickname', 'avatar', 'mobile', 'wechat');
+                $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
             }])->where('display', 1)
                 ->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")
                 ->get()->toArray();
@@ -150,7 +151,7 @@ class FriendService extends BaseService
             $friend->nickname = $params['nickname'];
             $friend->remark = $params['remark'];
             $friend->setting = $params['setting'];
-
+            $friend->is_read = 0;
             //对方有你好友
             if ($owner && !$owner->deleted_at) {
                 $friend->type = FriendEnum::TYPE_VERIFY;
@@ -173,7 +174,13 @@ class FriendService extends BaseService
             sprintf(RedisFriendEnum::APPLY_LIST, $params['user']->id),
         ];
         $this->forgetRememberCache(RedisFriendEnum::STORE, ...$delKeys);
-        return $friend->toArray();
+        $apply = $friend->toArray();
+        Gateway::sendToUid($params['friend'], json_encode([
+            'who' => 'friend',
+            'action' => 'apply',
+            'data' => $apply
+        ], JSON_UNESCAPED_UNICODE));
+        return $apply;
     }
 
     public function verify(array $params)

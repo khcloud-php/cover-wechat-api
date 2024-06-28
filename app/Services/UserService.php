@@ -8,6 +8,7 @@ use App\Enums\Database\UserEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\User;
+use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -39,6 +40,16 @@ class UserService extends BaseService
         $user = User::query()->where('mobile', $params['mobile'])->first();
         if (empty($user))
             $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_NOT_FOUND);
+        //单点登录，强制下线
+        if (Gateway::isUidOnline($user->id)) {
+            Gateway::sendToUid($user->id, json_encode([
+                'who' => 'user',
+                'action' => 'logout',
+                'data' => [
+                    'time' => date('Y-m-d H:i:s', time()),
+                ]
+            ]));
+        }
 
         if ($user->status != UserEnum::STATUS_NORMAL)
             $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_DISABLED);

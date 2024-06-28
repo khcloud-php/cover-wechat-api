@@ -20,6 +20,11 @@ class Friend extends Base
         'setting' => 'json'
     ];
 
+    public function to(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'friend', 'id');
+    }
+
     public function friend(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'friend', 'id');
