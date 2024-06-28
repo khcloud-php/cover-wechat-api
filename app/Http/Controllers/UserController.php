@@ -103,8 +103,7 @@ class UserController extends Controller
      */
     public function me(Request $request): \Illuminate\Http\JsonResponse
     {
-        $userId = $request->user()->id;
-        $me = $this->userService->me($userId);
+        $me = $this->userService->me($request->user()->id);
         return $this->success($me, $request);
     }
 }

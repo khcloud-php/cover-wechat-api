@@ -17,13 +17,11 @@ class FriendService extends BaseService
     public function list(array $params): array
     {
         $userId = $params['user']->id;
-        $friendList = Cache::store(RedisFriendEnum::STORE)->rememberForever(sprintf(RedisFriendEnum::LIST, $userId), function () use ($userId) {
-            return Friend::query()->with(['friend' => function ($query) {
+        $friendList = Friend::query()->with(['friend' => function ($query) {
                 $query->select(['id', 'nickname', 'avatar', 'wechat', 'mobile']);
             }])->where('owner', $userId)
                 ->where('status', FriendEnum::STATUS_PASS)
                 ->get(['id', 'owner', 'friend', 'nickname', 'source'])->toArray();
-        });
 
         foreach ($friendList as &$friend) {
             $friend['nickname'] = $friend['nickname'] ?: $friend['friend']['nickname'];
@@ -38,15 +36,13 @@ class FriendService extends BaseService
     public function applyList(array $params): array
     {
         $userId = $params['user']->id;
-        $applyList = Cache::store(RedisFriendEnum::STORE)->rememberForever(sprintf(RedisFriendEnum::APPLY_LIST, $userId), function () use ($userId) {
-            return Friend::query()->with(['friend' => function ($query) {
+        $applyList = Friend::query()->with(['friend' => function ($query) {
                 $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
             }, 'owner' => function ($query) {
                 $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
             }])->where('display', 1)
                 ->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")
                 ->get()->toArray();
-        });
 
         $day = 86400;
         $threeDay = $overThreeDay = [];
@@ -70,6 +66,7 @@ class FriendService extends BaseService
                 $threeDay[] = $apply;
             }
         }
+        Friend::query()->where('friend', $userId)->where('is_read', 0)->update(['is_read' => 1]);
         return ['three_day' => $threeDay, 'over_three_day' => $overThreeDay];
     }
 

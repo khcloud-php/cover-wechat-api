@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\BusinessException;
 use App\Services\FriendService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -58,8 +59,7 @@ class FriendController extends Controller
      */
     public function deleteApply($id, Request $request): \Illuminate\Http\JsonResponse
     {
-        $userId = $this->params['user']->id;
-        $this->friendService->deleteApply($id, $userId);
+        $this->friendService->deleteApply($id, $request->user()->id);
         return $this->success([], $request);
     }
 
@@ -78,6 +78,10 @@ class FriendController extends Controller
         return $this->success($friend, $request);
     }
 
+    /**
+     * @throws BusinessException
+     * @throws ValidationException
+     */
     public function showConfirm(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [

@@ -17,12 +17,12 @@
 $router->group(['prefix' => 'user'], function ($router) {
     $router->post('/register', 'UserController@register');
     $router->post('/login', 'UserController@login');
-    $router->post('/logout', 'UserController@logout');
 });
 
 
 $router->group(['middleware' => 'auth:api'], function ($router) {
     $router->group(['prefix' => 'user'], function ($router) {
+        $router->post('/logout', 'UserController@logout');
         $router->get('/me', 'UserController@me');
         $router->get('/{keywords}/home', 'UserController@home');
     });
@@ -37,6 +37,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->put('/read', 'MessageController@read');
     });
     $router->get('message/list', 'MessageController@list');
+    $router->get('message/unread', 'MessageController@unread');
 
     $router->group(['prefix' => 'group'], function ($router) {
         $router->post('/create', 'GroupController@create');

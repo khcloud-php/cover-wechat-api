@@ -10,6 +10,8 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class User
 {
+
+
     /**
      * @throws InvalidArgumentException
      */

@@ -331,4 +331,28 @@ class MessageService extends BaseService
         }
         return true;
     }
+
+    public function unread(int $userId): array
+    {
+        $group = GroupUser::query()
+            ->where('user_id', $userId)
+            ->where('display', 1)
+            ->where('unread', '>', 0)
+            ->sum('unread');
+        $private = Friend::query()
+            ->where('owner', $userId)
+            ->where('display', 1)
+            ->where('unread', '>', 0)
+            ->sum('unread');
+        $apply = Friend::query()
+            ->where('friend', $userId)
+            ->where('is_read', 0)
+            ->count();
+        return [
+            'chat' => $group + $private,
+            'apply' => $apply,
+            'friend' => $apply,
+            'discover' => 0
+        ];
+    }
 }

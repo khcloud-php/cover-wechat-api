@@ -73,4 +73,10 @@ class MessageController extends Controller
         $this->messageService->undo($this->params);
         return $this->success([], $request);
     }
+
+    public function unread(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $unread = $this->messageService->unread($request->user()->id);
+        return $this->success($unread, $request);
+    }
 }
