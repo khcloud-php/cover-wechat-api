@@ -25,7 +25,7 @@ class GroupController extends Controller
         $this->validate($request, [
             'group_users' => 'required|array',
         ]);
-        $group = $this->groupService->create($this->params);
-        return $this->success($group, $request);
+        $data = $this->groupService->create($this->params);
+        return $this->success($data, $request);
     }
 }

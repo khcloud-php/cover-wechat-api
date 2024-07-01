@@ -22,7 +22,7 @@ class FileController extends Controller
         ]);
         $file = $request->file('file');
         $file->getFileInfo();
-        $upload = $this->fileService->upload($file);
-        $this->success($upload, $request);
+        $data = $this->fileService->upload($file);
+        $this->success($data, $request);
     }
 }

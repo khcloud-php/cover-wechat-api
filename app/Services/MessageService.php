@@ -31,9 +31,6 @@ class MessageService extends BaseService
         ];
 
         $toUser = $params['to_user'];
-        if (!in_array($params['is_group'], MessageEnum::IS_GROUP)) {
-            $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
-        }
 
         $list = [];
         //聊天记录
@@ -231,7 +228,6 @@ class MessageService extends BaseService
                     ]);
                 GroupUser::query()
                     ->where('group_id', $toUser)
-                    ->where('user_id', '<>', $fromUser)
                     ->update([
                         'display' => 1
                     ]);
@@ -248,7 +244,7 @@ class MessageService extends BaseService
                         'time' => $time
                     ]);
                 Friend::query()
-                    ->whereRaw("((owner = $fromUser AND friend = $toUser) OR (friend = $fromUser AND owner = $toUser))")
+                    ->whereRaw("(friend = $fromUser AND owner = $toUser)")
                     ->increment('unread');
             }
 

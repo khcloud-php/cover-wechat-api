@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ChatService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ChatController extends Controller
 {
@@ -17,17 +18,60 @@ class ChatController extends Controller
 
     public function list(Request $request): \Illuminate\Http\JsonResponse
     {
-        $list = $this->chatService->list($this->params);
-        return $this->success($list, $request);
+        $data = $this->chatService->list($this->params);
+        return $this->success($data, $request);
     }
 
-    public function info(Request $request)
+    /**
+     * @throws ValidationException
+     */
+    public function info(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
             'is_group' => 'required'
         ]);
-        $chatInfo = $this->chatService->info($this->params);
-        return $this->success($chatInfo, $request);
+        $data = $this->chatService->info($this->params);
+        return $this->success($data, $request);
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function top(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'to_user' => 'required',
+            'is_group' => 'required',
+            'is_top' => 'required'
+        ]);
+        $data = $this->chatService->top($this->params);
+        return $this->success($data, $request);
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function hide(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'to_user' => 'required',
+            'is_group' => 'required'
+        ]);
+        $data = $this->chatService->hide($this->params);
+        return $this->success($data, $request);
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function delete(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'to_user' => 'required',
+            'is_group' => 'required'
+        ]);
+        $data = $this->chatService->delete($this->params);
+        return $this->success($data, $request);
     }
 }

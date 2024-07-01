@@ -35,8 +35,8 @@ class UserController extends Controller
             'mobile' => 'required|regex:/^1[3-9]\d{9}$/',
             'password' => 'required|min:6',
         ]);
-        $user = $this->userService->register($this->params);
-        return $this->success($user, $request, ApiCodeEnum::SERVICE_REGISTER_SUCCESS);
+        $data = $this->userService->register($this->params);
+        return $this->success($data, $request, ApiCodeEnum::SERVICE_REGISTER_SUCCESS);
     }
 
     /**
@@ -56,8 +56,8 @@ class UserController extends Controller
             'code' => 'required|digits:4|int'
         ]);
 
-        $user = $this->userService->login($this->params);
-        return $this->success($user, $request, ApiCodeEnum::SERVICE_LOGIN_SUCCESS);
+        $data = $this->userService->login($this->params);
+        return $this->success($data, $request, ApiCodeEnum::SERVICE_LOGIN_SUCCESS);
     }
 
     /**
@@ -85,15 +85,15 @@ class UserController extends Controller
     public function home(string $keywords, Request $request): \Illuminate\Http\JsonResponse
     {
         $this->params['keywords'] = $keywords;
-        $home = $this->userService->home($this->params);
-        return $this->success($home, $request);
+        $data = $this->userService->home($this->params);
+        return $this->success($data, $request);
     }
 
     public function info(int $id, Request $request)
     {
         $this->params['id'] = $id;
-        $info = $this->userService->info($this->params);
-        return $this->success($info, $request);
+        $data = $this->userService->info($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -103,7 +103,7 @@ class UserController extends Controller
      */
     public function me(Request $request): \Illuminate\Http\JsonResponse
     {
-        $me = $this->userService->me($request->user()->id);
-        return $this->success($me, $request);
+        $data = $this->userService->me($request->user()->id);
+        return $this->success($data, $request);
     }
 }

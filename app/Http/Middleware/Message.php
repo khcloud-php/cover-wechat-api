@@ -27,6 +27,9 @@ class Message
         $fromUser = $request->user()->id;
         $toUser = $request->input('to_user');
         $isGroup = $request->input('is_group');
+        if (!in_array($isGroup, MessageEnum::IS_GROUP)) {
+            $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+        }
         if (!$toUser) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         if ($isGroup == MessageEnum::GROUP) {
             //校验是否群成员

@@ -2,9 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\ApiCodeEnum;
 use App\Enums\Database\MessageEnum;
 use App\Models\Friend;
 use App\Models\GroupUser;
+use App\Models\Message;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class ChatService extends BaseService
 {
@@ -25,11 +29,11 @@ class ChatService extends BaseService
         foreach ($privateChatList as &$item) {
             $item['id'] = md5(MessageEnum::PRIVATE . $userId . $item['friend']['id']);
             $item['friend']['avatars'] = [$item['friend']['avatar']];
-            $item['from'] = $item['friend'];
-            $item['to_user'] = $item['from']['id'];
+            $item['to'] = $item['friend'];
+            $item['to_user'] = $item['to']['id'];
             $item['is_group'] = MessageEnum::PRIVATE;
             $item['muted'] = false;
-            unset($item['to'], $item['from']['avatar'], $item['friend']);
+            unset($item['from']['avatar'], $item['friend']);
         }
         unset($item);
 
@@ -79,7 +83,7 @@ class ChatService extends BaseService
             $item['to_user'] = $item['group_id'];
             $item['is_group'] = MessageEnum::GROUP;
             $item['muted'] = false;
-            $item['from'] = [
+            $item['to'] = [
                 'id' => $item['group_id'],
                 'avatars' => $groupAvatars[$item['group_id']] ?? []
             ];
@@ -125,5 +129,92 @@ class ChatService extends BaseService
             ];
         }
         return $chatInfo;
+    }
+
+    public function top(array $params): array
+    {
+        $isGroup = $params['is_group'];
+        $toUser = $params['to_user'];
+        $userId = $params['user']->id;
+        $isTop = $params['is_top'];
+        $time = $isTop > 0 ? time() : 0;
+        if ($isGroup == MessageEnum::GROUP) {
+            GroupUser::query()
+                ->where('group_id', $toUser)
+                ->where('user_id', $userId)
+                ->update(['top' => $time]);
+        } else {
+            Friend::query()
+                ->where('owner', $userId)
+                ->where('friend', $toUser)
+                ->update(['top' => $time]);
+        }
+
+        return [
+            'is_group' => $isGroup,
+            'to_user' => $toUser,
+            'from_user' => $userId,
+            'top' => $time
+        ];
+    }
+
+    public function hide(array $params): array
+    {
+        $isGroup = $params['is_group'];
+        $toUser = $params['to_user'];
+        $userId = $params['user']->id;
+        if ($isGroup == MessageEnum::GROUP) {
+            GroupUser::query()
+                ->where('group_id', $toUser)
+                ->where('user_id', $userId)
+                ->update(['display' => 0]);
+        } else {
+            Friend::query()
+                ->where('owner', $userId)
+                ->where('friend', $toUser)
+                ->update(['display' => 0]);
+        }
+
+        return [
+            'is_group' => $isGroup,
+            'to_user' => $toUser,
+            'from_user' => $userId
+        ];
+    }
+
+    public function delete(array $params): array
+    {
+        $isGroup = $params['is_group'];
+
+        $toUser = $params['to_user'];
+        $userId = $params['user']->id;
+        DB::beginTransaction();
+        try {
+            if ($isGroup == MessageEnum::GROUP) {
+                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE (from_user={$userId} AND to_user={$toUser}) AND is_group={$isGroup} AND (FIND_IN_SET({$userId}, deleted_users) = '')");
+                GroupUser::query()
+                    ->where('group_id', $toUser)
+                    ->where('user_id', $userId)
+                    ->update(['display' => 0]);
+            } else {
+                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE ((from_user={$userId} AND to_user={$toUser}) OR (from_user={$toUser} AND to_user={$userId})) AND is_group={$isGroup} AND (FIND_IN_SET({$userId}, deleted_users) = '')");
+                Friend::query()
+                    ->where('owner', $userId)
+                    ->where('friend', $toUser)
+                    ->update(['display' => 0]);
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());
+        }
+
+
+        return [
+            'is_group' => $isGroup,
+            'to_user' => $toUser,
+            'from_user' => $userId
+        ];
     }
 }

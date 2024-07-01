@@ -27,8 +27,8 @@ class MessageController extends Controller
             'to_user' => 'required',
             'is_group' => 'required'
         ]);
-        $list = $this->messageService->list($this->params);
-        return $this->success($list, $request);
+        $data = $this->messageService->list($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -44,8 +44,8 @@ class MessageController extends Controller
             'type' => 'required',
             'is_group' => 'required'
         ]);
-        $send = $this->messageService->send($this->params);
-        return $this->success($send, $request);
+        $data = $this->messageService->send($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -76,7 +76,7 @@ class MessageController extends Controller
 
     public function unread(Request $request): \Illuminate\Http\JsonResponse
     {
-        $unread = $this->messageService->unread($request->user()->id);
-        return $this->success($unread, $request);
+        $data = $this->messageService->unread($request->user()->id);
+        return $this->success($data, $request);
     }
 }

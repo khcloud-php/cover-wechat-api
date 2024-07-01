@@ -31,8 +31,8 @@ class FriendController extends Controller
      */
     public function list(Request $request): \Illuminate\Http\JsonResponse
     {
-        $friendList = $this->friendService->list($this->params);
-        return $this->success($friendList, $request);
+        $data = $this->friendService->list($this->params);
+        return $this->success($data, $request);
     }
 
 
@@ -45,8 +45,8 @@ class FriendController extends Controller
      */
     public function applyList(Request $request): \Illuminate\Http\JsonResponse
     {
-        $applyList = $this->friendService->applyList($this->params);
-        return $this->success($applyList, $request);
+        $data = $this->friendService->applyList($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -74,8 +74,8 @@ class FriendController extends Controller
     public function search($keywords, Request $request): \Illuminate\Http\JsonResponse
     {
         $this->params['keywords'] = $keywords;
-        $friend = $this->friendService->search($this->params);
-        return $this->success($friend, $request);
+        $data = $this->friendService->search($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -89,8 +89,8 @@ class FriendController extends Controller
             'relationship' => 'required|string',
             'keywords' => 'required|string',
         ]);
-        $confirm = $this->friendService->showConfirm($this->params);
-        return $this->success($confirm, $request);
+        $data = $this->friendService->showConfirm($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -109,8 +109,8 @@ class FriendController extends Controller
             'nickname' => 'required|string',
             'setting' => 'required|array'
         ]);
-        $apply = $this->friendService->apply($this->params);
-        return $this->success($apply, $request);
+        $data = $this->friendService->apply($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -128,8 +128,8 @@ class FriendController extends Controller
             'nickname' => 'required|string',
             'setting' => 'required|array'
         ]);
-        $verify = $this->friendService->verify($this->params);
-        return $this->success($verify, $request);
+        $data = $this->friendService->verify($this->params);
+        return $this->success($data, $request);
     }
 
     /**
@@ -144,7 +144,7 @@ class FriendController extends Controller
         $this->validate($request, [
             'friend' => 'required|int'
         ]);
-        $update = $this->friendService->update($this->params);
-        return $this->success($update, $request);
+        $data = $this->friendService->update($this->params);
+        return $this->success($data, $request);
     }
 }
