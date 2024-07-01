@@ -14,11 +14,16 @@
 */
 
 //用户模块路由
-$router->group(['prefix' => 'user'], function ($router) {
+$router->group(['prefix' => 'user','middleware' => 'captcha'], function ($router) {
     $router->post('/register', 'UserController@register');
     $router->post('/login', 'UserController@login');
 });
 
+$router->group(['prefix' => 'system'], function ($router) {
+    $router->post('/captcha/get', 'SystemController@get');
+    $router->post('/captcha/check', 'SystemController@check');
+    $router->post('/captcha/verification', 'SystemController@verification');
+});
 
 $router->group(['middleware' => 'auth:api'], function ($router) {
     $router->group(['prefix' => 'user'], function ($router) {

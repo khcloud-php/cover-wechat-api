@@ -62,6 +62,7 @@ $app->singleton(
 $app->configure('app');
 $app->configure('auth');
 $app->configure('user');
+$app->configure('captcha');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -78,6 +79,7 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
+    'captcha' => App\Http\Middleware\Captcha::class,
     'auth' => App\Http\Middleware\Authenticate::class,
     'message' => App\Http\Middleware\Message::class,
 ]);

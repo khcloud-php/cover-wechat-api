@@ -114,7 +114,8 @@ class Handler extends ExceptionHandler
 
             return response()->json([
                 'code' => $exception->getCode(),
-                'msg' => $exception->getFile() . $exception->getLine() . ':' . $exception->getMessage(),
+//                'msg' => $exception->getFile() . $exception->getLine() . ':' . $exception->getMessage(),
+                'msg' => $exception->getMessage(),
                 'data' => null,
                 'request_id' => $request->offsetGet('request_id')
             ]);

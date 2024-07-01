@@ -24,19 +24,19 @@ class ApiCodeEnum
     const SERVICE_INIT_SUCCESS = 200100; //初始化成功
     const SERVICE_REGISTER_SUCCESS = '200101|注册成功'; //注册成功
     const SERVICE_LOGIN_SUCCESS = '200102|登录成功'; //登录成功
-    const SERVICE_BIND_SUCCESS = 200103; //绑定成功
-    const SERVICE_CHANGE_PASSWORD_SUCCESS = 200104; //修改密码成功
-    const SERVICE_PAID_SUCCESS = 200105; //订单已支付
-    const PAY_SUCCESS = 200106; //支付成功
+    const SERVICE_BIND_SUCCESS = '200103|绑定成功'; //绑定成功
+    const SERVICE_CHANGE_PASSWORD_SUCCESS = '200104|修改密码成功'; //修改密码成功
+    const SERVICE_PAID_SUCCESS = '200105|订单已支付'; //订单已支付
+    const PAY_SUCCESS = '200106|支付成功'; //支付成功
 
     // 客户端错误码：400 ~ 499 开头，后拼接 3 位
     const CLIENT_PARAMETER_ERROR = '400002|参数有误'; //参数有误
     const CLIENT_DATA_EXIST = 400003; //数据已存在
     const CLIENT_DATA_NOT_FOUND = '400004|数据不存在'; //数据不存在
     const CLIENT_TOKEN_UNAVAILABLE = '400006|token无效'; //token无效
-    const CLIENT_NOT_FOUND_HTTP_ERROR = 400007; //请求失败
+    const CLIENT_NOT_FOUND_HTTP_ERROR = '400007|请求失败'; //请求失败
     const CLIENT_TRANSFER_ERROR = 400203; //数据转换失败
-    const CLIENT_PAY_ERROR = 400205; //支付失败
+    const CLIENT_PAY_ERROR = '400205|支付失败'; //支付失败
     const CLIENT_IOS_BLUR_CLOSED_ERROR = 400206; //混淆已关闭
     // 401 - 访问被拒绝
     const CLIENT_HTTP_UNAUTHORIZED_EXPIRED = '401200|账号信息已过期，请重新登录'; //账号信息已过期，请重新登录
@@ -61,13 +61,13 @@ class ApiCodeEnum
 
     // 业务操作错误码（外部服务或内部服务调用。..）
     const SERVICE_WECHAT_ALREADY_EXISTS = '500101|微信号已存在'; //微信号已存在
-    const SERVICE_LOGIN_ERROR = 500102; //登陆失败
+    const SERVICE_LOGIN_ERROR = '500102|登录失败'; //登陆失败
     const SERVICE_ACCOUNT_OR_PASSWORD_ERROR = '500103|账号或密码错误'; //账号或密码错误.
-    const SERVICE_PASSWORD_ERROR = 500104; //旧密码不正确.
+    const SERVICE_PASSWORD_ERROR = '500104|旧密码不正确'; //旧密码不正确.
     const SERVICE_ACCOUNT_NOT_FOUND = '500205|账号不存在'; //账号不存在
     const SERVICE_ACCOUNT_DISABLED = '500206|账号被禁'; //账号被禁
-    const SERVICE_ACCOUNT_CANCEL = 500207; //账号已注销.
-    const SERVICE_CODE_ERROR = 500208; // 验证码不正确
+    const SERVICE_ACCOUNT_CANCEL = '500207|账号已注销'; //账号已注销.
+    const SERVICE_CODE_ERROR = '500208|验证码不正确'; // 验证码不正确
     const SERVICE_ACCOUNT_ALREADY_EXISTS = '500209|账号已存在'; // 账号已存在.
     const SERVICE_FRIEND_ALREADY_EXISTS = '500210|好友已存在'; // 好友已存在.
     const SERVICE_FRIEND_NOT_EXISTS = '500211|对方不是你的好友'; // 对方不是你的好友.

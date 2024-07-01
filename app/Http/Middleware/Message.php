@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\MessageEnum;
+use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\GroupUser;
 use App\Support\Traits\ServiceException;
@@ -19,6 +20,7 @@ class Message
      * @param \Illuminate\Http\Request $request
      * @param \Closure $next
      * @return mixed
+     * @throws BusinessException
      */
     public function handle($request, Closure $next)
     {

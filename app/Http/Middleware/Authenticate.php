@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\ApiCodeEnum;
+use App\Exceptions\BusinessException;
 use App\Support\Traits\ServiceException;
 use Closure;
 use Illuminate\Contracts\Auth\Factory as Auth;
@@ -32,10 +33,11 @@ class Authenticate
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string|null  $guard
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
+     * @param string|null $guard
      * @return mixed
+     * @throws BusinessException
      */
     public function handle($request, Closure $next, $guard = null)
     {
