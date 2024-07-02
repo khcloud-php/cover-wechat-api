@@ -23,20 +23,19 @@ class MessageService extends BaseService
      */
     public function list(array $params): array
     {
-        $fromUser = $params['user']->id;
+        $fromUser = (int)$params['user']->id;
+        $toUser = (int)$params['to_user'];
         $me = [
             'id' => $fromUser,
             'nickname' => $params['user']->nickname,
             'avatar' => $params['user']->avatar
         ];
 
-        $toUser = $params['to_user'];
-
         $list = [];
         //聊天记录
         $messages = Message::query()
             ->whereRaw("((from_user = {$fromUser} AND to_user = {$toUser} AND is_group = 0) OR (from_user = {$toUser} AND to_user = {$fromUser} AND is_group = 0) OR (to_user = {$toUser} AND is_group=1))")
-            ->whereRaw("(FIND_IN_SET({$fromUser}, deleted_users) = '')")
+            ->whereRaw("(FIND_IN_SET('{$fromUser}', deleted_users) = '')")
             ->orderBy('created_at')
             ->get()
             ->toArray();

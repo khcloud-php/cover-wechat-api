@@ -186,18 +186,18 @@ class ChatService extends BaseService
     {
         $isGroup = $params['is_group'];
 
-        $toUser = $params['to_user'];
-        $userId = $params['user']->id;
+        $toUser = (int)$params['to_user'];
+        $userId = (int)$params['user']->id;
         DB::beginTransaction();
         try {
             if ($isGroup == MessageEnum::GROUP) {
-                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE (from_user={$userId} AND to_user={$toUser}) AND is_group={$isGroup} AND (FIND_IN_SET({$userId}, deleted_users) = '')");
+                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE (from_user={$userId} AND to_user={$toUser}) AND is_group={$isGroup} AND (FIND_IN_SET('{$userId}', deleted_users) = '')");
                 GroupUser::query()
                     ->where('group_id', $toUser)
                     ->where('user_id', $userId)
                     ->update(['display' => 0]);
             } else {
-                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE ((from_user={$userId} AND to_user={$toUser}) OR (from_user={$toUser} AND to_user={$userId})) AND is_group={$isGroup} AND (FIND_IN_SET({$userId}, deleted_users) = '')");
+                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE ((from_user={$userId} AND to_user={$toUser}) OR (from_user={$toUser} AND to_user={$userId})) AND is_group={$isGroup} AND (FIND_IN_SET('{$userId}', deleted_users) = '')");
                 Friend::query()
                     ->where('owner', $userId)
                     ->where('friend', $toUser)

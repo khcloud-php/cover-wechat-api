@@ -16,6 +16,12 @@ class GroupController extends Controller
         $this->groupService = new GroupService();
     }
 
+    public function list(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $this->groupService->list($this->params);
+        return $this->success($data, $request);
+    }
+
     /**
      * 创建群聊
      * @throws ValidationException

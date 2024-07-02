@@ -56,6 +56,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
     //群组模块
     $router->group(['prefix' => 'group'], function ($router) {
         $router->post('/create', 'GroupController@create');
+        $router->get('/list', 'GroupController@list');
     });
 
     //好友模块
