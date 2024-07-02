@@ -3,6 +3,7 @@
 namespace App\Workerman\Action;
 
 use App\Enums\Database\MessageEnum;
+use App\Enums\WorkerManEnum;
 use App\Models\Message;
 use GatewayWorker\Lib\Gateway;
 use App\Models\User;
@@ -40,8 +41,8 @@ class Group
         $message['deleted_users'] = implode(',', $groupUsers);
         Message::query()->insert($message);
         $sendData = [
-            'who' => 'message',
-            'action' => 'send',
+            'who' => WorkerManEnum::WHO_MESSAGE,
+            'action' => WorkerManEnum::ACTION_SEND,
             'data' => []
         ];
         Gateway::sendToGroup($groupId, json_encode($sendData, JSON_UNESCAPED_UNICODE), [$clientId]);

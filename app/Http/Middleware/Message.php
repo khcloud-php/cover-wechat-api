@@ -33,15 +33,22 @@ class Message
         if (!$toUser) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         if ($isGroup == MessageEnum::GROUP) {
             //校验是否群成员
-            if (!GroupUser::isGroupMember($fromUser, $toUser)) {
-                $this->throwBusinessException(ApiCodeEnum::SERVICE_GROUP_MEMBER_NOT_EXISTS);
-            }
+            list($isGroupMember, $group) = GroupUser::checkIsGroupMember($fromUser, $toUser, true);
+            if (!$isGroupMember) $this->throwBusinessException(ApiCodeEnum::SERVICE_GROUP_MEMBER_NOT_EXISTS);
+            $from = [
+                'id' => $group['group_id'],
+                'nickname' => $group['name'] ?: $group['group']['name']
+            ];
         } else {
             //好友校验
             list($isFriend, $friend) = Friend::checkIsFriend($fromUser, $toUser, true);
             if (!$isFriend) $this->throwBusinessException(ApiCodeEnum::SERVICE_FRIEND_NOT_EXISTS);
-            $request->offsetSet('friend', $friend);
+            $from = [
+                'id' => $friend['friend']['id'],
+                'nickname' => $friend['nickname'] ?: $friend['friend']['nickname']
+            ];
         }
+        $request->offsetSet('from', $from);
         return $next($request);
     }
 }

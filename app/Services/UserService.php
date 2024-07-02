@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FriendEnum;
 use App\Enums\Database\UserEnum;
+use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\User;
@@ -43,8 +44,8 @@ class UserService extends BaseService
         //单点登录，强制下线
         if (Gateway::isUidOnline($user->id)) {
             Gateway::sendToUid($user->id, json_encode([
-                'who' => 'user',
-                'action' => 'logout',
+                'who' => WorkerManEnum::WHO_USER,
+                'action' => WorkerManEnum::ACTION_LOGOUT,
                 'data' => [
                     'time' => date('Y-m-d H:i:s', time()),
                 ]

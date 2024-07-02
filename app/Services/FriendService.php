@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FriendEnum;
 use App\Enums\Redis\FriendEnum as RedisFriendEnum;
+use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\User;
@@ -18,10 +19,10 @@ class FriendService extends BaseService
     {
         $userId = $params['user']->id;
         $friendList = Friend::query()->with(['friend' => function ($query) {
-                $query->select(['id', 'nickname', 'avatar', 'wechat', 'mobile']);
-            }])->where('owner', $userId)
-                ->where('status', FriendEnum::STATUS_PASS)
-                ->get(['id', 'owner', 'friend', 'nickname', 'source'])->toArray();
+            $query->select(['id', 'nickname', 'avatar', 'wechat', 'mobile']);
+        }])->where('owner', $userId)
+            ->where('status', FriendEnum::STATUS_PASS)
+            ->get(['id', 'owner', 'friend', 'nickname', 'source'])->toArray();
 
         foreach ($friendList as &$friend) {
             $friend['nickname'] = $friend['nickname'] ?: $friend['friend']['nickname'];
@@ -37,12 +38,13 @@ class FriendService extends BaseService
     {
         $userId = $params['user']->id;
         $applyList = Friend::query()->with(['friend' => function ($query) {
-                $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
-            }, 'owner' => function ($query) {
-                $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
-            }])->where('display', 1)
-                ->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")
-                ->get()->toArray();
+            $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
+        }, 'owner' => function ($query) {
+            $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
+        }])
+            ->where('hide', 0)
+            ->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")
+            ->get()->toArray();
 
         $day = 86400;
         $threeDay = $overThreeDay = [];
@@ -72,15 +74,11 @@ class FriendService extends BaseService
 
     public function deleteApply($id, $userId): int
     {
-        try {
-            $delKeys = [
-                sprintf(RedisFriendEnum::APPLY_LIST, $userId)
-            ];
-            $this->forgetRememberCache(RedisFriendEnum::STORE, ...$delKeys);
-            return Friend::query()->where('id', $id)->update(['display' => 0]);
-        } catch (\Exception $e) {
-            return 0;
-        }
+//        $delKeys = [
+//            sprintf(RedisFriendEnum::APPLY_LIST, $userId)
+//        ];
+//        $this->forgetRememberCache(RedisFriendEnum::STORE, ...$delKeys);
+        return Friend::query()->where('id', $id)->update(['hide' => 1]);
     }
 
     public function search(array $params): array
@@ -144,7 +142,7 @@ class FriendService extends BaseService
             $friend->type = FriendEnum::TYPE_APPLY;
             $friend->status = FriendEnum::STATUS_CHECK;
             $friend->deleted_at = null;
-            $friend->display = 1;
+            $friend->hide = 0;
             $friend->nickname = $params['nickname'];
             $friend->remark = $params['remark'];
             $friend->setting = $params['setting'];
@@ -164,18 +162,20 @@ class FriendService extends BaseService
             $friend->save();
         }
 
-        $delKeys = [
-            sprintf(RedisFriendEnum::LIST, $params['friend']),
-            sprintf(RedisFriendEnum::LIST, $params['user']->id),
-            sprintf(RedisFriendEnum::APPLY_LIST, $params['friend']),
-            sprintf(RedisFriendEnum::APPLY_LIST, $params['user']->id),
-        ];
-        $this->forgetRememberCache(RedisFriendEnum::STORE, ...$delKeys);
+//        $this->delCache($params);
         $apply = $friend->toArray();
         Gateway::sendToUid($params['friend'], json_encode([
-            'who' => 'friend',
-            'action' => 'apply',
-            'data' => $apply
+            'who' => WorkerManEnum::WHO_FRIEND,
+            'action' => WorkerManEnum::ACTION_APPLY,
+            'data' => [
+                'from' => [
+                    'id' => $params['user']->id,
+                    'nickname' => $params['user']->nickname,
+                    'avatar' => $params['user']->avatar,
+                ],
+                'content' => '请求添加您为好友',
+                'keywords' => $params['user']->$source
+            ]
         ], JSON_UNESCAPED_UNICODE));
         return $apply;
     }
@@ -205,7 +205,7 @@ class FriendService extends BaseService
                 'status' => FriendEnum::STATUS_PASS
             ]);
             DB::commit();
-            $this->delCache($params);
+//            $this->delCache($params);
             return $friend->toArray();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -230,7 +230,7 @@ class FriendService extends BaseService
             }
         }
         $friend->save();
-        $this->delCache($params);
+//        $this->delCache($params);
         return $friend->toArray();
     }
 

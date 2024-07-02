@@ -19,9 +19,15 @@ class GroupUser extends Base
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public static function isGroupMember($userId, $groupId): bool
+    public static function checkIsGroupMember($userId, $groupId, $returnGroup = false): bool|array
     {
-        $group = self::query()->where('group_id', $groupId)->where('user_id', $userId)->first();
-        return (bool)$group;
+        $group = self::query()
+            ->with(['group' => function ($query) {
+                $query->select(['id', 'name']);
+            }])
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->first(['group_id', 'user_id', 'name'])->toArray();
+        return $returnGroup ? [(bool)$group, $group] : (bool)$group;
     }
 }

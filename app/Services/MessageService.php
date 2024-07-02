@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FileEnum;
 use App\Enums\Database\MessageEnum;
+use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\File;
 use App\Models\Friend;
@@ -156,12 +157,12 @@ class MessageService extends BaseService
         $from = [
             'id' => $fromUser,
             'avatar' => $params['user']->avatar,
-            'nickname' => $params['friend']->nickname ?? '',
+            'nickname' => $params['from']['nickname'] ?? '',
         ];
         $time = time();
         $sendData = [
-            'who' => 'message',
-            'action' => 'send',
+            'who' => WorkerManEnum::WHO_MESSAGE,
+            'action' => WorkerManEnum::ACTION_SEND,
             'data' => [
                 'from' => $from,
                 'to_user' => $toUser,
@@ -254,8 +255,8 @@ class MessageService extends BaseService
             //at用户处理
             if (!empty($params['at_users'])) {
                 $sendAtData = [
-                    'who' => 'message',
-                    'action' => 'at',
+                    'who' => WorkerManEnum::WHO_MESSAGE,
+                    'action' => WorkerManEnum::ACTION_AT,
                     'data' => [
                     ]
                 ];
@@ -269,8 +270,8 @@ class MessageService extends BaseService
                 $message = Message::query()->find($params['pid'], ['content']);
                 $sendData['data']['pcontent'] = $message->content;
                 $sendQuoteData = [
-                    'who' => 'message',
-                    'action' => 'quote',
+                    'who' => WorkerManEnum::WHO_MESSAGE,
+                    'action' => WorkerManEnum::ACTION_QUOTE,
                     'data' => [
 
                     ]
