@@ -36,16 +36,18 @@ class Message
             list($isGroupMember, $group) = GroupUser::checkIsGroupMember($fromUser, $toUser, true);
             if (!$isGroupMember) $this->throwBusinessException(ApiCodeEnum::SERVICE_GROUP_MEMBER_NOT_EXISTS);
             $from = [
-                'id' => $group['group_id'],
-                'nickname' => $group['name'] ?: $group['group']['name']
+                'id' => $fromUser,
+                'nickname' => $group['nickname'] ?: $request->user()->nickname,
+                'avatar' => $request->user()->avatar
             ];
         } else {
             //好友校验
             list($isFriend, $friend) = Friend::checkIsFriend($fromUser, $toUser, true);
             if (!$isFriend) $this->throwBusinessException(ApiCodeEnum::SERVICE_FRIEND_NOT_EXISTS);
             $from = [
-                'id' => $friend['friend']['id'],
-                'nickname' => $friend['nickname'] ?: $friend['friend']['nickname']
+                'id' => $fromUser,
+                'nickname' => $friend['nickname'] ?: $request->user()->nickname,
+                'avatar' => $request->user()->avatar
             ];
         }
         $request->offsetSet('from', $from);

@@ -19,7 +19,7 @@ class ChatService extends BaseService
         //私聊
         $privateChatList = Friend::query()
             ->with(['friend' => function ($query) {
-                $query->select(['id', 'avatar']);
+                $query->select(['id', 'avatar', 'nickname']);
             }])
             ->select(['content', 'time', 'unread', 'top', 'nickname', 'friend'])
             ->where('owner', $userId)
@@ -28,6 +28,7 @@ class ChatService extends BaseService
 
         foreach ($privateChatList as &$item) {
             $item['id'] = md5(MessageEnum::PRIVATE . $userId . $item['friend']['id']);
+            $item['nickname'] = $item['nickname'] ?: $item['friend']['nickname'];
             $item['friend']['avatars'] = [$item['friend']['avatar']];
             $item['to'] = $item['friend'];
             $item['to_user'] = $item['to']['id'];
@@ -44,7 +45,7 @@ class ChatService extends BaseService
                     $query->select(['id', 'nickname']);
                 }, 'friend' => function ($query) {
                     $query->select(['friend', 'nickname']);
-                }])->select(['id', 'content', 'time', 'send_user']);
+                }])->select(['id', 'content', 'time', 'send_user', 'name']);
             }])
             ->select(['unread', 'top', 'group_id', 'user_id', 'name', 'nickname'])
             ->where('user_id', $userId)
@@ -77,7 +78,7 @@ class ChatService extends BaseService
             if (empty($nickname)) {
                 $nickname = $item['group']['friend']['nickname'] ?: $item['group']['send']['nickname'];
             }
-            $item['nickname'] = $item['name'];
+            $item['nickname'] = $item['name'] ?: $item['group']['name'];
             $item['content'] = $nickname . '：' . $item['group']['content'];
             $item['time'] = $item['group']['time'];
             $item['to_user'] = $item['group_id'];

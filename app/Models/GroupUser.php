@@ -22,12 +22,9 @@ class GroupUser extends Base
     public static function checkIsGroupMember($userId, $groupId, $returnGroup = false): bool|array
     {
         $group = self::query()
-            ->with(['group' => function ($query) {
-                $query->select(['id', 'name']);
-            }])
             ->where('group_id', $groupId)
             ->where('user_id', $userId)
-            ->first(['group_id', 'user_id', 'name'])->toArray();
+            ->first(['group_id', 'user_id', 'nickname'])->toArray();
         return $returnGroup ? [(bool)$group, $group] : (bool)$group;
     }
 }

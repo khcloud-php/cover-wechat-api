@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FriendEnum;
+use App\Enums\Database\MessageEnum;
 use App\Enums\Redis\FriendEnum as RedisFriendEnum;
 use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
+use App\Models\Message;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\Cache;
@@ -110,6 +112,7 @@ class FriendService extends BaseService
         }
         $user = User::query()->where($source, $params['keywords'])->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->first(['id', 'nickname']);
         if (empty($user)) $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_NOT_FOUND);
+        $confirm['friend'] = $user->id;
         $confirm['nickname'] = $user->nickname;
         $confirm['setting'] = config('user.friend.setting');
         if ($relationship !== 'go_check') {
@@ -182,31 +185,83 @@ class FriendService extends BaseService
 
     public function verify(array $params)
     {
+        $fromUser = $params['user']->id;
+        $toUser = $params['friend'];
+        $time = time();
+        $content = '我通过了你的好友验证请求，现在我们可以开始聊天了';
+        $user = User::query()->find($toUser, ['nickname']);
+        //备注相同就是没有备注
+        if ($user->nickname == $params['nickname']) $params['nickname'] = '';
         DB::beginTransaction();
         try {
-            $friend = Friend::query()->where('owner', $params['user']->id)->where('friend', $params['friend'])->first();
-            if ($friend) {
-                $friend->type = FriendEnum::TYPE_VERIFY;
-                $friend->status = FriendEnum::STATUS_PASS;
-                $friend->nickname = $params['nickname'];
-                $friend->setting = $params['setting'];
-                $friend->deleted_at = null;
-                $friend->save();
+            $owner = Friend::query()->where('owner', $fromUser)->where('friend', $toUser)->first();
+            if ($owner) {
+                $owner->nickname = $params['nickname'];
+                $owner->setting = $params['setting'];
+                $owner->unread += $owner->unread;
+                $owner->deleted_at = null;
+                $owner->save();
             } else {
-                $friend = new Friend($params);
-                $friend->type = FriendEnum::TYPE_VERIFY;
-                $friend->status = FriendEnum::STATUS_PASS;
-                $friend->owner = $params['user']->id;
-                $friend->friend = $params['friend'];
-                $friend->save();
+                $owner = new Friend($params);
+                $owner->unread = 1;
+                $owner->owner = $fromUser;
+                $owner->friend = $toUser;
             }
-            Friend::query()->where('owner', $params['friend'])->where('friend', $params['user']->id)->update([
-                'type' => FriendEnum::TYPE_VERIFY,
-                'status' => FriendEnum::STATUS_PASS
-            ]);
+            $owner->type = FriendEnum::TYPE_VERIFY;
+            $owner->status = FriendEnum::STATUS_PASS;
+            $owner->display = 1;
+            $owner->content = $content;
+            $owner->time = $time;
+            $owner->save();
+
+            $friend = Friend::query()->where('owner', $toUser)->where('friend', $fromUser)->first();
+            $friend->type = FriendEnum::TYPE_VERIFY;
+            $friend->status = FriendEnum::STATUS_PASS;
+            $friend->display = 1;
+            $friend->unread = 1;
+            $friend->content = $content;
+            $friend->time = $time;
+            $friend->save();
             DB::commit();
+            //发送好友申请通过消息
+            $from = [
+                'id' => $fromUser,
+                'nickname' => $friend->nickname ?: $params['user']->nickname,
+                'avatar' => $params['user']->avatar,
+            ];
+            $sendData = [
+                'who' => WorkerManEnum::WHO_MESSAGE,
+                'action' => WorkerManEnum::ACTION_SEND,
+                'data' => [
+                    'from' => $from,
+                    'from_user' => $fromUser,
+                    'to_user' => $toUser,
+                    'content' => $toUser,
+                    'type' => MessageEnum::TEXT,
+                    'file' => [],
+                    'extends' => [],
+                    'pid' => 0,
+                    'is_tips' => 0,
+                    'is_undo' => 0,
+                    'pcontent' => '',
+                    'at_users' => [],
+                    'is_group' => MessageEnum::PRIVATE,
+                    'right' => false,
+                    'time' => $time,
+                ]
+            ];
+            $data = [
+                'from_user' => $fromUser,
+                'to_user' => $toUser,
+                'content' => $content,
+                'is_group' => MessageEnum::PRIVATE,
+                'type' => MessageEnum::TEXT,
+                'created_at' => $time
+            ];
+            $sendData['data']['id'] = Message::query()->insertGetId($data);
+            Gateway::sendToUid($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE));
 //            $this->delCache($params);
-            return $friend->toArray();
+            return $owner->toArray();
         } catch (\Exception $e) {
             DB::rollBack();
             $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());

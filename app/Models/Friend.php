@@ -38,13 +38,10 @@ class Friend extends Base
     public static function checkIsFriend(int|string $owner, int|string $friend, $returnFriend = false): bool|array
     {
         $friend = Friend::query()
-            ->with(['friend' => function ($query) {
-                $query->select(['id', 'nickname']);
-            }])
             ->where('friend', $owner)
             ->where('owner', $friend)
             ->where('status', FriendEnum::STATUS_PASS)
-            ->first(['nickname', 'friend'])->toArray();
+            ->first(['nickname'])->toArray();
         return $returnFriend ? [(bool)$friend, $friend] : (bool)$friend;
     }
 }

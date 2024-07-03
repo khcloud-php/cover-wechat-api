@@ -26,10 +26,10 @@ class User
         foreach ($groupIds as $groupId) {
             Gateway::joinGroup($clientId, $groupId);
         }
-        $_SESSION[sprintf(UserEnum::BIND_UID, $clientId)] = $uid;
-        $_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)] = json_encode($groupIds);
-//        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::BIND_UID, $clientId), $uid);
-//        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::JOIN_GROUPS, $clientId), $groupIds);
+//        $_SESSION[sprintf(UserEnum::BIND_UID, $clientId)] = $uid;
+//        $_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)] = json_encode($groupIds);
+        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::BIND_UID, $clientId), $uid);
+        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::JOIN_GROUPS, $clientId), $groupIds);
     }
 
     /**
@@ -37,8 +37,8 @@ class User
      */
     public function logout(string $clientId): void
     {
-        $uid = $_SESSION[sprintf(UserEnum::BIND_UID, $clientId)];
-//        $uid = Cache::store(UserEnum::STORE)->get(sprintf(UserEnum::BIND_UID, $clientId));
+//        $uid = $_SESSION[sprintf(UserEnum::BIND_UID, $clientId)];
+        $uid = Cache::store(UserEnum::STORE)->get(sprintf(UserEnum::BIND_UID, $clientId));
         echo "uid:{$uid} 离线了\n";
         if ($uid) {
             $groupIds = $this->getJoinGroupIdsByClientId($clientId);
@@ -46,12 +46,12 @@ class User
                 foreach ($groupIds as $groupId) {
                     Gateway::leaveGroup($clientId, $groupId);
                 }
-                unset($_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)]);
-//                Cache::store(UserEnum::STORE)->forget(sprintf(UserEnum::JOIN_GROUPS, $clientId));
+//                unset($_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)]);
+                Cache::store(UserEnum::STORE)->forget(sprintf(UserEnum::JOIN_GROUPS, $clientId));
             }
             Gateway::unbindUid($clientId, $uid);
-            unset($_SESSION[sprintf(UserEnum::BIND_UID, $clientId)]);
-//            Cache::store(UserEnum::STORE)->forget(sprintf(UserEnum::BIND_UID, $clientId));
+//            unset($_SESSION[sprintf(UserEnum::BIND_UID, $clientId)]);
+            Cache::store(UserEnum::STORE)->forget(sprintf(UserEnum::BIND_UID, $clientId));
         }
 
 
@@ -65,9 +65,9 @@ class User
 
     public function getJoinGroupIdsByClientId(string $clientId): array
     {
-        $groupIds = $_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)];
-        $groupIds = json_decode($groupIds);
-//        $groupIds = Cache::store(UserEnum::STORE)->get(sprintf(UserEnum::JOIN_GROUPS, $clientId));
+//        $groupIds = $_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)];
+//        $groupIds = json_decode($groupIds);
+        $groupIds = Cache::store(UserEnum::STORE)->get(sprintf(UserEnum::JOIN_GROUPS, $clientId));
         return $groupIds ?: [];
     }
 }

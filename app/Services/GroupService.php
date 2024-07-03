@@ -97,7 +97,7 @@ class GroupService extends BaseService
                     'user_id' => $groupUser,
                     'role' => $groupUser == $userId ? GroupEnum::ROLE_SUPER : GroupEnum::ROLE_USER,
                     'invite_id' => $userId,
-                    'name' => $name,
+                    'unread' => 1,
                     'setting' => json_encode([]),
                     'created_at' => time(),
                 ];

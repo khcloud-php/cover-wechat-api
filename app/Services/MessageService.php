@@ -154,23 +154,21 @@ class MessageService extends BaseService
         if (!in_array($params['is_group'], MessageEnum::IS_GROUP)) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
-        $from = [
-            'id' => $fromUser,
-            'avatar' => $params['user']->avatar,
-            'nickname' => $params['from']['nickname'] ?? '',
-        ];
         $time = time();
         $sendData = [
             'who' => WorkerManEnum::WHO_MESSAGE,
             'action' => WorkerManEnum::ACTION_SEND,
             'data' => [
-                'from' => $from,
+                'from' => $params['from'],
+                'from_user' => $fromUser,
                 'to_user' => $toUser,
                 'content' => $params['content'],
                 'type' => $params['type'],
                 'file' => [],
                 'extends' => [],
                 'pid' => 0,
+                'is_tips' => 0,
+                'is_undo' => 0,
                 'pcontent' => '',
                 'at_users' => [],
                 'is_group' => $params['is_group'],
