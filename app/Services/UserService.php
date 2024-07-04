@@ -88,6 +88,7 @@ class UserService extends BaseService
         $self = $user->id == $userId;
         $relationship = 'owner';
         $source = $isMobile ? 'mobile' : 'wechat';
+        $setting = config('user.friend.setting');
         $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'keywords' => $params['keywords'], 'display_nickname' => $user->nickname];
         $homeInfo = array_merge($homeInfo, $user->toArray());
         $sourceConfig = config('user.source');
@@ -114,12 +115,14 @@ class UserService extends BaseService
                 $homeInfo['source_text'] = '通过' . $sourceConfig[$owner->source] . '搜索';
                 $homeInfo['check_msg'] = "我：{$owner->remark}";
             }
-            if ($owner && $owner->nickname != $homeInfo['nickname']) $homeInfo['display_nickname'] = $owner->nickname;
             if ($owner) {
+                $homeInfo['display_nickname'] = $owner->nickname ?: $user->nickname;
                 $homeInfo['source'] = $owner->source;
+                $setting = $owner->setting;
             }
         }
         $homeInfo['relationship'] = $relationship;
+        $homeInfo['setting'] = $setting;
         return $homeInfo;
     }
 
@@ -128,16 +131,23 @@ class UserService extends BaseService
         return User::query()->find($userId, ['wechat', 'mobile', 'avatar', 'gender', 'sign', 'setting'])->toArray();
     }
 
-    public function info(array $params)
+    public function info(array $params): array
     {
         $id = $params['id'];
         $userId = $params['user']->id;
         $self = $id == $userId;
-        $user = User::query()->find($params['id'], ['id', 'nickname', 'avatar', 'wechat', 'mobile', 'gender', 'sign', 'setting']);
+        $user = User::query()->find($params['id'], ['id', 'nickname', 'avatar', 'wechat', 'mobile', 'gender', 'sign', 'setting'])->toArray();
+        $user['keywords'] = $user['wechat'];
         if (!$self) {
             $owner = Friend::query()->where('owner', $userId)->where('friend', $id)->first(['nickname', 'setting']);
-            $friend = Friend::query()->where('owner', $id)->where('friend', $userId)->first(['nickname', 'setting']);
-
+            if ($owner) {
+                $user['setting'] = $owner->setting;
+                $user['nickname'] = $owner->nickname ?: $user['nickname'];
+                $user['keywords'] = $user[$owner->source];
+                $user['desc'] = $owner->desc;
+            }
         }
+        unset($user['mobile']);
+        return $user;
     }
 }

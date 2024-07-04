@@ -32,6 +32,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
     $router->group(['prefix' => 'user'], function ($router) {
         $router->post('/logout', 'UserController@logout');
         $router->get('/me', 'UserController@me');
+        $router->get('/info', 'UserController@info');
         $router->get('/{keywords}/home', 'UserController@home');
     });
 

@@ -14,11 +14,14 @@ return [
     ],
     'friend' => [
         'setting' => [
-            'SettingFriendPerm' => 'ALLOW_ALL',
-            'MomentAndStatus' => [
-                "DontLetHimSeeIt" => 0,
-                "DontSeeHim" => 0
+            'FriendPerm' => [
+                'SettingFriendPerm' => 'ALLOW_ALL',
+                'MomentAndStatus' => [
+                    "DontLetHimSeeIt" => 0,
+                    "DontSeeHim" => 0
+                ]
             ]
+
         ]
     ],
     'source' => [

@@ -89,7 +89,7 @@ class UserController extends Controller
         return $this->success($data, $request);
     }
 
-    public function info(int $id, Request $request)
+    public function info(int $id, Request $request): \Illuminate\Http\JsonResponse
     {
         $this->params['id'] = $id;
         $data = $this->userService->info($this->params);

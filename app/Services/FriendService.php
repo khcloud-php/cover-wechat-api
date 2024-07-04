@@ -286,7 +286,7 @@ class FriendService extends BaseService
         }
         $friend->save();
 //        $this->delCache($params);
-        return $friend->toArray();
+        return [];
     }
 
     private function delCache(array $params): void
