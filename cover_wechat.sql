@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 01/07/2024 09:28:44
+ Date: 04/07/2024 10:46:38
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `cw_exception_logs`  (
   `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 179 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 199 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_files
@@ -72,6 +72,7 @@ CREATE TABLE `cw_friends`  (
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '最新消息',
   `time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '最新消息时间',
   `display` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '显示',
+  `hide` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '隐藏',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `desc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `setting` json NOT NULL,
@@ -81,7 +82,7 @@ CREATE TABLE `cw_friends`  (
   `updated_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_owner_friend`(`owner`, `friend`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '好友' ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '好友' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_group_users
@@ -105,7 +106,7 @@ CREATE TABLE `cw_group_users`  (
   `deleted_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_group_id_user_id`(`group_id`, `user_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 93 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '群成员' ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 95 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '群成员' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_groups
@@ -126,7 +127,7 @@ CREATE TABLE `cw_groups`  (
   `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `updated_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '群' ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '群' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_messages
@@ -154,7 +155,7 @@ CREATE TABLE `cw_messages`  (
   `deleted_users` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '已删除成员',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_from_to`(`from_user`, `to_user`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 187 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 272 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for cw_users
@@ -179,7 +180,7 @@ CREATE TABLE `cw_users`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_wechat`(`wechat`) USING BTREE,
   UNIQUE INDEX `uk_mobile`(`mobile`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for migrations
