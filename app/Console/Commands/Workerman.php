@@ -64,7 +64,7 @@ class Workerman extends Command
         $worker = new BusinessWorker();
         $worker->name = 'BusinessWorker';
         $worker->count = 1;
-        $worker->registerAddress = '127.0.0.1:1236';
+        $worker->registerAddress = '127.0.0.1:1238';
         $worker->eventHandler = \App\Workerman\Events::class;
     }
 
@@ -78,11 +78,11 @@ class Workerman extends Command
         $gateway->pingInterval = 30;
         $gateway->pingNotResponseLimit = 0;
         $gateway->pingData = '{"type":"@heart@"}';
-        $gateway->registerAddress = '127.0.0.1:1236';
+        $gateway->registerAddress = '127.0.0.1:1238';
     }
 
     private function startRegister(): void
     {
-        new Register('text://0.0.0.0:1236');
+        new Register('text://0.0.0.0:1238');
     }
 }
