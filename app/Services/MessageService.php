@@ -29,7 +29,8 @@ class MessageService extends BaseService
         $me = [
             'id' => $fromUser,
             'nickname' => $params['user']->nickname,
-            'avatar' => $params['user']->avatar
+            'avatar' => $params['user']->avatar,
+            'wechat' => $params['user']->wechat,
         ];
 
         $list = [];
@@ -97,7 +98,7 @@ class MessageService extends BaseService
             //群聊
             $userIds = array_column($list, 'from_user');
             $userIds = array_unique($userIds);
-            $userList = User::query()->whereIn('id', $userIds)->get(['id', 'nickname', 'avatar'])->toArray();
+            $userList = User::query()->whereIn('id', $userIds)->get(['id', 'nickname', 'avatar', 'wechat'])->toArray();
 
             $groupUserList = GroupUser::query()
                 ->where('group_id', $toUser)
@@ -105,7 +106,7 @@ class MessageService extends BaseService
                 ->get(['nickname', 'user_id'])->toArray();
             $groupUserList = array_column($groupUserList, 'nickname', 'user_id');
             foreach ($userList as &$user) {
-                if (isset($groupUserList[$item['id']])) {
+                if (!empty($groupUserList[$item['id']])) {
                     $user['nickname'] = $groupUserList[$user['id']];
                 }
             }
@@ -120,16 +121,15 @@ class MessageService extends BaseService
                     $item['content'] = $who . "撤回了一条消息";
                 }
                 $item['from'] = $item['from_user'] == $fromUser ? $me : $userList[$item['from_user']];
-
             }
             unset($item);
         } else {
             //私聊
-            $user = User::query()->where('id', $toUser)->first(['id', 'nickname', 'avatar']);
+            $user = User::query()->where('id', $toUser)->first(['id', 'nickname', 'avatar', 'wechat']);
             $friend = Friend::query()->where('owner', $fromUser)
                 ->where('friend', $toUser)
                 ->first(['id', 'nickname']);
-            $user->nickname = $friend->nickname ?? $user->nickname;
+            $user->nickname = $friend->nickname ?: $user->nickname;
             foreach ($list as &$item) {
                 //撤回处理
                 if ($item['is_undo']) {
