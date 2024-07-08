@@ -149,7 +149,6 @@ class ChatService extends BaseService
             $chatInfo['muted'] = (bool)$friend['muted'];
             $chatInfo['top'] = (bool)$friend['top'];
             $chatInfo['bg_file_path'] = $friend['bg_file_path'];
-            $chatInfo['role'] = $friend['role'];
             $chatInfo['users'][] = $friend['to'];
         }
         return $chatInfo;
