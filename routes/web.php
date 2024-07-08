@@ -40,12 +40,12 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
     $router->group(['prefix' => 'chat'], function ($router) {
         $router->get('/list', 'ChatController@list');
         $router->get('/info', 'ChatController@info');
-    });
-    $router->group(['middleware' => 'message', 'prefix' => 'chat'], function ($router) {
         $router->put('/top', 'ChatController@top');
         $router->put('/hide', 'ChatController@hide');
         $router->put('/delete', 'ChatController@delete');
+        $router->put('/update', 'ChatController@update');
     });
+
     $router->group(['middleware' => 'message', 'prefix' => 'message'], function ($router) {
         $router->post('/send', 'MessageController@send');
         $router->put('/read', 'MessageController@read');

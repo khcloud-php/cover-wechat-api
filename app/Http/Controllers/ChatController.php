@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\BusinessException;
 use App\Services\ChatService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -60,6 +61,22 @@ class ChatController extends Controller
         ]);
         $data = $this->chatService->hide($this->params);
         return $this->success($data, $request);
+    }
+
+    /**
+     * @throws BusinessException
+     * @throws ValidationException
+     */
+    public function update(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'to_user' => 'required',
+            'is_group' => 'required',
+            'key' => 'required',
+            'value' => 'required'
+        ]);
+        $this->chatService->update($this->params);
+        return $this->success([], $request);
     }
 
     /**

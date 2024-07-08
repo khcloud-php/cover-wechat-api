@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\MessageEnum;
+use App\Exceptions\BusinessException;
 use App\Models\Friend;
+use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\Message;
 use Exception;
@@ -14,7 +16,7 @@ class ChatService extends BaseService
 {
     public function list(array $params): array
     {
-        $userId = $params['user']->id;
+        $fromUser = $params['user']->id;
 
         //私聊
         $privateChatList = Friend::query()
@@ -22,12 +24,12 @@ class ChatService extends BaseService
                 $query->select(['id', 'avatar', 'nickname']);
             }])
             ->select(['content', 'time', 'unread', 'top', 'nickname', 'friend'])
-            ->where('owner', $userId)
+            ->where('owner', $fromUser)
             ->where('display', 1)
             ->get()->toArray();
 
         foreach ($privateChatList as &$item) {
-            $item['id'] = md5(MessageEnum::PRIVATE . $userId . $item['friend']['id']);
+            $item['id'] = md5(MessageEnum::PRIVATE . $fromUser . $item['friend']['id']);
             $item['nickname'] = $item['nickname'] ?: $item['friend']['nickname'];
             $item['friend']['avatars'] = [$item['friend']['avatar']];
             $item['to'] = $item['friend'];
@@ -48,7 +50,7 @@ class ChatService extends BaseService
                 }])->select(['id', 'content', 'time', 'send_user', 'name']);
             }])
             ->select(['unread', 'top', 'group_id', 'user_id', 'name', 'nickname'])
-            ->where('user_id', $userId)
+            ->where('user_id', $fromUser)
             ->where('display', 1)
             ->get()->toArray();
 
@@ -73,7 +75,7 @@ class ChatService extends BaseService
         unset($groupUserList, $groupUser);
 
         foreach ($groupChatList as &$item) {
-            $item['id'] = md5(MessageEnum::GROUP . $userId . $item['group']['id']);
+            $item['id'] = md5(MessageEnum::GROUP . $fromUser . $item['group']['id']);
             $nickname = $item['nickname'];
             if (empty($nickname)) {
                 $nickname = $item['group']['friend']['nickname'] ?: $item['group']['send']['nickname'];
@@ -99,35 +101,56 @@ class ChatService extends BaseService
         $fromUser = $params['user']->id;
         $isGroup = $params['is_group'];
         $toUser = $params['to_user'];
+        $chatInfo = [
+            'from_user' => $fromUser,
+            'to_user' => $toUser,
+            'is_group' => $isGroup,
+            'users' => []
+        ];
+
         if ($isGroup == MessageEnum::GROUP) {
             $groupUser = GroupUser::query()
                 ->with(['group' => function ($query) {
-                    $query->select(['id', 'name', 'setting']);
+                    $query->select(['id', 'name', 'notice']);
                 }])
                 ->where('group_id', $toUser)
                 ->where('user_id', $fromUser)
-                ->first(['group_id', 'user_id', 'name', 'unread', 'setting'])->toArray();
-            $userCnt = GroupUser::query()->where('group_id', $toUser)->count();
-            $chatInfo = [
-                'nickname' => ($groupUser['group']['name'] ?: $groupUser['name']) . "({$userCnt})",
-                'from_setting' => $groupUser['setting'],
-                'to_setting' => $groupUser['group']['setting'],
-                'unread' => $groupUser['unread'],
+                ->first(['group_id', 'user_id', 'name', 'unread', 'top', 'muted', 'nickname', 'display_nickname', 'bg_file_path', 'role'])->toArray();
+//            var_dump($groupUser);
+            $groupUserList = GroupUser::query()->with(['user' => function ($query) {
+                $query->select(['id', 'nickname', 'avatar', 'wechat']);
+            }])->where('group_id', $toUser)->get(['group_id', 'user_id'])->toArray();
+            foreach ($groupUserList as $groupUserItem) {
+                $chatInfo['users'][] = $groupUserItem['user'];
+            }
+            $userCnt = count($chatInfo['users']);
+            $chatInfo['nickname'] = ($groupUser['name'] ?: $groupUser['group']['name']) . "({$userCnt})";
+            $chatInfo['unread'] = $groupUser['unread'];
+            $chatInfo['muted'] = (bool)$groupUser['muted'];
+            $chatInfo['top'] = (bool)$groupUser['top'];
+            $chatInfo['display_nickname'] = (bool)$groupUser['display_nickname'];
+            $chatInfo['bg_file_path'] = $groupUser['bg_file_path'];
+            $chatInfo['group_name'] = $groupUser['group']['name'];
+            $chatInfo['group'] = [
+                'name' => $groupUser['name'],
+                'nickname' => trim($groupUser['nickname']) ? $groupUser['nickname'] : $params['user']->nickname,
+                'notice' => $groupUser['group']['notice'],
             ];
         } else {
             $friend = Friend::query()
                 ->with(['to' => function ($query) {
-                    $query->select(['id', 'nickname', 'setting']);
+                    $query->select(['id', 'nickname', 'avatar', 'wechat']);
                 }])
                 ->where('owner', $fromUser)
                 ->where('friend', $toUser)
-                ->first(['owner', 'friend', 'nickname', 'unread', 'setting'])->toArray();
-            $chatInfo = [
-                'nickname' => $friend['nickname'] ?: $friend['to']['nickname'],
-                'from_setting' => $friend['setting'],
-                'to_setting' => $friend['to']['setting'],
-                'unread' => $friend['unread'],
-            ];
+                ->first(['owner', 'friend', 'nickname', 'unread', 'top', 'muted', 'bg_file_path'])->toArray();
+            $chatInfo['nickname'] = $friend['nickname'] ?: $friend['to']['nickname'];
+            $chatInfo['unread'] = $friend['unread'];
+            $chatInfo['muted'] = (bool)$friend['muted'];
+            $chatInfo['top'] = (bool)$friend['top'];
+            $chatInfo['bg_file_path'] = $friend['bg_file_path'];
+            $chatInfo['role'] = $friend['role'];
+            $chatInfo['users'][] = $friend['to'];
         }
         return $chatInfo;
     }
@@ -136,17 +159,17 @@ class ChatService extends BaseService
     {
         $isGroup = $params['is_group'];
         $toUser = $params['to_user'];
-        $userId = $params['user']->id;
+        $fromUser = $params['user']->id;
         $isTop = $params['is_top'];
         $time = $isTop > 0 ? time() : 0;
         if ($isGroup == MessageEnum::GROUP) {
             GroupUser::query()
                 ->where('group_id', $toUser)
-                ->where('user_id', $userId)
+                ->where('user_id', $fromUser)
                 ->update(['top' => $time]);
         } else {
             Friend::query()
-                ->where('owner', $userId)
+                ->where('owner', $fromUser)
                 ->where('friend', $toUser)
                 ->update(['top' => $time]);
         }
@@ -154,7 +177,7 @@ class ChatService extends BaseService
         return [
             'is_group' => $isGroup,
             'to_user' => $toUser,
-            'from_user' => $userId,
+            'from_user' => $fromUser,
             'top' => $time
         ];
     }
@@ -163,15 +186,15 @@ class ChatService extends BaseService
     {
         $isGroup = $params['is_group'];
         $toUser = $params['to_user'];
-        $userId = $params['user']->id;
+        $fromUser = $params['user']->id;
         if ($isGroup == MessageEnum::GROUP) {
             GroupUser::query()
                 ->where('group_id', $toUser)
-                ->where('user_id', $userId)
+                ->where('user_id', $fromUser)
                 ->update(['display' => 0]);
         } else {
             Friend::query()
-                ->where('owner', $userId)
+                ->where('owner', $fromUser)
                 ->where('friend', $toUser)
                 ->update(['display' => 0]);
         }
@@ -179,8 +202,43 @@ class ChatService extends BaseService
         return [
             'is_group' => $isGroup,
             'to_user' => $toUser,
-            'from_user' => $userId
+            'from_user' => $fromUser
         ];
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    public function update(array $params)
+    {
+        $fromUser = $params['user']->id;
+        $toUser = $params['to_user'];
+        $isGroup = $params['is_group'];
+        $key = $params['key']; //更新字段
+        $value = $params['value']; //更新值
+        $commonFields = ['top', 'muted', 'bg_file_id'];
+        $updateField = $key;
+        $value = is_bool($value) ? intval($value) : $value;
+        if ($isGroup == MessageEnum::GROUP) {
+            $groupFields = ['notice', 'group_name'];
+            $groupUserFields = array_merge($commonFields, ['display_nickname', 'name', 'nickname']);
+            if (!in_array($key, array_merge($groupFields, $groupUserFields))) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+            if (in_array($key, $groupFields)) {
+                $key == 'group_name' && $updateField = 'name';
+                Group::query()->where('id', $toUser)->update([$updateField => $value]);
+            } else {
+                GroupUser::query()
+                    ->where('group_id', $toUser)
+                    ->where('user_id', $fromUser)
+                    ->update([$updateField => $value]);
+            }
+        } else {
+            if (!in_array($key, $commonFields)) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+            Friend::query()
+                ->where('owner', $fromUser)
+                ->where('friend', $toUser)
+                ->update([$updateField => $value]);
+        }
     }
 
     public function delete(array $params): array
@@ -188,19 +246,19 @@ class ChatService extends BaseService
         $isGroup = $params['is_group'];
 
         $toUser = (int)$params['to_user'];
-        $userId = (int)$params['user']->id;
+        $fromUser = (int)$params['user']->id;
         DB::beginTransaction();
         try {
             if ($isGroup == MessageEnum::GROUP) {
-                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE (from_user={$userId} AND to_user={$toUser}) AND is_group={$isGroup} AND (FIND_IN_SET('{$userId}', deleted_users) = '')");
+                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$fromUser}) WHERE (from_user={$fromUser} AND to_user={$toUser}) AND is_group={$isGroup} AND (FIND_IN_SET('{$fromUser}', deleted_users) = '')");
                 GroupUser::query()
                     ->where('group_id', $toUser)
-                    ->where('user_id', $userId)
+                    ->where('user_id', $fromUser)
                     ->update(['display' => 0]);
             } else {
-                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$userId}) WHERE ((from_user={$userId} AND to_user={$toUser}) OR (from_user={$toUser} AND to_user={$userId})) AND is_group={$isGroup} AND (FIND_IN_SET('{$userId}', deleted_users) = '')");
+                DB::update("UPDATE cw_messages SET deleted_users=CONCAT(deleted_users, ',', {$fromUser}) WHERE ((from_user={$fromUser} AND to_user={$toUser}) OR (from_user={$toUser} AND to_user={$fromUser})) AND is_group={$isGroup} AND (FIND_IN_SET('{$fromUser}', deleted_users) = '')");
                 Friend::query()
-                    ->where('owner', $userId)
+                    ->where('owner', $fromUser)
                     ->where('friend', $toUser)
                     ->update(['display' => 0]);
             }
@@ -215,7 +273,7 @@ class ChatService extends BaseService
         return [
             'is_group' => $isGroup,
             'to_user' => $toUser,
-            'from_user' => $userId
+            'from_user' => $fromUser
         ];
     }
 }
