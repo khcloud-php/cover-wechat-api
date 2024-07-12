@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 04/07/2024 10:46:38
+ Date: 12/07/2024 15:11:51
 */
 
 SET NAMES utf8mb4;
@@ -31,18 +31,18 @@ CREATE TABLE `cw_exception_logs`  (
   `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 199 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 222 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_files
 -- ----------------------------
 DROP TABLE IF EXISTS `cw_files`;
 CREATE TABLE `cw_files`  (
-  `id` int(11) NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `type` enum('file','video','image') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'image',
   `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `preview_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `thumbnail_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `format` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `signature` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `size` int(10) UNSIGNED NOT NULL DEFAULT 0,
@@ -53,7 +53,7 @@ CREATE TABLE `cw_files`  (
   `updated_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_signature`(`signature`) USING BTREE
-) ENGINE = MyISAM CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件' ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_friends
@@ -66,13 +66,16 @@ CREATE TABLE `cw_friends`  (
   `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `type` enum('apply','verify') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'apply',
   `status` enum('check','pass','overdue') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'check',
-  `is_read` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `is_read` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
   `unread` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未读消息数',
   `top` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '置顶时间',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '最新消息',
   `time` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '最新消息时间',
   `display` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '显示',
   `hide` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '隐藏',
+  `muted` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '免打扰',
+  `bg_file_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '背景图ID(对应cw_files里的ID)',
+  `bg_file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '背景图路径',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `desc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `setting` json NOT NULL,
@@ -82,7 +85,7 @@ CREATE TABLE `cw_friends`  (
   `updated_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_owner_friend`(`owner`, `friend`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '好友' ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '好友' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cw_group_users
@@ -99,7 +102,11 @@ CREATE TABLE `cw_group_users`  (
   `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '我在本群昵称',
   `unread` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '未读消息数',
   `top` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '置顶时间',
-  `display` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '显示',
+  `display` tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '显示',
+  `muted` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '免打扰',
+  `display_nickname` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '显示群成员昵称',
+  `bg_file_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '背景图ID(对应cw_files里的ID)',
+  `bg_file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '背景图路径',
   `setting` json NOT NULL,
   `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `updated_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
@@ -155,7 +162,7 @@ CREATE TABLE `cw_messages`  (
   `deleted_users` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '已删除成员',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_from_to`(`from_user`, `to_user`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 272 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 277 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for cw_users
@@ -180,7 +187,7 @@ CREATE TABLE `cw_users`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_wechat`(`wechat`) USING BTREE,
   UNIQUE INDEX `uk_mobile`(`mobile`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for migrations
