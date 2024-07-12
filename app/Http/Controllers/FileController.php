@@ -24,10 +24,9 @@ class FileController extends Controller
     public function upload(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'file' => 'required|file|mimes:jpg,jpeg,png,mp4,mov,avi,pdf,docx,txt|max:20480',
+            'file' => 'required|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,pdf,docx,txt|max:20480',
         ]);
-        $file = $request->file('file');
-        $data = $this->fileService->upload($file);
+        $data = $this->fileService->upload($request);
         return $this->success($data, $request);
     }
 

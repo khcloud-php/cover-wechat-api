@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ApiCodeEnum;
 use App\Exceptions\BusinessException;
 use App\Models\File;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
@@ -13,13 +14,17 @@ class FileService extends BaseService
     /**
      * @throws BusinessException
      */
-    public function upload($file): array
+    public function upload(Request $request): array
     {
+        //上传的如果是头像就需要裁剪成正方头像
+        $avatar = $request->input('avatar');
+        $file = $request->file('file');
         if (!$file->isValid()) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
         // 已存在直接返回
-        $signature = md5_file($file->getPathname());
+        $realPath = $file->getPathname();
+        $signature = md5_file($realPath);
         if ($data = $this->checkFileExists($signature)) {
             return $data;
         }
@@ -35,28 +40,39 @@ class FileService extends BaseService
         $duration = 0;
         $fileType = 'file';
         $date = date('Ymd');
+        $filePath = "uploads/image/{$date}/{$newFileName}";
+        $outputPath = Storage::disk('public')->path($filePath);
         $thumbnailPath = '';
+        $needCropSquare = false;
+        //头像的话需要截图
+        if ($avatar) {
+            $needCropSquare = $this->cropSquare($realPath, $outputPath);
+        }
+
+        // 指定上传路径并重命名文件
+        if (!$needCropSquare)
+            $path = $file->storeAs("uploads/{$fileType}/{$date}", $newFileName, 'public');
+        else {
+            $realPath = $outputPath;
+            $path = $filePath;
+        }
 
         if (in_array($fileFormat, ['jpg', 'jpeg', 'png'])) {
             // 生成缩略图
             $fileType = 'image';
             $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
-            list($width, $height) = $this->makeThumbnailImage($file->getPathname(), $thumbnailPath);
+            list($width, $height, $size) = $this->makeThumbnailImage($realPath, $thumbnailPath);
         } elseif (in_array($fileFormat, ['mp4', 'mov', 'avi'])) {
-            // 获取视频时长和缩略图
+            // 获取视频时长和封面图
             $ffmpeg = \FFMpeg\FFMpeg::create();
-            $video = $ffmpeg->open($file->getPathname());
+            $video = $ffmpeg->open($realPath);
             $ffprobe = \FFMpeg\FFProbe::create();
-            $duration = (int)$ffprobe->format($file->getPathname())->get('duration');
+            $duration = (int)$ffprobe->format($realPath)->get('duration');
             $fileType = 'video';
-            // 生成缩略图
             $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
             $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1))
                 ->save(storage_path('app/public/' . $thumbnailPath));
         }
-
-        // 指定上传路径并重命名文件
-        $path = $file->storeAs("uploads/{$fileType}/{$date}", $newFileName, 'public');
 
         // 将文件信息存储到数据库
         $fileRecord = new File();
@@ -92,20 +108,11 @@ class FileService extends BaseService
         $date = date('Ymd');
         // 确定文件扩展名
         $mimeType = explode(':', explode(';', $base64Image)[0])[1];
-        $extension = '';
-        switch ($mimeType) {
-            case 'image/jpeg':
-                $extension = 'jpg';
-                break;
-            case 'image/png':
-                $extension = 'png';
-                break;
-            case 'image/gif':
-                $extension = 'gif';
-                break;
-            default:
-                $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
-        }
+        $extension = match ($mimeType) {
+            'image/jpeg' => 'jpeg',
+            'image/png' => 'png',
+            default => $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR),
+        };
         // 生成唯一文件名
         $fileName = uniqid() . '.' . $extension;
         $filePath = "uploads/image/{$date}/{$fileName}";
@@ -162,11 +169,36 @@ class FileService extends BaseService
         $image = Image::make($filePath);
         $width = $image->width();
         $height = $image->height();
+        $size = $image->filesize();
         // 生成缩略图
         $thumbnail = $image->resize($width * 0.5, $height * 0.5, function ($constraint) {
             $constraint->aspectRatio();
         });
         Storage::disk('public')->put($thumbnailFilePath, (string)$thumbnail->encode());
-        return [$width, $height];
+        return [$width, $height, $size];
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    private function cropSquare(string $filePath, string $outputPath): bool
+    {
+        if (!file_exists($filePath)) $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, '裁剪图片失败，文件不存在');
+        // 创建一个 Image 实例
+        $image = Image::make($filePath);
+        // 获取图片的宽和高
+        $width = $image->width();
+        $height = $image->height();
+        if ($width == $height) return false;
+        // 计算正方形的边长
+        $sideLength = min($width, $height);
+        // 计算裁剪位置
+        $x = $width > $height ? intval(($width - $sideLength) / 2) : 0;
+        $y = $height > $width ? intval(($height - $sideLength) / 2) : 0;
+        // 居中裁剪成正方形
+        $image->crop($sideLength, $sideLength, $x, $y);
+        // 保存裁剪后的图片
+        $image->save($outputPath);
+        return true;
     }
 }

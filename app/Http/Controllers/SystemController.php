@@ -62,17 +62,11 @@ class SystemController extends Controller
     {
         $captchaType = request()->post('captchaType', null);
         $config = config('captcha');
-        switch ($captchaType) {
-            case "clickWord":
-                $service = new ClickWordCaptchaService($config);
-                break;
-            case "blockPuzzle":
-                $service = new BlockPuzzleCaptchaService($config);
-                break;
-            default:
-                throw new ParamException('captchaType参数不正确！');
-        }
-        return $service;
+        return match ($captchaType) {
+            "clickWord" => new ClickWordCaptchaService($config),
+            "blockPuzzle" => new BlockPuzzleCaptchaService($config),
+            default => throw new ParamException('captchaType参数不正确！'),
+        };
     }
 
     private function result($data): array
