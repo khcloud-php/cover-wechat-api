@@ -28,8 +28,8 @@ class User
         }
 //        $_SESSION[sprintf(UserEnum::BIND_UID, $clientId)] = $uid;
 //        $_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)] = json_encode($groupIds);
-        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::BIND_UID, $clientId), $uid);
-        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::JOIN_GROUPS, $clientId), $groupIds);
+//        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::BIND_UID, $clientId), $uid);
+//        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::JOIN_GROUPS, $clientId), $groupIds);
     }
 
     /**
@@ -43,13 +43,13 @@ class User
         if ($uid) {
             $groupIds = $this->getJoinGroupIdsByClientId($clientId);
             if ($groupIds) {
-                foreach ($groupIds as $groupId) {
-                    Gateway::leaveGroup($clientId, $groupId);
-                }
+//                foreach ($groupIds as $groupId) {
+//                    Gateway::leaveGroup($clientId, $groupId);
+//                }
 //                unset($_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)]);
                 Cache::store(UserEnum::STORE)->forget(sprintf(UserEnum::JOIN_GROUPS, $clientId));
             }
-            Gateway::unbindUid($clientId, $uid);
+//            Gateway::unbindUid($clientId, $uid);
 //            unset($_SESSION[sprintf(UserEnum::BIND_UID, $clientId)]);
             Cache::store(UserEnum::STORE)->forget(sprintf(UserEnum::BIND_UID, $clientId));
         }

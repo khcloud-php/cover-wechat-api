@@ -42,11 +42,6 @@ class Events
     public static function onClose($clientId): void
     {
         echo "clientId:{$clientId} 离线了\n";
-//        try {
-//            (new User)->logout($clientId);
-//        } catch (\Exception $e) {
-//            echo $e->getMessage();
-//        }
-
+        (new User)->logout($clientId);
     }
 }
