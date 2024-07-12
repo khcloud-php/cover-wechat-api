@@ -20,6 +20,19 @@ if (!function_exists('is_mobile')) {
     }
 }
 
+if (!function_exists('public_path')) {
+    /**
+     * Get the path to the public folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function public_path($path = '')
+    {
+        return app()->basePath('public').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+}
+
 if (!function_exists('group_by_first_char')) {
     //通过中英文的拼音英文首字母分组
     function group_by_first_char($array, $field)
