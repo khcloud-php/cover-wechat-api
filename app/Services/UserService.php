@@ -126,11 +126,6 @@ class UserService extends BaseService
         return $homeInfo;
     }
 
-    public function me(int $userId): array
-    {
-        return User::query()->find($userId, ['wechat', 'mobile', 'avatar', 'gender', 'sign', 'setting'])->toArray();
-    }
-
     public function info(array $params): array
     {
         $id = $params['id'];
@@ -149,5 +144,20 @@ class UserService extends BaseService
         }
         unset($user['mobile']);
         return $user;
+    }
+
+    public function update(array $params): array
+    {
+        $userId = $params['user']->id;
+        $updateAllowFields = ['avatar', 'gender', 'sign', 'nickname', 'setting'];
+        $updateData = [];
+        foreach ($params as $key => $value) {
+            if (in_array($key, $updateAllowFields)) {
+                $updateData[$key] = $value;
+            }
+        }
+        if ($updateData)
+            User::query()->where('id', $userId)->update($updateData);
+        return $updateData;
     }
 }

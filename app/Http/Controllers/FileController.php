@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\BusinessException;
 use App\Services\FileService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class FileController extends Controller
 {
@@ -15,14 +17,30 @@ class FileController extends Controller
         $this->fileService = new FileService();
     }
 
-    public function upload(Request $request)
+    /**
+     * @throws ValidationException
+     * @throws BusinessException
+     */
+    public function upload(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'file' => 'required|file|mimes:jpeg,jpg,png,gif,mp4,avi,wmv,mpeg'
+            'file' => 'required|file|mimes:jpg,jpeg,png,mp4,mov,avi,pdf,docx,txt|max:20480',
         ]);
         $file = $request->file('file');
-        $file->getFileInfo();
         $data = $this->fileService->upload($file);
-        $this->success($data, $request);
+        return $this->success($data, $request);
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws BusinessException
+     */
+    public function uploadBase64(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'base64' => 'required'
+        ]);
+        $data = $this->fileService->uploadBase64($this->params['base64']);
+        return $this->success($data, $request);
     }
 }

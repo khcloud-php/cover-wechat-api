@@ -32,4 +32,16 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
     protected $casts = [
         'setting' => 'json'
     ];
+
+    /**
+     * 头像路径处理
+     *
+     * @param string $value
+     * @return string
+     */
+    public function getAvatarAttribute($value)
+    {
+        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . '/' . $value;
+        return $value;
+    }
 }

@@ -101,9 +101,9 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me(Request $request): \Illuminate\Http\JsonResponse
+    public function update(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = $this->userService->me($request->user()->id);
+        $data = $this->userService->update($this->params);
         return $this->success($data, $request);
     }
 }

@@ -20,6 +20,12 @@ $router->group(['prefix' => 'system'], function ($router) {
     $router->post('/captcha/verification', 'SystemController@verification');
 });
 
+//文件模块
+$router->group(['prefix' => 'file'], function ($router) {
+    $router->post('/upload', 'FileController@upload');
+    $router->post('/upload-base64', 'FileController@uploadBase64');
+});
+
 //用户模块-需校验验证码
 $router->group(['prefix' => 'user', 'middleware' => 'captcha'], function ($router) {
     $router->post('/register', 'UserController@register');
@@ -34,6 +40,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->get('/me', 'UserController@me');
         $router->get('/info', 'UserController@info');
         $router->get('/{keywords}/home', 'UserController@home');
+        $router->put('/update', 'UserController@update');
     });
 
     // 消息模块
