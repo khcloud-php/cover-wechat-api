@@ -51,6 +51,14 @@ class MessageService extends BaseService
             $parentMessages = array_column($parentMessages, 'content', 'id');
         }
 
+        $fileIds = array_column($messages, 'file_id');
+        $fileIds = array_filter($fileIds);
+        $files = [];
+        if ($fileIds) {
+            $files = File::query()->whereIn('id', $fileIds)->get()->toArray();
+            $files = array_column($files, null, 'id');
+        }
+
         foreach ($messages as $message) {
             $item = [
                 'id' => $message['id'],
@@ -69,20 +77,21 @@ class MessageService extends BaseService
             ];
             if (in_array($message['type'], FileEnum::TYPE)) {
                 $fileId = $message['file_id'];
-                $file = File::query()->find($fileId);
+                $file = $files[$fileId] ?? [];
                 if ($file) {
+                    $item['content'] = env('STATIC_FILE_URL') . '/' . $file['path'];
                     $item['extends'] = [
-                        'path' => $file->path,
-                        'format' => $file->format,
-                        'width' => $file->width,
-                        'height' => $file->height,
-                        'duration' => $file->duration
+                        'thumbnail' => $file['thumbnail_path'] ? env('STATIC_FILE_URL') . '/' . $file['thumbnail_path'] : '',
+                        'format' => $file['format'],
+                        'width' => $file['width'],
+                        'height' => $file['height'],
+                        'duration' => $file['duration']
                     ];
                     $item['file'] = [
                         'id' => $fileId,
-                        'name' => $file->name,
-                        'type' => $file->type,
-                        'size' => $file->size
+                        'name' => $file['name'],
+                        'type' => $file['type'],
+                        'size' => $file['size']
                     ];
                 }
 
@@ -198,7 +207,7 @@ class MessageService extends BaseService
                 $data['file_name'] = $file->name;
                 $data['file_type'] = $file->type;
                 $data['file_size'] = $file->size;
-                $data['extends'] = $sendData['data']['extends'] = [
+                $sendData['data']['extends'] = [
                     'path' => $file->path,
                     'format' => $file->format,
                     'width' => $file->width,
@@ -211,6 +220,9 @@ class MessageService extends BaseService
                     'type' => $file->type,
                     'size' => $file->size
                 ];
+                $data['extends'] = json_encode($sendData['data']['extends']);
+                $data['content'] = FileEnum::CONTENT[$file->type] ?? '[文件信息]';
+                $sendData['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
             }
 
         }

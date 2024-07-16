@@ -12,4 +12,6 @@ class FriendEnum
     const SOURCE_MOBILE = 'mobile';
     const SOURCE_WECHAT = 'wechat';
     const SOURCE_GROUP = 'group';
+
+    const PASS_MESSAGE = '我通过了你的好友验证请求，现在我们可以开始聊天了';
 }

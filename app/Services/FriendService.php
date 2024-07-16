@@ -188,7 +188,6 @@ class FriendService extends BaseService
         $fromUser = $params['user']->id;
         $toUser = $params['friend'];
         $time = time();
-        $content = '我通过了你的好友验证请求，现在我们可以开始聊天了';
         $user = User::query()->find($toUser, ['nickname']);
         //备注相同就是没有备注
         if ($user->nickname == $params['nickname']) $params['nickname'] = '';
@@ -210,7 +209,7 @@ class FriendService extends BaseService
             $owner->type = FriendEnum::TYPE_VERIFY;
             $owner->status = FriendEnum::STATUS_PASS;
             $owner->display = 1;
-            $owner->content = $content;
+            $owner->content = FriendEnum::PASS_MESSAGE;
             $owner->time = $time;
             $owner->save();
 
@@ -219,7 +218,7 @@ class FriendService extends BaseService
             $friend->status = FriendEnum::STATUS_PASS;
             $friend->display = 1;
             $friend->unread = 1;
-            $friend->content = $content;
+            $friend->content = FriendEnum::PASS_MESSAGE;
             $friend->time = $time;
             $friend->save();
             DB::commit();
@@ -253,7 +252,7 @@ class FriendService extends BaseService
             $data = [
                 'from_user' => $fromUser,
                 'to_user' => $toUser,
-                'content' => $content,
+                'content' => FriendEnum::PASS_MESSAGE,
                 'is_group' => MessageEnum::PRIVATE,
                 'type' => MessageEnum::TEXT,
                 'created_at' => $time

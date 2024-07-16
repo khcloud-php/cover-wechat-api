@@ -13,4 +13,10 @@ class FileEnum
         self::IMAGE,
         self::VIDEO,
     ];
+
+    const CONTENT = [
+        self::FILE => '[文件信息]',
+        self::IMAGE => '[图片信息]',
+        self::VIDEO => '[视频信息]'
+    ];
 }

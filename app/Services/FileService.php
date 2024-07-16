@@ -33,12 +33,13 @@ class FileService extends BaseService
         $newThumbnailFileName = 'thumbnail_' . $newFileName;
         // 获取文件信息
         $size = $file->getSize();
-        $fileFormat = $file->getClientOriginalExtension();
+        $mimeTypeArr = explode('/', $file->getClientMimeType());
+        $fileType = $mimeTypeArr[0] ?? 'file';
+        $fileFormat = $mimeTypeArr[1] ?? $file->getClientOriginalExtension();
         // 初始化变量
         $width = 0;
         $height = 0;
         $duration = 0;
-        $fileType = 'file';
         $date = date('Ymd');
         $filePath = "uploads/image/{$date}/{$newFileName}";
         $outputPath = Storage::disk('public')->path($filePath);
@@ -57,12 +58,11 @@ class FileService extends BaseService
             $path = $filePath;
         }
 
-        if (in_array($fileFormat, ['jpg', 'jpeg', 'png'])) {
+        if ($fileType == 'image') {
             // 生成缩略图
-            $fileType = 'image';
             $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
             list($width, $height, $size) = $this->makeThumbnailImage($realPath, $thumbnailPath);
-        } elseif (in_array($fileFormat, ['mp4', 'mov', 'avi'])) {
+        } elseif ($fileType == 'video') {
             // 获取视频时长和封面图
             $ffmpeg = \FFMpeg\FFMpeg::create();
             $video = $ffmpeg->open($realPath);
