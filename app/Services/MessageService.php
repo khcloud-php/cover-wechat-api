@@ -222,7 +222,7 @@ class MessageService extends BaseService
                 ];
                 $data['extends'] = json_encode($sendData['data']['extends']);
                 $data['content'] = FileEnum::CONTENT[$file->type] ?? '[文件信息]';
-                $sendData['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
+                $sendData['data']['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
             }
 
         }
