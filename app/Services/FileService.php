@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ApiCodeEnum;
+use App\Enums\Database\FileEnum;
 use App\Exceptions\BusinessException;
 use App\Models\File;
 use Illuminate\Http\Request;
@@ -29,12 +30,14 @@ class FileService extends BaseService
             return $data;
         }
         // 生成新的文件名
-        $newFileName = $signature . '.' . $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
+        $newFileName = $signature . '.' . $extension;
         $newThumbnailFileName = 'thumbnail_' . $newFileName;
         // 获取文件信息
         $size = $file->getSize();
         $mimeTypeArr = explode('/', $file->getClientMimeType());
         $fileType = $mimeTypeArr[0] ?? 'file';
+        $this->limitFileSIze($fileType, $size);
         $fileFormat = $mimeTypeArr[1] ?? $file->getClientOriginalExtension();
         // 初始化变量
         $width = 0;
@@ -58,17 +61,19 @@ class FileService extends BaseService
             $path = $filePath;
         }
 
-        if ($fileType == 'image') {
+        if ($fileType == FileEnum::IMAGE) {
             // 生成缩略图
             $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
             list($width, $height, $size) = $this->makeThumbnailImage($realPath, $thumbnailPath);
-        } elseif ($fileType == 'video') {
+        } elseif ($fileType == FileEnum::VIDEO) {
             // 获取视频时长和封面图
             $ffmpeg = \FFMpeg\FFMpeg::create();
             $video = $ffmpeg->open($realPath);
             $ffprobe = \FFMpeg\FFProbe::create();
             $duration = (int)$ffprobe->format($realPath)->get('duration');
-            $fileType = 'video';
+            $width = (int)$ffprobe->format($realPath)->get('width');
+            $height = (int)$ffprobe->format($realPath)->get('height');
+            $newThumbnailFileName = str_replace($extension, 'jpg', $newThumbnailFileName);
             $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
             $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1))
                 ->save(storage_path('app/public/' . $thumbnailPath));
@@ -99,7 +104,7 @@ class FileService extends BaseService
     /**
      * @throws BusinessException
      */
-    public function uploadBase64(string $base64Image)
+    public function uploadBase64(string $base64Image): bool|array
     {
         // 解析 Base64 编码的图像数据
         list($type, $data) = explode(';', $base64Image);
@@ -199,6 +204,25 @@ class FileService extends BaseService
         $image->crop($sideLength, $sideLength, $x, $y);
         // 保存裁剪后的图片
         $image->save($outputPath);
+        return true;
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    private function limitFileSIze($fileType, $size): bool
+    {
+        switch ($fileType) {
+            case FileEnum::IMAGE:
+                if ($size > FileEnum::IMAGE_LIMIT_SIZE) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+                break;
+            case FileEnum::VIDEO:
+                if ($size > FileEnum::VIDEO_LIMIT_SIZE) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+                break;
+            default:
+                if ($size > FileEnum::FILE_LIMIT_SIZE) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+                break;
+        }
         return true;
     }
 }
