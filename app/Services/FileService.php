@@ -67,8 +67,6 @@ class FileService extends BaseService
             list($width, $height, $size) = $this->makeThumbnailImage($realPath, $thumbnailPath);
         } elseif ($fileType == FileEnum::VIDEO) {
             // 获取视频时长和封面图
-            $ffmpeg = \FFMpeg\FFMpeg::create();
-            $video = $ffmpeg->open($realPath);
             $configuration = [];
             if (isLinux()) {
                 $configuration = [
@@ -76,6 +74,8 @@ class FileService extends BaseService
                     'ffprobe.binaries' => '/usr/bin/ffprobe'
                 ];
             }
+            $ffmpeg = \FFMpeg\FFMpeg::create($configuration);
+            $video = $ffmpeg->open($realPath);
             $ffprobe = \FFMpeg\FFProbe::create($configuration);
             $duration = (int)$ffprobe->format($realPath)->get('duration');
             $width = (int)$ffprobe->format($realPath)->get('width');
