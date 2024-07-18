@@ -21,6 +21,6 @@ class FileEnum
     ];
 
     const FILE_LIMIT_SIZE = 5 * 1024 * 1024;
-    const IMAGE_LIMIT_SIZE = 2 * 1024 * 1024;
+    const IMAGE_LIMIT_SIZE = 5 * 1024 * 1024;
     const VIDEO_LIMIT_SIZE = 30 * 1024 * 1024;
 }
