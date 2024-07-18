@@ -70,8 +70,8 @@ class FileService extends BaseService
             $configuration = [];
             if (isLinux()) {
                 $configuration = [
-                    'ffmpeg.binaries' => '/usr/bin/ffmpeg',
-                    'ffprobe.binaries' => '/usr/bin/ffprobe'
+                    'ffmpeg.binaries' => env('FFMPEG_PATH'),
+                    'ffprobe.binaries' => env('FFPROBE_PATH')
                 ];
             }
             $ffmpeg = \FFMpeg\FFMpeg::create($configuration);
