@@ -69,7 +69,14 @@ class FileService extends BaseService
             // 获取视频时长和封面图
             $ffmpeg = \FFMpeg\FFMpeg::create();
             $video = $ffmpeg->open($realPath);
-            $ffprobe = \FFMpeg\FFProbe::create();
+            $configuration = [];
+            if (isLinux()) {
+                $configuration = [
+                    'ffmpeg.binaries' => '/usr/bin/ffmpeg',
+                    'ffprobe.binaries' => '/usr/bin/ffprobe'
+                ];
+            }
+            $ffprobe = \FFMpeg\FFProbe::create($configuration);
             $duration = (int)$ffprobe->format($realPath)->get('duration');
             $width = (int)$ffprobe->format($realPath)->get('width');
             $height = (int)$ffprobe->format($realPath)->get('height');
