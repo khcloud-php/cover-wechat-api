@@ -70,7 +70,23 @@ class Workerman extends Command
 
     private function startGateWay(): void
     {
-        $gateway = new Gateway("websocket://0.0.0.0:2346");
+        $context = [];
+        if (env('OPEN_WSS')) {
+            $certificatePath = env('CERTIFICATE_PATH');
+            $privatePath = env('PRIVATE_PATH');
+            if (is_file($certificatePath) && is_file($certificatePath)) {
+                $context = [
+                    'ssl' => [
+                        'local_cert' => $certificatePath, // 证书文件
+                        'local_pk' => $privatePath,     // 私钥文件
+                        'verify_peer' => false
+                    ]
+                ];
+            }
+        }
+        echo "context：" . json_encode($context) . "\n";
+
+        $gateway = new Gateway("websocket://0.0.0.0:2346", $context);
         $gateway->name = 'Gateway';
         $gateway->count = 1;
         $gateway->lanIp = '127.0.0.1';
