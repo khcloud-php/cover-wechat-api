@@ -88,6 +88,9 @@ class Workerman extends Command
 
         $gateway = new Gateway("websocket://0.0.0.0:2346", $context);
         $gateway->name = 'Gateway';
+        if($context){
+            $gateway->transport = 'ssl';
+        }
         $gateway->count = 1;
         $gateway->lanIp = '127.0.0.1';
         $gateway->startPort = 2300;
