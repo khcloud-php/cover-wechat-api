@@ -8,7 +8,7 @@ use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\Group;
 use App\Models\GroupUser;
-use App\Models\Message;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -107,7 +107,7 @@ class ChatService extends BaseService
             'is_group' => $isGroup,
             'users' => []
         ];
-
+        $user = User::query()->find($fromUser, ['bg_file_path']);
         if ($isGroup == MessageEnum::GROUP) {
             $groupUser = GroupUser::query()
                 ->with(['group' => function ($query) {
@@ -118,10 +118,13 @@ class ChatService extends BaseService
                 ->first(['group_id', 'user_id', 'name', 'unread', 'top', 'muted', 'nickname', 'display_nickname', 'bg_file_path', 'role'])->toArray();
 //            var_dump($groupUser);
             $groupUserList = GroupUser::query()->with(['user' => function ($query) {
-                $query->select(['id', 'nickname', 'avatar', 'wechat']);
+                $query->select(['id', 'nickname', 'avatar', 'wechat', 'bg_file_path']);
             }])->where('group_id', $toUser)->get(['group_id', 'user_id'])->toArray();
             foreach ($groupUserList as $groupUserItem) {
                 $chatInfo['users'][] = $groupUserItem['user'];
+                if ($groupUserItem['user_id'] == $fromUser && !empty($groupUserItem['bg_file_path'])) {
+
+                }
             }
             $userCnt = count($chatInfo['users']);
             $chatInfo['nickname'] = ($groupUser['name'] ?: $groupUser['group']['name']) . "({$userCnt})";
@@ -129,7 +132,7 @@ class ChatService extends BaseService
             $chatInfo['muted'] = (bool)$groupUser['muted'];
             $chatInfo['top'] = (bool)$groupUser['top'];
             $chatInfo['display_nickname'] = (bool)$groupUser['display_nickname'];
-            $chatInfo['bg_file_path'] = $groupUser['bg_file_path'];
+            $chatInfo['bg_file_path'] = $user->bg_file_path ?: $groupUser['bg_file_path'];
             $chatInfo['group_name'] = $groupUser['group']['name'];
             $chatInfo['group'] = [
                 'name' => $groupUser['name'],
@@ -148,7 +151,7 @@ class ChatService extends BaseService
             $chatInfo['unread'] = $friend['unread'];
             $chatInfo['muted'] = (bool)$friend['muted'];
             $chatInfo['top'] = (bool)$friend['top'];
-            $chatInfo['bg_file_path'] = $friend['bg_file_path'];
+            $chatInfo['bg_file_path'] = $user->bg_file_path ?: $friend['bg_file_path'];
             $chatInfo['users'][] = $friend['to'];
         }
         return $chatInfo;
@@ -213,30 +216,45 @@ class ChatService extends BaseService
         $fromUser = $params['user']->id;
         $toUser = $params['to_user'];
         $isGroup = $params['is_group'];
-        $key = $params['key']; //更新字段
-        $value = $params['value']; //更新值
-        $commonFields = ['top', 'muted', 'bg_file_id'];
-        $updateField = $key;
-        $value = is_bool($value) ? intval($value) : $value;
+        $paramKeys = array_keys($params);
+        $commonFields = ['top', 'muted', 'bg_file_id', 'bg_file_path'];
         if ($isGroup == MessageEnum::GROUP) {
             $groupFields = ['notice', 'group_name'];
             $groupUserFields = array_merge($commonFields, ['display_nickname', 'name', 'nickname']);
-            if (!in_array($key, array_merge($groupFields, $groupUserFields))) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
-            if (in_array($key, $groupFields)) {
-                $key == 'group_name' && $updateField = 'name';
-                Group::query()->where('id', $toUser)->update([$updateField => $value]);
-            } else {
+            if (!array_intersect($paramKeys, array_merge($groupFields, $groupUserFields))) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+            $updateData = [
+                'group' => [],
+                'group_user' => []
+            ];
+            foreach ($params as $key => $value) {
+                if (in_array($key, $groupFields)) {
+                    $updateData['group'][$key == 'group_name' ? 'name' : $key] = is_bool($value) ? intval($value) : $value;
+                }
+                if (in_array($key, $groupUserFields)) {
+                    $updateData['group_user'][$key] = is_bool($value) ? intval($value) : $value;
+                }
+            }
+            if ($updateData['group']) {
+                Group::query()->where('id', $toUser)->update($updateData['group']);
+            }
+            if ($updateData['group_user']) {
                 GroupUser::query()
                     ->where('group_id', $toUser)
                     ->where('user_id', $fromUser)
-                    ->update([$updateField => $value]);
+                    ->update($updateData['group_user']);
             }
         } else {
-            if (!in_array($key, $commonFields)) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+            if (!array_intersect($paramKeys, $commonFields)) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+            $updateData = [];
+            foreach ($params as $key => $value) {
+                if (in_array($key, $commonFields)) {
+                    $updateData[$key] = is_bool($value) ? intval($value) : $value;
+                }
+            }
             Friend::query()
                 ->where('owner', $fromUser)
                 ->where('friend', $toUser)
-                ->update([$updateField => $value]);
+                ->update($updateData);
         }
     }
 

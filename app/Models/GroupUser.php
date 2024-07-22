@@ -27,4 +27,11 @@ class GroupUser extends Base
             ->first(['group_id', 'user_id', 'nickname'])->toArray();
         return $returnGroup ? [(bool)$group, $group] : (bool)$group;
     }
+
+    public function getBgFilePathAttribute($value): string
+    {
+        if (empty($value)) return '';
+        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . '/' . $value;
+        return $value;
+    }
 }

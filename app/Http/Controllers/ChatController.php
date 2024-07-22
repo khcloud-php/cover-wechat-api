@@ -71,9 +71,7 @@ class ChatController extends Controller
     {
         $this->validate($request, [
             'to_user' => 'required',
-            'is_group' => 'required',
-            'key' => 'required',
-            'value' => 'required'
+            'is_group' => 'required'
         ]);
         $this->chatService->update($this->params);
         return $this->success([], $request);
