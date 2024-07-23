@@ -38,7 +38,8 @@ class Message
             $from = [
                 'id' => $fromUser,
                 'nickname' => $group['nickname'] ?: $request->user()->nickname,
-                'avatar' => $request->user()->avatar
+                'avatar' => $request->user()->avatar,
+                'wechat' => $request->user()->wechat
             ];
         } else {
             //好友校验
@@ -47,7 +48,8 @@ class Message
             $from = [
                 'id' => $fromUser,
                 'nickname' => $friend['nickname'] ?: $request->user()->nickname,
-                'avatar' => $request->user()->avatar
+                'avatar' => $request->user()->avatar,
+                'wechat' => $request->user()->wechat
             ];
         }
         $request->offsetSet('from', $from);
