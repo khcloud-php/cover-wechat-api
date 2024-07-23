@@ -37,6 +37,9 @@ class FileService extends BaseService
         $size = $file->getSize();
         $mimeTypeArr = explode('/', $file->getClientMimeType());
         $fileType = $mimeTypeArr[0] ?? 'file';
+        if (!in_array($fileType, FileEnum::TYPE)) {
+            $fileType = 'file';
+        }
         $this->limitFileSIze($fileType, $size);
         $fileFormat = $mimeTypeArr[1] ?? $file->getClientOriginalExtension();
         // 初始化变量
@@ -217,7 +220,7 @@ class FileService extends BaseService
     /**
      * @throws BusinessException
      */
-    private function limitFileSIze($fileType, $size): bool
+    private function limitFileSIze($fileType, $size): void
     {
         switch ($fileType) {
             case FileEnum::IMAGE:
@@ -226,10 +229,12 @@ class FileService extends BaseService
             case FileEnum::VIDEO:
                 if ($size > FileEnum::VIDEO_LIMIT_SIZE) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
                 break;
+            case FileEnum::AUDIO:
+                if ($size > FileEnum::AUDIO_LIMIT_SIZE) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+                break;
             default:
                 if ($size > FileEnum::FILE_LIMIT_SIZE) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
                 break;
         }
-        return true;
     }
 }
