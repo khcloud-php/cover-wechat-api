@@ -12,7 +12,8 @@ class MessageEnum
         self::TEXT,
         FileEnum::FILE,
         FileEnum::IMAGE,
-        FileEnum::VIDEO
+        FileEnum::VIDEO,
+        FileEnum::AUDIO
     ];
 
     const IS_GROUP = [self::PRIVATE, self::GROUP];
