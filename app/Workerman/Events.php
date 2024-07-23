@@ -42,6 +42,6 @@ class Events
     public static function onClose($clientId): void
     {
         echo "clientId:{$clientId} 离线了\n";
-        (new User)->logout($clientId);
+        //(new User)->logout($clientId);
     }
 }
