@@ -81,6 +81,7 @@ class GroupService extends BaseService
         $action = $params['action'];
         $groupId = $params['group_id'] ?? 0;
         $name = "群聊";
+        $time = time();
         if ($action == GroupEnum::ACTION_INVITE) {
             empty($groupId) && $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
             $group = Group::query()->find($groupId, ['name']);
@@ -103,18 +104,22 @@ class GroupService extends BaseService
         DB::beginTransaction();
         try {
             $id = $groupId;
+            $content = "{$params['user']->nickname}创建了群聊‘{$name}’";
             if ($action == GroupEnum::ACTION_CREATE) {
                 $groupData = [
                     'name' => $name,
                     'owner' => $userId,
                     'notice' => '',
                     'send_user' => $userId,
-                    'content' => '创建了群聊',
-                    'time' => time(),
+                    'content' => $content,
+                    'time' => $time,
                     'setting' => json_encode([]),
-                    'created_at' => time(),
+                    'created_at' => $time,
                 ];
                 $id = Group::query()->insertGetId($groupData);
+            } else {
+                $content = "{$params['user']->nickname}邀请你进入群聊‘{$name}’";
+                Group::query()->where('id', $id)->update(['send_user' => $userId, 'content' => $content, 'time' => $time]);
             }
 
             $batch = [];
@@ -124,9 +129,10 @@ class GroupService extends BaseService
                     'user_id' => $groupUser,
                     'role' => $groupUser == $userId ? GroupEnum::ROLE_SUPER : GroupEnum::ROLE_USER,
                     'invite_id' => $userId,
+                    'display' => 1,
                     'unread' => 1,
                     'setting' => json_encode([]),
-                    'created_at' => time(),
+                    'created_at' => $time,
                 ];
             }
             GroupUser::query()->insertOrIgnore($batch);

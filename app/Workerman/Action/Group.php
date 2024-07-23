@@ -34,6 +34,7 @@ class Group
         $user = User::query()->find($userId);
 
         array_shift($groupUsers);
+        $time = time();
         $message = [
             'from_user' => $userId,
             'to_user' => $groupId,
@@ -41,12 +42,13 @@ class Group
             'is_tips' => 1,
             'is_group' => MessageEnum::GROUP,
             'type' => MessageEnum::TEXT,
-            'created_at' => time(),
+            'created_at' => $time,
             'deleted_users' => $userId
         ];
         if ($action == GroupEnum::ACTION_INVITE) {
             $message['content'] = "‘{$user->nickname}’邀请你进入群聊‘{$groupName}’";
         }
+        $sendContent = $message['content'];
         Message::query()->insert($message);
         $message['content'] = "你创建了群聊‘{$groupName}’";
         if ($action == GroupEnum::ACTION_INVITE) {
@@ -58,7 +60,27 @@ class Group
         $sendData = [
             'who' => WorkerManEnum::WHO_MESSAGE,
             'action' => WorkerManEnum::ACTION_SEND,
-            'data' => []
+            'data' => [
+                'from' => [
+                    'id' => $userId,
+                    'avatar' => $user->avatar,
+                    'nickname' => $user->nickname
+                ],
+                'from_user' => $userId,
+                'to_user' => $groupId,
+                'content' => $sendContent,
+                'type' => MessageEnum::TEXT,
+                'file' => [],
+                'extends' => [],
+                'pid' => 0,
+                'is_tips' => 0,
+                'is_undo' => 0,
+                'pcontent' => '',
+                'at_users' => [],
+                'is_group' => MessageEnum::GROUP,
+                'right' => false,
+                'time' => $time,
+            ]
         ];
         Gateway::sendToGroup($groupId, json_encode($sendData, JSON_UNESCAPED_UNICODE), [$clientId]);
     }
