@@ -117,13 +117,11 @@ class GroupService extends BaseService
                     'created_at' => $time,
                 ];
                 $id = Group::query()->insertGetId($groupData);
-            } else {
-                $content = "{$params['user']->nickname}邀请你进入群聊‘{$name}’";
-                Group::query()->where('id', $id)->update(['send_user' => $userId, 'content' => $content, 'time' => $time]);
             }
 
             $batch = [];
             foreach ($groupUsers as $groupUser) {
+                if ($action == GroupEnum::ACTION_INVITE && $groupUser == $userId) continue;
                 $batch[] = [
                     'group_id' => $id,
                     'user_id' => $groupUser,
@@ -132,10 +130,11 @@ class GroupService extends BaseService
                     'display' => 1,
                     'unread' => 1,
                     'setting' => json_encode([]),
+                    'deleted_at' => 0,
                     'created_at' => $time,
                 ];
             }
-            GroupUser::query()->insertOrIgnore($batch);
+            GroupUser::query()->upsert($batch, ['group_id', 'user_id']);
             $data = ['group_id' => $id, 'group_users' => $groupUsers, 'group_name' => $name, 'action' => $action];
             DB::commit();
         } catch (\Exception $e) {

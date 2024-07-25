@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ApiCodeEnum;
+use App\Enums\Database\GroupEnum;
 use App\Enums\Database\MessageEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
@@ -220,6 +221,13 @@ class ChatService extends BaseService
         $commonFields = ['top', 'muted', 'bg_file_id', 'bg_file_path'];
         if ($isGroup == MessageEnum::GROUP) {
             $groupFields = ['notice', 'group_name'];
+            //修改群信息需要群主、管理员身份
+            if (array_intersect($paramKeys, $groupFields)) {
+                $groupUserRole = GroupUser::query()->where('group_id', $toUser)->where('user_id', $fromUser)->value('role');
+                if ($groupUserRole == GroupEnum::ROLE_USER) {
+                    $this->throwBusinessException(ApiCodeEnum::SERVICE_GROUP_USER_NO_PERM);
+                }
+            }
             $groupUserFields = array_merge($commonFields, ['display_nickname', 'name', 'nickname']);
             if (!array_intersect($paramKeys, array_merge($groupFields, $groupUserFields))) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
             $updateData = [

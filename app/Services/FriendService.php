@@ -235,7 +235,7 @@ class FriendService extends BaseService
                     'from' => $from,
                     'from_user' => $fromUser,
                     'to_user' => $toUser,
-                    'content' => $toUser,
+                    'content' => FriendEnum::PASS_MESSAGE,
                     'type' => MessageEnum::TEXT,
                     'file' => [],
                     'extends' => [],

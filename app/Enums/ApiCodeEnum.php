@@ -71,7 +71,8 @@ class ApiCodeEnum
     const SERVICE_ACCOUNT_ALREADY_EXISTS = '500209|账号已存在'; // 账号已存在.
     const SERVICE_FRIEND_ALREADY_EXISTS = '500210|好友已存在'; // 好友已存在.
     const SERVICE_FRIEND_NOT_EXISTS = '500211|对方不是你的好友'; // 对方不是你的好友.
-    const SERVICE_GROUP_MEMBER_NOT_EXISTS = '500212|你不是群成员';
+    const SERVICE_GROUP_USER_NOT_EXISTS = '500212|你不是群成员';
+    const SERVICE_GROUP_USER_NO_PERM = '500213|群成员没权限操作';
     // 400 支付
     const PAY_TIME_ERROR = 500404; // 时间异常
     const PAY_TIMEOUT_ERROR = 500405; // 超过限定时间

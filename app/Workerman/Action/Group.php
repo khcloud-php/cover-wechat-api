@@ -8,6 +8,7 @@ use App\Enums\WorkerManEnum;
 use App\Models\Message;
 use GatewayWorker\Lib\Gateway;
 use App\Models\User;
+use App\Models\Group as GroupModel;
 
 class Group
 {
@@ -42,20 +43,16 @@ class Group
             'is_tips' => 1,
             'is_group' => MessageEnum::GROUP,
             'type' => MessageEnum::TEXT,
-            'created_at' => $time,
-            'deleted_users' => $userId
+            'created_at' => $time
         ];
+
         if ($action == GroupEnum::ACTION_INVITE) {
-            $message['content'] = "‘{$user->nickname}’邀请你进入群聊‘{$groupName}’";
+            $users = User::query()->whereIn('id', $groupUsers)->get(['nickname'])->toArray();
+            $cnt = count($users);
+            $userNicknames = array_column($users, 'nickname');
+            $message['content'] = "‘{$user->nickname}’邀请" . implode('、', $userNicknames) . "等{$cnt}人进入群聊";
+            GroupModel::query()->where('id', $groupId)->update(['send_user' => $userId, 'content' => $message['content'], 'time' => $time]);
         }
-        $sendContent = $message['content'];
-        Message::query()->insert($message);
-        $message['content'] = "你创建了群聊‘{$groupName}’";
-        if ($action == GroupEnum::ACTION_INVITE) {
-            $cnt = count($groupUsers);
-            $message['content'] = "你邀请了{$cnt}人进入群聊‘{$groupName}’";
-        }
-        $message['deleted_users'] = implode(',', $groupUsers);
         Message::query()->insert($message);
         $sendData = [
             'who' => WorkerManEnum::WHO_MESSAGE,
@@ -68,12 +65,12 @@ class Group
                 ],
                 'from_user' => $userId,
                 'to_user' => $groupId,
-                'content' => $sendContent,
+                'content' => $message['content'],
                 'type' => MessageEnum::TEXT,
                 'file' => [],
                 'extends' => [],
                 'pid' => 0,
-                'is_tips' => 0,
+                'is_tips' => 1,
                 'is_undo' => 0,
                 'pcontent' => '',
                 'at_users' => [],

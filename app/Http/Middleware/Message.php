@@ -34,7 +34,7 @@ class Message
         if ($isGroup == MessageEnum::GROUP) {
             //校验是否群成员
             list($isGroupMember, $group) = GroupUser::checkIsGroupMember($fromUser, $toUser, true);
-            if (!$isGroupMember) $this->throwBusinessException(ApiCodeEnum::SERVICE_GROUP_MEMBER_NOT_EXISTS);
+            if (!$isGroupMember) $this->throwBusinessException(ApiCodeEnum::SERVICE_GROUP_USER_NOT_EXISTS);
             $from = [
                 'id' => $fromUser,
                 'nickname' => $group['nickname'] ?: $request->user()->nickname,
