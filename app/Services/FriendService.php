@@ -196,13 +196,12 @@ class FriendService extends BaseService
             $owner = Friend::query()->where('owner', $fromUser)->where('friend', $toUser)->first();
             if ($owner) {
                 $owner->nickname = $params['nickname'];
+                $owner->unread = 0;
                 $owner->setting = $params['setting'];
-                $owner->unread += $owner->unread;
                 $owner->deleted_at = null;
                 $owner->save();
             } else {
                 $owner = new Friend($params);
-                $owner->unread = 1;
                 $owner->owner = $fromUser;
                 $owner->friend = $toUser;
             }

@@ -55,7 +55,8 @@ class MessageController extends Controller
     public function read(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
-            'to_user' => 'required'
+            'to_user' => 'required',
+            'is_group' => 'required'
         ]);
         $this->messageService->read($this->params);
         return $this->success([], $request);

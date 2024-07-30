@@ -94,7 +94,6 @@ class MessageService extends BaseService
                         'size' => $file['size']
                     ];
                 }
-
             }
             !empty($message['at_users']) && $item['at_users'] = explode(',', $message['at_users']);
             !empty($parentMessages[$message['pid']]) && $item['pcontent'] = $parentMessages[$message['pid']];
@@ -132,6 +131,8 @@ class MessageService extends BaseService
                 $item['from'] = $item['from_user'] == $fromUser ? $me : $userList[$item['from_user']];
             }
             unset($item);
+            //标记已读
+            GroupUser::query()->where('user_id', $fromUser)->where('group_id', $toUser)->update(['unread' => 0]);
         } else {
             //私聊
             $user = User::query()->where('id', $toUser)->first(['id', 'nickname', 'avatar', 'wechat']);
@@ -148,6 +149,8 @@ class MessageService extends BaseService
                 $item['from'] = $item['from_user'] == $fromUser ? $me : $user->toArray();
             }
             unset($item);
+            //标记已读
+            Friend::query()->where('owner', $fromUser)->where('friend', $toUser)->update(['unread' => 0]);
         }
         return $list;
     }
@@ -224,7 +227,6 @@ class MessageService extends BaseService
                 $data['content'] = FileEnum::CONTENT[$file->type] ?? '[文件信息]';
                 $sendData['data']['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
             }
-
         }
 
         DB::beginTransaction();
@@ -267,8 +269,7 @@ class MessageService extends BaseService
                 $sendAtData = [
                     'who' => WorkerManEnum::WHO_MESSAGE,
                     'action' => WorkerManEnum::ACTION_AT,
-                    'data' => [
-                    ]
+                    'data' => []
                 ];
                 $sendData['data']['at_users'] = $atUsers = explode(',', $params['at_users']);
                 //通知被at的用户
@@ -282,13 +283,13 @@ class MessageService extends BaseService
                 $sendQuoteData = [
                     'who' => WorkerManEnum::WHO_MESSAGE,
                     'action' => WorkerManEnum::ACTION_QUOTE,
-                    'data' => [
-
-                    ]
+                    'data' => []
                 ];
                 //通知被引用消息的用户
                 Gateway::sendToUid($message->from_user, json_encode(
-                    $sendQuoteData, JSON_UNESCAPED_UNICODE));
+                    $sendQuoteData,
+                    JSON_UNESCAPED_UNICODE
+                ));
             }
 
             //发送消息通知

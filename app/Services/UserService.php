@@ -36,6 +36,9 @@ class UserService extends BaseService
         return $this->login($params, true);
     }
 
+    /**
+     * @throws BusinessException
+     */
     public function login(array $params, bool $auto = false): array
     {
         $user = User::query()->where('mobile', $params['mobile'])->first();
@@ -99,18 +102,18 @@ class UserService extends BaseService
             $homeInfo['source_text'] = '通过' . $sourceConfig[$source] . '搜索';
             $homeInfo['check_msg'] = '';
             if ($friend && $friend->status == FriendEnum::STATUS_CHECK) {
-                $relationship = 'go_check';
+                $relationship = FriendEnum::RELATIONSHIP_GO_CHECK;
                 $homeInfo['source_text'] = '对方通过' . $sourceConfig[$friend->source] . '搜索';
                 $homeInfo['remark'] = $friend->remark;
                 $homeInfo['check_msg'] = "{$friend->nickname}：{$friend->remark}";
             }
             if ($owner && $owner->status == FriendEnum::STATUS_PASS) {
-                $relationship = 'friend';
+                $relationship = FriendEnum::RELATIONSHIP_FRIEND;
                 $prefix = $friend->created_at > $owner->created_at ? '' : '对方';
                 $homeInfo['source_text'] = $prefix . '通过搜索' . $sourceConfig[$owner->source] . '添加';
             }
             if ($owner && $owner->status == FriendEnum::STATUS_CHECK) {
-                $relationship = 'wait_check';
+                $relationship = FriendEnum::RELATIONSHIP_WAIT_CHECK;
                 $homeInfo['remark'] = $owner->remark;
                 $homeInfo['source_text'] = '通过' . $sourceConfig[$owner->source] . '搜索';
                 $homeInfo['check_msg'] = "我：{$owner->remark}";
@@ -122,6 +125,9 @@ class UserService extends BaseService
             }
         }
         $homeInfo['relationship'] = $relationship;
+        if ($relationship != FriendEnum::RELATIONSHIP_FRIEND) {
+            Friend::query()->where('owner', $user->id)->where('friend', $userId)->where('is_read', 0)->update(['is_read' => 1]);
+        }
         $homeInfo['setting'] = $setting;
         return $homeInfo;
     }
