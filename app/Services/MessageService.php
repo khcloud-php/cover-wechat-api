@@ -358,7 +358,6 @@ class MessageService extends BaseService
         return [
             'chat' => $group + $private,
             'apply' => $apply,
-            'friend' => $apply,
             'discover' => 0
         ];
     }
