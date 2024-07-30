@@ -30,6 +30,10 @@ cd cover-wechat-backend
 ```
 
 ```shell
+cp .env.example .env
+```
+
+```shell
 composer install
 ```
 
