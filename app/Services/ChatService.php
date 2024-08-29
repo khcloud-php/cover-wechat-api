@@ -117,15 +117,11 @@ class ChatService extends BaseService
                 ->where('group_id', $toUser)
                 ->where('user_id', $fromUser)
                 ->first(['group_id', 'user_id', 'name', 'unread', 'top', 'muted', 'nickname', 'display_nickname', 'bg_file_path', 'role'])->toArray();
-//            var_dump($groupUser);
             $groupUserList = GroupUser::query()->with(['user' => function ($query) {
                 $query->select(['id', 'nickname', 'avatar', 'wechat', 'bg_file_path']);
             }])->where('group_id', $toUser)->get(['group_id', 'user_id'])->toArray();
             foreach ($groupUserList as $groupUserItem) {
                 $chatInfo['users'][] = $groupUserItem['user'];
-                if ($groupUserItem['user_id'] == $fromUser && !empty($groupUserItem['bg_file_path'])) {
-
-                }
             }
             $userCnt = count($chatInfo['users']);
             $chatInfo['nickname'] = ($groupUser['name'] ?: $groupUser['group']['name']) . "({$userCnt})";
@@ -133,13 +129,14 @@ class ChatService extends BaseService
             $chatInfo['muted'] = (bool)$groupUser['muted'];
             $chatInfo['top'] = (bool)$groupUser['top'];
             $chatInfo['display_nickname'] = (bool)$groupUser['display_nickname'];
-            $chatInfo['bg_file_path'] = $user->bg_file_path ?: $groupUser['bg_file_path'];
+            $chatInfo['bg_file_path'] = $groupUser['bg_file_path'] ?: $user->bg_file_path;
             $chatInfo['group_name'] = $groupUser['group']['name'];
             $chatInfo['group'] = [
                 'name' => $groupUser['name'],
                 'nickname' => trim($groupUser['nickname']) ? $groupUser['nickname'] : $params['user']->nickname,
                 'notice' => $groupUser['group']['notice'],
             ];
+            $chatInfo['role'] = $groupUser['role'];
         } else {
             $friend = Friend::query()
                 ->with(['to' => function ($query) {
@@ -152,7 +149,7 @@ class ChatService extends BaseService
             $chatInfo['unread'] = $friend['unread'];
             $chatInfo['muted'] = (bool)$friend['muted'];
             $chatInfo['top'] = (bool)$friend['top'];
-            $chatInfo['bg_file_path'] = $user->bg_file_path ?: $friend['bg_file_path'];
+            $chatInfo['bg_file_path'] = $friend['bg_file_path'] ?: $user->bg_file_path;
             $chatInfo['users'][] = $friend['to'];
         }
         return $chatInfo;

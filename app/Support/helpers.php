@@ -27,7 +27,7 @@ if (!function_exists('public_path')) {
      * @param string $path
      * @return string
      */
-    function public_path(string $path = '')
+    function public_path(string $path = ''): string
     {
         return app()->basePath('public') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
