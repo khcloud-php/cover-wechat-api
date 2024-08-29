@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FileEnum;
 use App\Enums\Database\MessageEnum;
+use App\Enums\Database\FriendEnum;
 use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\File;
@@ -108,17 +109,32 @@ class MessageService extends BaseService
             $userIds = array_unique($userIds);
             $userList = User::query()->whereIn('id', $userIds)->get(['id', 'nickname', 'avatar', 'wechat'])->toArray();
 
+            //本群显示昵称 显示优先级最高
             $groupUserList = GroupUser::query()
                 ->where('group_id', $toUser)
                 ->whereIn('user_id', $userIds)
                 ->get(['nickname', 'user_id'])->toArray();
+            //朋友昵称 显示优先级第二
+
+            $friendList = Friend::query()
+                ->where('owner', $fromUser)
+                ->whereIn('friend', $userIds)
+                ->where('status', FriendEnum::STATUS_PASS)
+                ->get(['nickname', 'friend'])->toArray();
+
             $groupUserList = array_column($groupUserList, 'nickname', 'user_id');
+            $friendList = array_column($friendList, 'nickname', 'friend');
+
+            //处理群成员昵称显示 默认用户昵称
             foreach ($userList as &$user) {
-                if (!empty($groupUserList[$item['id']])) {
+                if (!empty($friendList[$user['id']])) {
+                    $user['nickname'] = $friendList[$user['id']];
+                }
+                if (!empty($groupUserList[$user['id']])) {
                     $user['nickname'] = $groupUserList[$user['id']];
                 }
             }
-            unset($user, $groupUserList, $userIds);
+            unset($user, $groupUserList, $friendList, $userIds);
 
             $userList = array_column($userList, null, 'id');
 
@@ -128,7 +144,7 @@ class MessageService extends BaseService
                     $who = $item['from_user'] == $fromUser ? "你" : $userList[$fromUser]['nickname'];
                     $item['content'] = $who . "撤回了一条消息";
                 }
-                $item['from'] = $item['from_user'] == $fromUser ? $me : $userList[$item['from_user']];
+                $item['from'] = $userList[$item['from_user']];
             }
             unset($item);
             //标记已读
