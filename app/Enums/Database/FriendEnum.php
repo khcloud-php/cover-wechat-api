@@ -12,6 +12,7 @@ class FriendEnum
     const SOURCE_MOBILE = 'mobile';
     const SOURCE_WECHAT = 'wechat';
     const SOURCE_GROUP = 'group';
+    const SOURCE_ASSISTANT = 'assistant';
     const RELATIONSHIP_GO_CHECK = 'go_check';
     const RELATIONSHIP_WAIT_CHECK = 'wait_check';
     const RELATIONSHIP_FRIEND = 'friend';

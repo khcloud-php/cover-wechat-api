@@ -71,7 +71,7 @@ class FileService extends BaseService
         } elseif ($fileType == FileEnum::VIDEO) {
             // 获取视频时长和封面图
             $configuration = [];
-            if (isLinux()) {
+            if (is_linux()) {
                 $configuration = [
                     'ffmpeg.binaries' => env('FFMPEG_PATH'),
                     'ffprobe.binaries' => env('FFPROBE_PATH')

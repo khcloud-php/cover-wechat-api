@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Hash;
 class UserService extends BaseService
 {
 
+    /**
+     * @throws BusinessException
+     */
     public function register(array $params): array
     {
         $user = User::query()->where('mobile', $params['mobile'])->orWhere('wechat', $params['wechat'])->first(['mobile', 'wechat']);
@@ -32,6 +35,10 @@ class UserService extends BaseService
         $user->password = $params['password'];
         $user->salt = $params['salt'];
         $user->save();
+
+        // 把ai小助手添加为朋友
+        (new AssistantService())->becomeFriendWhenRegister($user->toArray());
+
         // 自动登录
         return $this->login($params, true);
     }
@@ -95,6 +102,7 @@ class UserService extends BaseService
         $homeInfo = ['moment' => [], 'relationship' => 'owner', 'source' => $source, 'source_text' => '', 'remark' => '', 'keywords' => $params['keywords'], 'display_nickname' => $user->nickname];
         $homeInfo = array_merge($homeInfo, $user->toArray());
         $sourceConfig = config('user.source');
+        $assistantIds = get_assistant_ids();
         if (!$self) {
             $relationship = FriendEnum::TYPE_APPLY;
             $owner = Friend::query()->where('owner', $userId)->where('friend', $user->id)->first();
@@ -109,8 +117,12 @@ class UserService extends BaseService
             }
             if ($owner && $owner->status == FriendEnum::STATUS_PASS) {
                 $relationship = FriendEnum::RELATIONSHIP_FRIEND;
-                $prefix = $friend->created_at > $owner->created_at ? '' : '对方';
-                $homeInfo['source_text'] = $prefix . '通过搜索' . $sourceConfig[$owner->source] . '添加';
+                if (in_array($owner->friend, $assistantIds)) {
+                    $homeInfo['source_text'] = '对方是你的AI小助手';
+                } else {
+                    $prefix = $friend->created_at > $owner->created_at ? '' : '对方';
+                    $homeInfo['source_text'] = $prefix . '通过搜索' . $sourceConfig[$owner->source] . '添加';
+                }
             }
             if ($owner && $owner->status == FriendEnum::STATUS_CHECK) {
                 $relationship = FriendEnum::RELATIONSHIP_WAIT_CHECK;

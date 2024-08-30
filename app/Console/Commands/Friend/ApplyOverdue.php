@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 class ApplyOverdue extends Command
 {
 
-    protected $signature = 'Friend:apply:overdue';
+    protected $signature = 'Friend:applyOverdue';
 
     protected $description = 'Friend apply auto overdue.';
 

@@ -38,14 +38,27 @@ if (!function_exists('group_by_first_char')) {
     function group_by_first_char(array $array, string $field): array
     {
         $grouped = [];
+
+        //小助手排前面
+        $assistantIds = get_assistant_ids();
+        foreach ($array as $k => $v) {
+            if (in_array($v['friend'], $assistantIds)) {
+                unset($array[$k]);
+                $firstChar = 'A';
+                if (!isset($grouped[$firstChar])) {
+                    $grouped[$firstChar] = [];
+                }
+                $grouped[$firstChar][] = $v;
+            }
+        }
         foreach ($array as $item) {
             $str = $item[$field];
-            $firstChar = '';
             if (preg_match('/^[\x{4e00}-\x{9fa5}]/u', $str)) { // 匹配中文字符
                 $str = (string)Pinyin::sentence($str);
             }
 
             $firstChar = strtoupper($str[0]);
+            if (!ctype_upper($firstChar)) $firstChar = 'A';
 
             if (!isset($grouped[$firstChar])) {
                 $grouped[$firstChar] = [];
@@ -56,14 +69,21 @@ if (!function_exists('group_by_first_char')) {
     }
 }
 
-if (!function_exists('isLinux')) {
+if (!function_exists('is_linux')) {
     /**
      * 判断当前操作系统是否为 Linux
      *
      * @return bool
      */
-    function isLinux(): bool
+    function is_linux(): bool
     {
         return stripos(PHP_OS, 'Linux') !== false || stripos(php_uname('s'), 'Linux') !== false;
+    }
+}
+
+if (!function_exists('get_assistant_ids')) {
+    function get_assistant_ids(): array
+    {
+        return array_keys(config('assistant'));
     }
 }

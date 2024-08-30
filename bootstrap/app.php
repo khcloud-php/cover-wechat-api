@@ -63,6 +63,7 @@ $app->configure('app');
 $app->configure('auth');
 $app->configure('user');
 $app->configure('captcha');
+$app->configure('assistant');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware

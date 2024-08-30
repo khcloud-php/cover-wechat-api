@@ -29,10 +29,11 @@ class FriendService extends BaseService
         foreach ($friendList as &$friend) {
             $friend['nickname'] = $friend['nickname'] ?: $friend['friend']['nickname'];
             $friend['avatar'] = $friend['friend']['avatar'];
-            $friend['keywords'] = $friend['friend'][$friend['source']];
+            $friend['keywords'] = $friend['friend'][$friend['source']] ?? $friend['friend']['wechat'];
             $friend['checked'] = false;
             $friend['friend'] = $friend['friend']['id'];
         }
+        unset($friend);
         return group_by_first_char($friendList, 'nickname');
     }
 
@@ -60,7 +61,7 @@ class FriendService extends BaseService
             } elseif ($apply['status'] == FriendEnum::STATUS_CHECK) {
                 $apply['status'] = 'wait_check';
             }
-            $apply['keywords'] = $apply['friend'][$apply['source']];
+            $apply['keywords'] = $apply['friend'][$apply['source']] ?? $apply['friend']['wechat'];
             unset($apply['friend']['mobile'], $apply['friend']['wechat'], $apply['owner']['mobile'], $apply['owner']['wechat']);
             $field = $apply['updated_at'] ? 'updated_at' : 'created_at';
             $days = (time() - strtotime($apply[$field])) / $day;
@@ -109,6 +110,9 @@ class FriendService extends BaseService
         $relationship = $params['relationship'];
         if ($relationship == 'friend') {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+        }
+        if (!in_array($source, [FriendEnum::SOURCE_WECHAT, FriendEnum::SOURCE_MOBILE])) {
+            $source = FriendEnum::SOURCE_WECHAT;
         }
         $user = User::query()->where($source, $params['keywords'])->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->first(['id', 'nickname']);
         if (empty($user)) $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_NOT_FOUND);

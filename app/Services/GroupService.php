@@ -117,6 +117,8 @@ class GroupService extends BaseService
                     'created_at' => $time,
                 ];
                 $id = Group::query()->insertGetId($groupData);
+                //把ai小助手加入群聊
+                (new AssistantService())->joinGroupWhenCreateGroup($id);
             }
 
             $batch = [];
