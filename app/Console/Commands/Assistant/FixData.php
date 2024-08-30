@@ -15,7 +15,7 @@ class FixData extends Command
 
     protected $description = 'Fix assistant data.';
 
-    public function handle(): bool
+    public function handle(): void
     {
         DB::beginTransaction();
         try {
@@ -45,11 +45,10 @@ class FixData extends Command
                 foreach ($groupList as $group) {
                     (new AssistantService())->joinGroupWhenCreateGroup($group['id']);
                 }
+                DB::commit();
             }
         } catch (\Exception $e) {
             DB::rollBack();
         }
-
-        return true;
     }
 }

@@ -27,6 +27,7 @@ class Message
         $fromUser = $request->user()->id;
         $toUser = $request->input('to_user');
         $isGroup = $request->input('is_group');
+        $assistantIds = get_assistant_ids();
         if (!in_array($isGroup, MessageEnum::IS_GROUP)) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
@@ -42,9 +43,12 @@ class Message
                 'wechat' => $request->user()->wechat
             ];
         } else {
-            //好友校验
-            list($isFriend, $friend) = Friend::checkIsFriend($fromUser, $toUser, true);
-            if (!$isFriend) $this->throwBusinessException(ApiCodeEnum::SERVICE_FRIEND_NOT_EXISTS);
+            //好友校验 ai小助手不用校验
+            $friend['nickname'] = $request->user()->nickname;
+            if (!in_array($toUser, $assistantIds)) {
+                list($isFriend, $friend) = Friend::checkIsFriend($fromUser, $toUser, true);
+                if (!$isFriend) $this->throwBusinessException(ApiCodeEnum::SERVICE_FRIEND_NOT_EXISTS);
+            }
             $from = [
                 'id' => $fromUser,
                 'nickname' => $friend['nickname'] ?: $request->user()->nickname,

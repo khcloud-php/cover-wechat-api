@@ -13,9 +13,9 @@ class ApplyOverdue extends Command
 
     protected $description = 'Friend apply auto overdue.';
 
-    public function handle(): int
+    public function handle(): void
     {
-        return Friend::query()
+        Friend::query()
             ->where('type', FriendEnum::TYPE_APPLY)
             ->where('status', FriendEnum::STATUS_CHECK)
             ->where('display', 1)

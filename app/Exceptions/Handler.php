@@ -69,7 +69,7 @@ class Handler extends ExceptionHandler
                 'project' => config('app.name'),
                 'url' => $request->fullUrl(),
                 'request_ip' => $request->getClientIp(),
-                'request_id' => $request->offsetGet('request_id'),
+                'request_id' => $request->offsetGet('request_id') ?? uniqid(),
                 'exception' => $exString,
                 'created_at' => time()
             ];

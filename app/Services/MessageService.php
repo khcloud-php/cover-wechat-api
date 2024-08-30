@@ -6,8 +6,10 @@ use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FileEnum;
 use App\Enums\Database\MessageEnum;
 use App\Enums\Database\FriendEnum;
+use App\Enums\Redis\ChatEnum;
 use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
+use App\Jobs\AssistantReplyJob;
 use App\Models\File;
 use App\Models\Friend;
 use App\Models\Group;
@@ -183,6 +185,8 @@ class MessageService extends BaseService
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
         $time = time();
+        $assistantIds = get_assistant_ids();
+        $atUsers = [];
         $sendData = [
             'who' => WorkerManEnum::WHO_MESSAGE,
             'action' => WorkerManEnum::ACTION_SEND,
@@ -308,13 +312,37 @@ class MessageService extends BaseService
                 ));
             }
 
-            //发送消息通知
-            if ($params['is_group'] == MessageEnum::GROUP) {
-                $excludeClientId = Gateway::getClientIdByUid($fromUser);
-                Gateway::sendToGroup($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE), $excludeClientId);
-            } else {
-                Gateway::sendToUid($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE));
+            $sendToAi = false;
+            $aiData = $sendData['data'];
+            if (($params['is_group'] == MessageEnum::PRIVATE && in_array($toUser, $assistantIds))) {
+                //私聊ai小助手回复消息
+                $aiData['to_ai'] = $toUser;
+                $job = new AssistantReplyJob($aiData);
+                dispatch($job->onQueue(ChatEnum::ASSISTANT_REPLY));
+                $sendToAi = true;
             }
+
+            if (array_intersect($assistantIds, $atUsers)) {
+                //群聊@ai小助手回复消息
+                $aiIds = array_intersect($assistantIds, $atUsers);
+                foreach ($aiIds as $aiId) {
+                    $aiData['to_ai'] = $aiId;
+                    $job = new AssistantReplyJob($aiData);
+                    dispatch($job->onQueue(ChatEnum::ASSISTANT_REPLY));
+                }
+                $sendToAi = true;
+            }
+
+            if (!$sendToAi) {
+                //向用户发送消息通知
+                if ($params['is_group'] == MessageEnum::GROUP) {
+                    $excludeClientId = Gateway::getClientIdByUid($fromUser);
+                    Gateway::sendToGroup($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE), $excludeClientId);
+                } else {
+                    Gateway::sendToUid($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE));
+                }
+            }
+
         } catch (\Exception $e) {
             DB::rollBack();
             $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());
