@@ -237,6 +237,7 @@ class AssistantService extends BaseService
                     'from_user' => $data['to_ai'],
                     'to_user' => $data['is_group'] == MessageEnum::GROUP ? $data['to_user'] : $data['from_user'],
                     'content' => $replyMessage,
+                    'type' => $aiType,
                     'is_group' => $data['is_group'],
                     'created_at' => $this->time
                 ];
