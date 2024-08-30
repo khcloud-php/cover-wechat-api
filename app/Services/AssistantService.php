@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\Database\FileEnum;
 use App\Enums\Database\FriendEnum;
 use App\Enums\Database\GroupEnum;
 use App\Enums\Database\MessageEnum;
 use App\Enums\Database\UserEnum;
 use App\Enums\WorkerManEnum;
+use App\Models\File;
 use App\Models\Friend;
 use App\Models\Group;
 use App\Models\GroupUser;
@@ -16,6 +18,7 @@ use GatewayWorker\Lib\Gateway;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AssistantService extends BaseService
 {
@@ -110,6 +113,8 @@ class AssistantService extends BaseService
     {
         if (isset($this->assistant[$data['to_ai']])) {
             $ai = $this->assistant[$data['to_ai']];
+            $data['type'] = $aiType = $ai['type'];
+
             $options = [
                 'timeout' => 30,
             ];
@@ -117,26 +122,79 @@ class AssistantService extends BaseService
             $apiUri = $ai['api_uri'];
             $token = $ai['token'];
             $tokenType = $ai['token_type'];
-            $messages = $ai['messages'];
-            $messages[] = [
-                'role' => 'user',
-                'content' => $data['content'],
-            ];
+            $json = [];
+            if ($aiType === MessageEnum::TEXT) {
+                //ai文字回复
+                $json['messages'] = $ai['messages'];
+                $json['messages'][] = [
+                    'role' => 'user',
+                    'content' => $data['content'],
+                ];
+            } else {
+                //ai绘画
+                $json = ['prompt' => $data['content']];
+            }
+            $file = [];
             $user = User::query()->find($data['to_ai']);
             try {
                 $response = $client->post($apiUri, [
                     'headers' => [
                         'Authorization' => "$tokenType $token",
                     ],
-                    'json' => [
-                        'messages' => $messages,
-                    ]
+                    'json' => $json
                 ]);
-                $result = json_decode($response->getBody()->getContents(), true);
-                if ($result['success']) {
-                    $replyMessage = $result['result']['response'];
+
+                if ($aiType === MessageEnum::TEXT) {
+                    //回复文本信息
+                    $result = json_decode($response->getBody()->getContents(), true);
+                    if ($result['success']) {
+                        $replyMessage = $result['result']['response'];
+                    } else {
+                        $replyMessage = implode('\n\n', $result['messages']);
+                    }
                 } else {
-                    $replyMessage = implode('\n\n', $result['messages']);
+                    //下载并回复绘制好的图片
+                    $date = date('Ymd');
+                    $fileName = md5($data['content']) . ".jpg";
+                    $filePath = "uploads/image/{$date}/{$fileName}";
+                    $fileRealPath = Storage::disk('public')->path($filePath);
+
+                    if (file_exists($fileRealPath)) {
+                        $signature = md5_file($fileRealPath);
+                        $file = File::query()->where('signature', $signature)->first();
+                    }
+                    if (!$file) {
+                        $thumbnailFilePath = "uploads/image/{$date}/thumbnail_{$fileName}";
+                        Storage::disk('public')->put($filePath, (string)$response->getBody());
+                        list($width, $height, $size) = (new FileService())->makeThumbnailImage($fileRealPath, $thumbnailFilePath);
+                        $file = new File();
+                        $file->name = $fileName;
+                        $file->path = $filePath;
+                        $file->thumbnail_path = $thumbnailFilePath;
+                        $file->size = $size;
+                        $file->width = $width;
+                        $file->height = $height;
+                        $file->duration = 0;
+                        $file->signature = md5_file($fileRealPath);
+                        $file->type = 'image';
+                        $file->format = 'jpeg';
+                        $file->save();
+                    }
+
+                    $data['extends'] = [
+                        'path' => $file->path,
+                        'format' => $file->format,
+                        'width' => $file->width,
+                        'height' => $file->height,
+                        'duration' => $file->duration
+                    ];
+                    $data['file'] = [
+                        'id' => $file->id,
+                        'name' => $file->name,
+                        'type' => $file->type,
+                        'size' => $file->size
+                    ];
+                    $replyMessage = FileEnum::CONTENT[$aiType] ?? '[文件信息]';
                 }
             } catch (\Exception $e) {
                 $replyMessage = $e->getMessage();
@@ -182,6 +240,16 @@ class AssistantService extends BaseService
                     'is_group' => $data['is_group'],
                     'created_at' => $this->time
                 ];
+                if ($aiType === MessageEnum::TEXT) {
+                    $data['content'] = $replyMessage;
+                } else {
+                    $messageData['file_id'] = $file->id;
+                    $messageData['file_name'] = $file->name;
+                    $messageData['file_type'] = $file->type;
+                    $messageData['file_size'] = $file->size;
+                    $messageData['extends'] = json_encode($data['extends']);
+                    $data['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
+                }
                 $data['id'] = Message::query()->insertGetId($messageData);
                 $data['from'] = [
                     'id' => $data['to_ai'],
@@ -191,7 +259,7 @@ class AssistantService extends BaseService
                 ];
                 $data['from_user'] = $messageData['from_user'];
                 $data['to_user'] = $messageData['to_user'];
-                $data['content'] = $replyMessage;
+
                 $data['time'] = $this->time;
                 $sendData = [
                     'who' => WorkerManEnum::WHO_MESSAGE,

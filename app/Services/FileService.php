@@ -178,7 +178,7 @@ class FileService extends BaseService
     /**
      * @throws BusinessException
      */
-    private function makeThumbnailImage(string $filePath, string $thumbnailFilePath): array
+    public function makeThumbnailImage(string $filePath, string $thumbnailFilePath): array
     {
         if (!file_exists($filePath)) $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, '生成缩略图失败，文件不存在');
         $image = Image::make($filePath);
