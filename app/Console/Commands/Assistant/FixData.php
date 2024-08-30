@@ -21,29 +21,36 @@ class FixData extends Command
         try {
             $assistant = config('assistant');
             $batchAssistantData = [];
+            $historyAssistantIds = [];
             foreach ($assistant as $k => $v) {
-                $batchAssistantData[] = [
-                    'id' => $k,
-                    'wechat' => $v['platform'],
-                    'mobile' => $v['account_id'],
-                    'token' => $v['token'],
-                    'nickname' => $v['nickname'],
-                    'avatar' => $v['avatar'],
-                    'sign' => $v['desc'],
-                    'setting' => json_encode(config('user.owner.setting')),
-                    'created_at' => time(),
-                ];
+                if ($v['history']) {
+                    $historyAssistantIds[] = $k;
+                    $batchAssistantData[] = [
+                        'id' => $k,
+                        'wechat' => $v['wechat'],
+                        'mobile' => str_pad($k, 11, '0'),
+                        'password' => $v['account_id'],
+                        'token' => $v['token'],
+                        'nickname' => $v['nickname'],
+                        'avatar' => $v['avatar'],
+                        'sign' => $v['desc'],
+                        'gender' => 'female',
+                        'setting' => json_encode(config('user.owner.setting')),
+                        'created_at' => time(),
+                    ];
+                }
             }
             if ($batchAssistantData) {
                 User::query()->insert($batchAssistantData);
+                $assistantService = new AssistantService($historyAssistantIds);
                 $assistantIds = get_assistant_ids();
                 $userList = User::query()->whereNotIn('id', $assistantIds)->get()->toArray();
                 foreach ($userList as $user) {
-                    (new AssistantService())->becomeFriendWhenRegister($user);
+                    $assistantService->becomeFriendWhenRegister($user);
                 }
                 $groupList = Group::query()->get()->toArray();
                 foreach ($groupList as $group) {
-                    (new AssistantService())->joinGroupWhenCreateGroup($group['id']);
+                    $assistantService->joinGroupWhenCreateGroup($group['id']);
                 }
                 DB::commit();
             }

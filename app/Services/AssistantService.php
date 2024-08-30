@@ -25,12 +25,13 @@ class AssistantService extends BaseService
 
     private array $assistant;
 
-    public function __construct()
+    public function __construct(array $assistantIds = [])
     {
         $this->assistant = config('assistant');
         $this->time = time();
+        if (!$assistantIds) $assistantIds = array_keys($this->assistant);
         // ai小助手
-        $this->aiList = User::query()->whereIn('id', array_keys($this->assistant))->where('status', UserEnum::STATUS_NORMAL)->get()->toArray();
+        $this->aiList = User::query()->whereIn('id', $assistantIds)->where('status', UserEnum::STATUS_NORMAL)->get()->toArray();
     }
 
     /**
