@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         //
         Commands\Workerman::class,
+        Commands\Assistant\FixData::class,
+        Commands\Friend\ApplyOverdue::class
     ];
 
     /**
