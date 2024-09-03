@@ -246,12 +246,16 @@ class AssistantService extends BaseService
                 if ($aiType === MessageEnum::TEXT) {
                     $data['content'] = $replyMessage;
                 } else {
-                    $messageData['file_id'] = $file->id;
-                    $messageData['file_name'] = $file->name;
-                    $messageData['file_type'] = $file->type;
-                    $messageData['file_size'] = $file->size;
-                    $messageData['extends'] = json_encode($data['extends']);
-                    $data['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
+                    if (isset($file->id)) {
+                        $messageData['file_id'] = $file->id;
+                        $messageData['file_name'] = $file->name;
+                        $messageData['file_type'] = $file->type;
+                        $messageData['file_size'] = $file->size;
+                        $messageData['extends'] = json_encode($data['extends']);
+                        $data['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
+                    } else {
+                        $data['content'] = $replyMessage;
+                    }
                 }
                 $data['id'] = Message::query()->insertGetId($messageData);
                 $data['from'] = [
