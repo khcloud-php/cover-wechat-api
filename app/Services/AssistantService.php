@@ -160,31 +160,30 @@ class AssistantService extends BaseService
                 } else {
                     //下载并回复绘制好的图片
                     $date = date('Ymd');
-                    $fileName = md5($data['content'] . uniqid(time(), true)) . ".jpg";
+                    $fileName = md5(uniqid(time(), true)) . ".jpg";
                     $filePath = "uploads/image/{$date}/{$fileName}";
                     $fileRealPath = Storage::disk('public')->path($filePath);
-
-//                    if (file_exists($fileRealPath)) {
-//                        $signature = md5_file($fileRealPath);
-//                        $file = File::query()->where('signature', $signature)->first();
-//                    }
-//                    if (!$file) {
                     $thumbnailFilePath = "uploads/image/{$date}/thumbnail_{$fileName}";
                     Storage::disk('public')->put($filePath, (string)$response->getBody());
-                    list($width, $height, $size) = (new FileService())->makeThumbnailImage($fileRealPath, $thumbnailFilePath);
-                    $file = new File();
-                    $file->name = $fileName;
-                    $file->path = $filePath;
-                    $file->thumbnail_path = $thumbnailFilePath;
-                    $file->size = $size;
-                    $file->width = $width;
-                    $file->height = $height;
-                    $file->duration = 0;
-                    $file->signature = md5_file($fileRealPath);
-                    $file->type = 'image';
-                    $file->format = 'jpeg';
-                    $file->save();
-//                    }
+                    $signature = md5_file($fileRealPath);
+                    $file = File::query()->where('signature', $signature)->first();
+                    if (!$file) {
+                        list($width, $height, $size) = (new FileService())->makeThumbnailImage($fileRealPath, $thumbnailFilePath);
+                        $file = new File();
+                        $file->name = $fileName;
+                        $file->path = $filePath;
+                        $file->thumbnail_path = $thumbnailFilePath;
+                        $file->size = $size;
+                        $file->width = $width;
+                        $file->height = $height;
+                        $file->duration = 0;
+                        $file->signature = md5_file($fileRealPath);
+                        $file->type = 'image';
+                        $file->format = 'jpeg';
+                        $file->save();
+                    } else {
+                        @unlink($fileRealPath);
+                    }
 
                     $data['extends'] = [
                         'path' => $file->path,
