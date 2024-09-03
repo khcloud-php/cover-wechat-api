@@ -133,8 +133,12 @@ class AssistantService extends BaseService
             } else {
                 //ai绘画
                 $promptArr = explode('<>', $data['content']);
-                $json = ['prompt' => $promptArr[0]];
-                if (!empty($promptArr[1])) $json['negative_prompt'] = $promptArr[1];
+                $prompt = str_replace(array("\r\n", "\r", "\n"), '', $promptArr[0]);
+                $json = ['prompt' => $prompt];
+                if (!empty($promptArr[1])) {
+                    $negativePrompt = str_replace(array("\r\n", "\r", "\n"), '', $promptArr[1]);
+                    $json['negative_prompt'] = $negativePrompt;
+                }
             }
             $file = [];
             $user = User::query()->find($data['to_ai']);
@@ -145,7 +149,6 @@ class AssistantService extends BaseService
                     ],
                     'json' => $json
                 ]);
-
                 if ($aiType === MessageEnum::TEXT) {
                     //回复文本信息
                     $result = json_decode($response->getBody()->getContents(), true);
@@ -157,7 +160,7 @@ class AssistantService extends BaseService
                 } else {
                     //下载并回复绘制好的图片
                     $date = date('Ymd');
-                    $fileName = md5($data['content'] . uniqid(time()), true) . ".jpg";
+                    $fileName = md5($data['content'] . uniqid(time(), true)) . ".jpg";
                     $filePath = "uploads/image/{$date}/{$fileName}";
                     $fileRealPath = Storage::disk('public')->path($filePath);
 
@@ -255,6 +258,8 @@ class AssistantService extends BaseService
                         $data['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
                     } else {
                         $data['content'] = $replyMessage;
+                        $data['type'] = MessageEnum::TEXT;
+                        $messageData['type'] = MessageEnum::TEXT;
                     }
                 }
                 $data['id'] = Message::query()->insertGetId($messageData);
