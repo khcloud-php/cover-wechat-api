@@ -13,7 +13,7 @@ return [
         'type' => 'image',
         'avatar' => 'https://ai-sora.oss-cn-hangzhou.aliyuncs.com/mj_generate_images/5-1712836180-ldc857857_A_mechanical_platinum_mech_female_character_macro_ove_035bc5b9-2772-4027-99ca-154393b65823.png?x-oss-process=image/resize,w_500,m_lfit',
         'account_id' => '970edfbecb39ea3bae2cc34ac1636ed4',
-        'api_uri' => 'https://api.cloudflare.com/client/v4/accounts/970edfbecb39ea3bae2cc34ac1636ed4/ai/run/@cf/lykon/dreamshaper-8-lcm',
+        'api_uri' => 'https://api.cloudflare.com/client/v4/accounts/970edfbecb39ea3bae2cc34ac1636ed4/ai/run/@cf/bytedance/stable-diffusion-xl-lightning',
         'token' => 'QGb4agQuPlOgNS6VtzryfUI4xMce3N2Am284OVX2',
         'token_type' => 'Bearer',
         'messages' => [],
