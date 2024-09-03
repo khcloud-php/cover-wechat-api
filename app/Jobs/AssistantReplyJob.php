@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\Redis\ChatEnum;
 use App\Services\AssistantService;
+use GuzzleHttp\Exception\GuzzleException;
 
 class AssistantReplyJob extends Job
 {
@@ -32,6 +33,7 @@ class AssistantReplyJob extends Job
      * Execute the job.
      *
      * @return void
+     * @throws GuzzleException
      */
     public function handle(): void
     {

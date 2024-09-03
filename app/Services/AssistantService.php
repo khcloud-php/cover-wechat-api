@@ -132,7 +132,9 @@ class AssistantService extends BaseService
                 ];
             } else {
                 //ai绘画
-                $json = ['prompt' => $data['content']];
+                $promptArr = explode('<>', $data['content']);
+                $json = ['prompt' => $promptArr[0]];
+                if (!empty($promptArr[1])) $json['negative_prompt'] = $promptArr[1];
             }
             $file = [];
             $user = User::query()->find($data['to_ai']);
