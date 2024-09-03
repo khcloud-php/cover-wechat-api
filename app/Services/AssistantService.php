@@ -113,26 +113,29 @@ class AssistantService extends BaseService
     {
         if (isset($this->assistant[$data['to_ai']])) {
             $ai = $this->assistant[$data['to_ai']];
+            $aiUser = User::query()->find($data['to_ai']);
             $data['type'] = $aiType = $ai['type'];
 
             $options = [
                 'timeout' => 30,
             ];
             $client = new Client($options);
+            $nickname = $aiUser->nickname;
             $apiUri = $ai['api_uri'];
             $token = $ai['token'];
             $tokenType = $ai['token_type'];
+            $aiContent = str_replace("@{$nickname} ", "", $data['content']);
             $json = [];
             if ($aiType === MessageEnum::TEXT) {
                 //ai文字回复
                 $json['messages'] = $ai['messages'];
                 $json['messages'][] = [
                     'role' => 'user',
-                    'content' => $data['content'],
+                    'content' => $aiContent,
                 ];
             } else {
                 //ai绘画
-                $promptArr = explode('<>', $data['content']);
+                $promptArr = explode('<>', $aiContent);
                 $prompt = str_replace(array("\r\n", "\r", "\n"), '', $promptArr[0]);
                 $json = ['prompt' => $prompt];
                 if (!empty($promptArr[1])) {
@@ -160,7 +163,7 @@ class AssistantService extends BaseService
                 } else {
                     //下载并回复绘制好的图片
                     $date = date('Ymd');
-                    $fileName = md5(uniqid(time(), true)) . ".jpg";
+                    $fileName = md5(uniqid(time(), true)) . ".png";
                     $filePath = "uploads/image/{$date}/{$fileName}";
                     $fileRealPath = Storage::disk('public')->path($filePath);
                     $thumbnailFilePath = "uploads/image/{$date}/thumbnail_{$fileName}";
@@ -179,7 +182,7 @@ class AssistantService extends BaseService
                         $file->duration = 0;
                         $file->signature = md5_file($fileRealPath);
                         $file->type = 'image';
-                        $file->format = 'jpeg';
+                        $file->format = 'png';
                         $file->save();
                     } else {
                         @unlink($fileRealPath);
