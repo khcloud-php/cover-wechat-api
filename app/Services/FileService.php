@@ -38,9 +38,9 @@ class FileService extends BaseService
         // 已存在直接返回
         $realPath = $file->getPathname();
         $signature = md5_file($realPath);
-        if ($data = $this->checkFileExists($signature)) {
-            return $data;
-        }
+//        if ($data = $this->checkFileExists($signature)) {
+//            return $data;
+//        }
         // 生成新的文件名
         $extension = $file->getClientOriginalExtension();
         $newFileName = $signature . '.' . $extension;
@@ -53,13 +53,12 @@ class FileService extends BaseService
             $fileType = 'file';
         }
         $this->limitFileSIze($fileType, $size);
-        $fileFormat = $mimeTypeArr[1] ?? $file->getClientOriginalExtension();
         // 初始化变量
         $width = 0;
         $height = 0;
         $duration = 0;
         $date = date('Ymd');
-        $filePath = "uploads/image/{$date}/{$newFileName}";
+        $filePath = "uploads/{$fileType}/{$date}/{$newFileName}";
         $outputPath = Storage::disk('public')->path($filePath);
         $thumbnailPath = '';
         $needCropSquare = false;
@@ -67,7 +66,6 @@ class FileService extends BaseService
         if ($avatar) {
             $needCropSquare = $this->cropSquare($realPath, $outputPath);
         }
-
         // 指定上传路径并重命名文件
         if (!$needCropSquare)
             $path = $file->storeAs("uploads/{$fileType}/{$date}", $newFileName, 'public');
@@ -75,7 +73,6 @@ class FileService extends BaseService
             $realPath = $outputPath;
             $path = $filePath;
         }
-
         if ($fileType == FileEnum::IMAGE) {
             // 生成缩略图
             $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
@@ -112,7 +109,7 @@ class FileService extends BaseService
         $fileRecord->duration = $duration;
         $fileRecord->signature = $signature;
         $fileRecord->type = $fileType;
-        $fileRecord->format = $fileFormat;
+        $fileRecord->format = $extension;
         $fileRecord->save();
 
         // 获取文件的 URL

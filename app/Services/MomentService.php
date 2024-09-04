@@ -41,7 +41,7 @@ class MomentService extends BaseService
                 $fileService = new FileService();
                 $batchFileData = [];
                 foreach ($params['files'] as $file) {
-                    $file = $fileService->uploadFile($file, []);
+                    $file = $fileService->uploadFile($file, false);
                     $batchFileData[] = [
                         'moment_id' => $id,
                         'file_id' => $file['id'],
