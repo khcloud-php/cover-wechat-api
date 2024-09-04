@@ -82,9 +82,9 @@ class MessageService extends BaseService
                 $fileId = $message['file_id'];
                 $file = $files[$fileId] ?? [];
                 if ($file) {
-                    $item['content'] = env('STATIC_FILE_URL') . '/' . $file['path'];
+                    $item['content'] = $file['path'];
                     $item['extends'] = [
-                        'thumbnail' => $file['thumbnail_path'] ? env('STATIC_FILE_URL') . '/' . $file['thumbnail_path'] : '',
+                        'thumbnail' => $file['thumbnail_path'] ?: '',
                         'format' => $file['format'],
                         'width' => $file['width'],
                         'height' => $file['height'],
@@ -245,7 +245,7 @@ class MessageService extends BaseService
                 ];
                 $data['extends'] = json_encode($sendData['data']['extends']);
                 $data['content'] = FileEnum::CONTENT[$file->type] ?? '[文件信息]';
-                $sendData['data']['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
+                $sendData['data']['content'] = $file->path;
             }
         }
 

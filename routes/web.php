@@ -79,4 +79,10 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->post('/verify', 'FriendController@verify');
         $router->put('/update', 'FriendController@update');
     });
+
+    //朋友圈模块
+     $router->group(['prefix' => 'moment'], function ($router) {
+         $router->get('/list', 'MomentController@list');
+         $router->post('/publish', 'MomentController@publish');
+     });
 });

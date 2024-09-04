@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class File extends Base
 {
     use HasFactory;
+
     protected $fillable = [
         'name',
         'path',
@@ -19,4 +20,16 @@ class File extends Base
         'type',
         'format',
     ];
+
+    public function getPathAttribute($value): string
+    {
+        if (empty($value)) return '';
+        return env('STATIC_FILE_URL') . '/' . $value;
+    }
+
+    public function getThumbnailPathAttribute($value): string
+    {
+        if (empty($value)) return '';
+        return env('STATIC_FILE_URL') . '/' . $value;
+    }
 }

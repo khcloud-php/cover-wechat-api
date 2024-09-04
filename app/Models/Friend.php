@@ -51,4 +51,25 @@ class Friend extends Base
         if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . '/' . $value;
         return $value;
     }
+
+    public static function getMomentCanSeeFriends(int|string $owner): array
+    {
+        $canWatchMine = Friend::query()->where('owner', $owner)
+            ->where('status', FriendEnum::STATUS_PASS)
+            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => ['DontSeeHim' => '0']]])
+            ->pluck('friend')->toArray();
+        $friends = Friend::query()->where('friend', $owner)
+            ->where('status', FriendEnum::STATUS_PASS)
+            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => ['DontLetHimSeeIt' => '0']]])
+            ->get(['owner', 'setting'])->toArray();
+        $canWatchThem = array_column($friends, 'owner');
+        $canWatchFriends = array_intersect($canWatchThem, $canWatchMine);
+        $friends = array_column($friends, null, 'owner');
+        foreach ($friends as $key => $friend) {
+            if (!in_array($key, $canWatchFriends)) {
+                unset($friends[$key]);
+            }
+        }
+        return $friends;
+    }
 }

@@ -20,6 +20,18 @@ class FileService extends BaseService
         //上传的如果是头像就需要裁剪成正方头像
         $avatar = $request->input('avatar');
         $file = $request->file('file');
+        return $this->uploadFile($file, $avatar);
+    }
+
+    /**
+     * 上传文件
+     * @param $file
+     * @param $avatar
+     * @return bool|array
+     * @throws BusinessException
+     */
+    public function uploadFile($file, $avatar): bool|array
+    {
         if (!$file->isValid()) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
@@ -168,8 +180,8 @@ class FileService extends BaseService
         $file = File::query()->where('signature', $signature)->first();
         if ($file) {
             $data = $file->toArray();
-            $data['url'] = env('STATIC_FILE_URL') . '/' . $file->path;
-            $data['thumbnail_url'] = env('STATIC_FILE_URL') . '/' . $file->thumbnail_path;
+            $data['url'] = $file->path;
+            $data['thumbnail_url'] = $file->thumbnail_path;
             return $data;
         }
         return false;

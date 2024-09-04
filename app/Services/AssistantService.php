@@ -168,25 +168,19 @@ class AssistantService extends BaseService
                     $fileRealPath = Storage::disk('public')->path($filePath);
                     $thumbnailFilePath = "uploads/image/{$date}/thumbnail_{$fileName}";
                     Storage::disk('public')->put($filePath, (string)$response->getBody());
-                    $signature = md5_file($fileRealPath);
-                    $file = File::query()->where('signature', $signature)->first();
-                    if (!$file) {
-                        list($width, $height, $size) = (new FileService())->makeThumbnailImage($fileRealPath, $thumbnailFilePath);
-                        $file = new File();
-                        $file->name = $fileName;
-                        $file->path = $filePath;
-                        $file->thumbnail_path = $thumbnailFilePath;
-                        $file->size = $size;
-                        $file->width = $width;
-                        $file->height = $height;
-                        $file->duration = 0;
-                        $file->signature = md5_file($fileRealPath);
-                        $file->type = 'image';
-                        $file->format = 'png';
-                        $file->save();
-                    } else {
-                        @unlink($fileRealPath);
-                    }
+                    list($width, $height, $size) = (new FileService())->makeThumbnailImage($fileRealPath, $thumbnailFilePath);
+                    $file = new File();
+                    $file->name = $fileName;
+                    $file->path = $filePath;
+                    $file->thumbnail_path = $thumbnailFilePath;
+                    $file->size = $size;
+                    $file->width = $width;
+                    $file->height = $height;
+                    $file->duration = 0;
+                    $file->signature = md5_file($fileRealPath);
+                    $file->type = 'image';
+                    $file->format = 'png';
+                    $file->save();
 
                     $data['extends'] = [
                         'path' => $file->path,
