@@ -46,13 +46,13 @@ class Moment extends Base
                 }])->orderBy('created_at', 'asc');
             }, 'likes' => function ($query) use ($userIds) {
                 return $query->with(['user' => function ($query) {
-                    return $query->select(['id', 'nickname']);
+                    return $query->select(['id', 'nickname', 'wechat']);
                 }])->whereIn('user_id', $userIds)->orderBy('created_at', 'asc');
             }, 'comments' => function ($query) use ($userIds) {
                 return $query->with(['from' => function ($query) {
-                    return $query->select(['id', 'nickname']);
+                    return $query->select(['id', 'nickname', 'wechat']);
                 }, 'to' => function ($query) {
-                    return $query->select(['id', 'nickname']);
+                    return $query->select(['id', 'nickname', 'wechat']);
                 }])->whereIn('from_user', $userIds)->orderBy('created_at', 'asc');
             }])
             ->whereRaw("(user_id = {$owner} OR (user_id IN($friendIdsStr) AND ((perm='" . MomentEnum::PUBLIC . "') OR (perm='" . MomentEnum::VISIBLE . "' AND FIND_IN_SET('{$owner}', visible) != '') OR (perm='" . MomentEnum::INVISIBLE . "' AND FIND_IN_SET('{$owner}', invisible) = ''))))")
