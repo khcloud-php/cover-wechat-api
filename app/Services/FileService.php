@@ -38,9 +38,9 @@ class FileService extends BaseService
         // 已存在直接返回
         $realPath = $file->getPathname();
         $signature = md5_file($realPath);
-//        if ($data = $this->checkFileExists($signature)) {
-//            return $data;
-//        }
+        if ($data = $this->checkFileExists($signature)) {
+            return $data;
+        }
         // 生成新的文件名
         $extension = $file->getClientOriginalExtension();
         $newFileName = $signature . '.' . $extension;
