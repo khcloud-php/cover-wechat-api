@@ -18,7 +18,7 @@ class ApplyOverdue extends Command
         Friend::query()
             ->where('type', FriendEnum::TYPE_APPLY)
             ->where('status', FriendEnum::STATUS_CHECK)
-            ->where('display', 1)
+            ->whereNotIn('friend', array_keys(config('assistant')))
             ->where('updated_at', '<', time() - 10 * 86400)
             ->update(['type' => FriendEnum::TYPE_VERIFY, 'status' => FriendEnum::STATUS_OVERDUE]);
     }

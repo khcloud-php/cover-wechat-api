@@ -90,7 +90,7 @@ class FriendService extends BaseService
         //黑名单
         $isMobile = is_mobile($keywords);
         $source = $isMobile ? FriendEnum::SOURCE_MOBILE : FriendEnum::SOURCE_WECHAT;
-        $friend = User::query()->where($source, $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->get(['id', 'nickname', 'avatar']);
+        $friend = User::query()->where($source, $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => "1"]]])->get(['id', 'nickname', 'avatar']);
         if ($friend) {
             $friend = $friend->toArray();
             foreach ($friend as &$v) {
@@ -114,7 +114,7 @@ class FriendService extends BaseService
         if (!in_array($source, [FriendEnum::SOURCE_WECHAT, FriendEnum::SOURCE_MOBILE])) {
             $source = FriendEnum::SOURCE_WECHAT;
         }
-        $user = User::query()->where($source, $params['keywords'])->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->first(['id', 'nickname']);
+        $user = User::query()->where($source, $params['keywords'])->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => "1"]]])->first(['id', 'nickname']);
         if (empty($user)) $this->throwBusinessException(ApiCodeEnum::SERVICE_ACCOUNT_NOT_FOUND);
         $confirm['friend'] = $user->id;
         $confirm['nickname'] = $user->nickname;
@@ -135,7 +135,7 @@ class FriendService extends BaseService
         $keywords = $params['keywords'];
         $isMobile = is_mobile($keywords);
         $source = $isMobile ? FriendEnum::SOURCE_MOBILE : FriendEnum::SOURCE_WECHAT;
-        $params['friend'] = User::query()->where($source, $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => 1]]])->value('id');
+        $params['friend'] = User::query()->where($source, $keywords)->whereJsonContains('setting', ["FriendPerm" => ["AddMyWay" => [ucfirst($source) => "1"]]])->value('id');
         if (!$params['friend']) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         $friend = Friend::query()->where('owner', $params['user']->id)->where('friend', $params['friend'])->first();
         $owner = Friend::query()->where('owner', $params['friend'])->where('friend', $params['user']->id)->first();
