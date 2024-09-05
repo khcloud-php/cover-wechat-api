@@ -15,6 +15,7 @@ use App\Models\Friend;
 use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\Message;
+use App\Models\Moment;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\DB;
@@ -399,10 +400,16 @@ class MessageService extends BaseService
             ->where('friend', $userId)
             ->where('is_read', 0)
             ->count();
+        $moment = Moment::query()
+            ->where('user_id', $userId)
+            ->where('unread', '>', 0)
+            ->sum('unread');
         return [
             'chat' => $group + $private,
             'apply' => $apply,
-            'discover' => 0
+            'friend' => $apply,
+            'moment' => $moment,
+            'discover' => $moment
         ];
     }
 }

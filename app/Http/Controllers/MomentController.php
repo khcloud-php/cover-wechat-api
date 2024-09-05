@@ -45,4 +45,43 @@ class MomentController extends Controller
         $data = $this->momentService->publish($this->params);
         return $this->success($data, $request);
     }
+
+    /**
+     * @throws BusinessException
+     * @throws ValidationException
+     */
+    public function like(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'id' => 'required'
+        ]);
+        $data = $this->momentService->like($this->params);
+        return $this->success($data, $request);
+    }
+
+    /**
+     * @throws BusinessException
+     * @throws ValidationException
+     */
+    public function unlike(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'id' => 'required'
+        ]);
+        $data = $this->momentService->unlike($this->params);
+        return $this->success($data, $request);
+    }
+
+    /**
+     * @throws BusinessException
+     * @throws ValidationException
+     */
+    public function delete(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'id' => 'required'
+        ]);
+        $data = $this->momentService->delete($this->params);
+        return $this->success($data, $request);
+    }
 }

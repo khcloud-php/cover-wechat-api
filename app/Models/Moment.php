@@ -34,25 +34,26 @@ class Moment extends Base
     public static function getMomentsPageByUserIds(array $friendIds, string|int $owner, int $page = 1, int $limit = 10): array
     {
         $friendIdsStr = implode(',', $friendIds);
+        $userIds = array_merge($friendIds, [$owner]);
         $offset = ($page - 1) * $limit;
         $total = self::query()->whereRaw("(user_id = {$owner} OR (user_id IN($friendIdsStr) AND ((perm='" . MomentEnum::PUBLIC . "') OR (perm='" . MomentEnum::VISIBLE . "' AND FIND_IN_SET('{$owner}', visible) != '') OR (perm='" . MomentEnum::INVISIBLE . "' AND FIND_IN_SET('{$owner}', invisible) = ''))))")->count();
         $moments = self::query()
             ->with(['user' => function ($query) {
-                return $query->select(['id', 'nickname', 'avatar']);
+                return $query->select(['id', 'nickname', 'avatar', 'wechat']);
             }, 'files' => function ($query) {
                 return $query->with(['file' => function ($query) {
                     return $query->select(['id', 'name', 'type', 'path', 'thumbnail_path']);
                 }])->orderBy('created_at', 'asc');
-            }, 'likes' => function ($query) {
+            }, 'likes' => function ($query) use ($userIds) {
                 return $query->with(['user' => function ($query) {
                     return $query->select(['id', 'nickname']);
-                }])->orderBy('created_at', 'asc');
-            }, 'comments' => function ($query) {
+                }])->whereIn('user_id', $userIds)->orderBy('created_at', 'asc');
+            }, 'comments' => function ($query) use ($userIds) {
                 return $query->with(['from' => function ($query) {
                     return $query->select(['id', 'nickname']);
                 }, 'to' => function ($query) {
                     return $query->select(['id', 'nickname']);
-                }])->orderBy('created_at', 'asc');
+                }])->whereIn('from_user', $userIds)->orderBy('created_at', 'asc');
             }])
             ->whereRaw("(user_id = {$owner} OR (user_id IN($friendIdsStr) AND ((perm='" . MomentEnum::PUBLIC . "') OR (perm='" . MomentEnum::VISIBLE . "' AND FIND_IN_SET('{$owner}', visible) != '') OR (perm='" . MomentEnum::INVISIBLE . "' AND FIND_IN_SET('{$owner}', invisible) = ''))))")
             ->orderBy('created_at', 'desc')->offset($offset)->limit($limit)->get()->toArray();

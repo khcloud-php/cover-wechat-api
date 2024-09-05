@@ -11,9 +11,11 @@ class WorkerManEnum
     const ACTION_LOGOUT = 'logout';
     const ACTION_AT = 'at';
     const ACTION_QUOTE = 'quote';
+    const ACTION_LIKE = 'like';
 
     const WHO_MESSAGE = 'message';
     const WHO_FRIEND = 'friend';
     const WHO_USER = 'user';
+    const WHO_MOMENT = 'moment';
 
 }
