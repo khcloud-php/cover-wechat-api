@@ -14,13 +14,11 @@ class MomentService extends BaseService
     public function list(array $params): array
     {
         $owner = $params['user']->id;
+        $page = $params['page'] ?? 1;
+        $limit = $params['limit'] ?? 10;
         $friends = Friend::getMomentCanSeeFriends($owner);
         $friendIds = array_keys($friends);
-        $moments = Moment::getMomentsByUserIds($friendIds, $owner);
-        usort($moments, function ($a, $b) {
-           return $b['created_at'] - $a['created_at'];
-        });
-        return $moments;
+        return Moment::getMomentsPageByUserIds($friendIds, $owner, $page, $limit);
     }
 
     /**

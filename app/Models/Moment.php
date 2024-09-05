@@ -31,9 +31,11 @@ class Moment extends Base
         return $this->hasMany(MomentComments::class, 'moment_id', 'id');
     }
 
-    public static function getMomentsByUserIds(array $friendIds, string| int $owner): array
+    public static function getMomentsPageByUserIds(array $friendIds, string|int $owner, int $page = 1, int $limit = 10): array
     {
         $friendIdsStr = implode(',', $friendIds);
+        $offset = ($page - 1) * $limit;
+        $total = self::query()->whereRaw("(user_id = {$owner} OR (user_id IN($friendIdsStr) AND ((perm='" . MomentEnum::PUBLIC . "') OR (perm='" . MomentEnum::VISIBLE . "' AND FIND_IN_SET('{$owner}', visible) != '') OR (perm='" . MomentEnum::INVISIBLE . "' AND FIND_IN_SET('{$owner}', invisible) = ''))))")->count();
         $moments = self::query()
             ->with(['user' => function ($query) {
                 return $query->select(['id', 'nickname', 'avatar']);
@@ -53,14 +55,19 @@ class Moment extends Base
                 }])->orderBy('created_at', 'asc');
             }])
             ->whereRaw("(user_id = {$owner} OR (user_id IN($friendIdsStr) AND ((perm='" . MomentEnum::PUBLIC . "') OR (perm='" . MomentEnum::VISIBLE . "' AND FIND_IN_SET('{$owner}', visible) != '') OR (perm='" . MomentEnum::INVISIBLE . "' AND FIND_IN_SET('{$owner}', invisible) = ''))))")
-            ->get()->toArray();
+            ->orderBy('created_at', 'desc')->offset($offset)->limit($limit)->get()->toArray();
         foreach ($moments as &$moment) {
-            if(!empty($moment['files'])) {
+            if (!empty($moment['files'])) {
                 foreach ($moment['files'] as &$file) {
                     $file['url'] = $file['file']['path'];
                 }
             }
         }
-        return $moments;
+        $pageInfo = [
+            'total' => $total,
+            'total_page' => ceil($total / $limit),
+            'current_page' => $page,
+        ];
+        return [$pageInfo, $moments];
     }
 }

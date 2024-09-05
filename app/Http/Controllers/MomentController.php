@@ -18,10 +18,17 @@ class MomentController extends Controller
     }
 
 
+    /**
+     * @throws ValidationException
+     */
     public function list(Request $request): \Illuminate\Http\JsonResponse
     {
+        $this->validate($request, [
+            'page' => 'integer|min:1',
+            'limit' => 'integer|min:1|max:20',
+        ]);
         $data = $this->momentService->list($this->params);
-        return $this->success($data, $request);
+        return $this->setPageInfo($data[0])->success($data[1], $request);
     }
 
     /**

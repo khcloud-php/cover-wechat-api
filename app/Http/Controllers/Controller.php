@@ -10,11 +10,19 @@ class Controller extends BaseController
 {
     protected array $params;
 
+    private array $pageInfo = [];
+
     public function __construct()
     {
         $this->params = request()->all();
         if (empty($this->params['user']) && request()->user())
             $this->params['user'] = request()->user();
+    }
+
+    protected function setPageInfo(array $pageInfo): static
+    {
+        $this->pageInfo = $pageInfo;
+        return $this;
     }
 
     //
@@ -26,11 +34,15 @@ class Controller extends BaseController
             $message = $arr[1];
             $code = $arr[0];
         }
-        return response()->json([
+        $result = [
             'code' => $code,
             'msg' => $message,
             'data' => $data,
             'request_id' => $request->offsetGet('request_id')
-        ]);
+        ];
+        if ($this->pageInfo) {
+            $result['page_info'] = $this->pageInfo;
+        }
+        return response()->json($result);
     }
 }
