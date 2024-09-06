@@ -22,4 +22,7 @@ class MomentEnum
         self::VISIBLE,
         self::INVISIBLE,
     ];
+
+    const LIKE = 'like';
+    const COMMENT = 'comment';
 }

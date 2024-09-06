@@ -24,12 +24,12 @@ class File extends Base
     public function getPathAttribute($value): string
     {
         if (empty($value)) return '';
-        return env('STATIC_FILE_URL') . '/' . $value;
+        return env('STATIC_FILE_URL') . $value;
     }
 
     public function getThumbnailPathAttribute($value): string
     {
         if (empty($value)) return '';
-        return env('STATIC_FILE_URL') . '/' . $value;
+        return env('STATIC_FILE_URL') . $value;
     }
 }

@@ -111,11 +111,12 @@ class FileService extends BaseService
         $fileRecord->type = $fileType;
         $fileRecord->format = $extension;
         $fileRecord->save();
-
+        $fileRecord->path = $filePath;
+        $fileRecord->thumbnail_path = $thumbnailFilePath;
         // 获取文件的 URL
         $data = $fileRecord->toArray();
-        $data['url'] = env('STATIC_FILE_URL') . '/' . $path;
-        $data['thumbnail_url'] = env('STATIC_FILE_URL') . '/' . $thumbnailPath;
+        $data['url'] = env('STATIC_FILE_URL') . $path;
+        $data['thumbnail_url'] = env('STATIC_FILE_URL') . $thumbnailPath;
 
         return $data;
     }
@@ -164,10 +165,12 @@ class FileService extends BaseService
         $fileRecord->type = 'image';
         $fileRecord->format = $extension;
         $fileRecord->save();
+        $fileRecord->path = $filePath;
+        $fileRecord->thumbnail_path = $thumbnailFilePath;
         // 获取文件的 URL
         $data = $fileRecord->toArray();
-        $data['url'] = env('STATIC_FILE_URL') . '/' . $filePath;
-        $data['thumbnail_url'] = env('STATIC_FILE_URL') . '/' . $thumbnailFilePath;
+        $data['url'] = env('STATIC_FILE_URL') . $filePath;
+        $data['thumbnail_url'] = env('STATIC_FILE_URL') . $thumbnailFilePath;
 
         return $data;
     }

@@ -251,7 +251,7 @@ class AssistantService extends BaseService
                         $messageData['file_type'] = $file->type;
                         $messageData['file_size'] = $file->size;
                         $messageData['extends'] = json_encode($data['extends']);
-                        $data['content'] = env('STATIC_FILE_URL') . '/' . $file->path;
+                        $data['content'] = env('STATIC_FILE_URL') . $file->path;
                     } else {
                         $data['content'] = $replyMessage;
                         $data['type'] = MessageEnum::TEXT;

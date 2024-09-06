@@ -167,7 +167,7 @@ class UserService extends BaseService
     public function update(array $params): array
     {
         $userId = $params['user']->id;
-        $updateAllowFields = ['avatar', 'gender', 'sign', 'nickname', 'setting'];
+        $updateAllowFields = ['avatar', 'gender', 'sign', 'nickname', 'setting', 'bg_file_id', 'bg_file_path', 'moment_bg_file_id', 'moment_bg_file_path'];
         $updateData = [];
         foreach ($params as $key => $value) {
             if (in_array($key, $updateAllowFields)) {

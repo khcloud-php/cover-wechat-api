@@ -7,6 +7,7 @@ use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\Moment;
+use App\Models\MomentComments;
 use App\Models\MomentFiles;
 use App\Models\MomentLikes;
 use GatewayWorker\Lib\Gateway;
@@ -107,6 +108,31 @@ class MomentService extends BaseService
         }
         $like->delete();
         return ['id' => $params['id'], 'like_id' => $like->id];
+    }
+
+    public function unreadList(array $params): array
+    {
+        $unreadLikes = MomentLikes::getUnreadLikesByUserId($params['user']->id);
+        $unreadComments = MomentComments::getUnreadCommentsByUserId($params['user']->id);
+        DB::beginTransaction();
+        try {
+            if ($unreadLikes) {
+                $momentIds = array_column($unreadLikes, 'moment_id');
+                MomentLikes::query()->whereIn('moment_id', $momentIds)->update(['is_read' => 1]);
+            }
+            if ($unreadComments) {
+                $momentIds = array_column($unreadComments, 'moment_id');
+                MomentComments::query()->whereIn('moment_id', $momentIds)->update(['is_read' => 1]);
+            }
+            DB::commit();
+        } catch (\Exception) {
+            DB::rollBack();
+        }
+        $unreadList = array_merge($unreadLikes, $unreadComments);
+        usort($unreadList, function ($a, $b) {
+            return $b['created_at'] <=> $a['created_at'];
+        });
+        return $unreadList;
     }
 
     /**

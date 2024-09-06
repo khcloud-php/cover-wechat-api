@@ -41,14 +41,21 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
      */
     public function getAvatarAttribute($value)
     {
-        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . '/' . $value;
+        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . $value;
         return $value;
     }
 
     public function getBgFilePathAttribute($value): string
     {
         if (empty($value)) return '';
-        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . '/' . $value;
+        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . $value;
+        return $value;
+    }
+
+    public function getMomentBgFilePathAttribute($value): string
+    {
+        if (empty($value)) return '';
+        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . $value;
         return $value;
     }
 }

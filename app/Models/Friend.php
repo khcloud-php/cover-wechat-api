@@ -48,7 +48,7 @@ class Friend extends Base
     public function getBgFilePathAttribute($value): string
     {
         if (empty($value)) return '';
-        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . '/' . $value;
+        if (!str_contains($value, 'http')) return env('STATIC_FILE_URL') . $value;
         return $value;
     }
 
