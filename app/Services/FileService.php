@@ -112,7 +112,7 @@ class FileService extends BaseService
         $fileRecord->format = $extension;
         $fileRecord->save();
         $fileRecord->path = $filePath;
-        $fileRecord->thumbnail_path = $thumbnailFilePath;
+        $fileRecord->thumbnail_path = $thumbnailPath;
         // 获取文件的 URL
         $data = $fileRecord->toArray();
         $data['url'] = env('STATIC_FILE_URL') . $path;
