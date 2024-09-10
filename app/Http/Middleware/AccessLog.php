@@ -25,7 +25,7 @@ class AccessLog
     {
         //接口限流
         $api = strtolower($request->path());
-        $limit = 60;
+        $limit = 30;
         if ($api == 'message/send') {
             $aiUsers = array_keys(config('assistant'));
             $toUser = $request->post('to_user', 0);

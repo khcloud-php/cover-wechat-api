@@ -131,7 +131,7 @@ class AssistantService extends BaseService
                 $json['messages'] = $ai['messages'];
                 $json['messages'][] = [
                     'role' => 'user',
-                    'content' => $aiContent,
+                    'content' => "{$aiContent}，请用中文回复我！",
                 ];
             } else {
                 //ai绘画
@@ -251,7 +251,7 @@ class AssistantService extends BaseService
                         $messageData['file_type'] = $file->type;
                         $messageData['file_size'] = $file->size;
                         $messageData['extends'] = json_encode($data['extends']);
-                        $data['content'] = env('STATIC_FILE_URL') . $file->path;
+                        $data['content'] = $file->path;
                     } else {
                         $data['content'] = $replyMessage;
                         $data['type'] = MessageEnum::TEXT;
