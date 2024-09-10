@@ -209,7 +209,7 @@ class ChatService extends BaseService
     /**
      * @throws BusinessException
      */
-    public function update(array $params)
+    public function update(array $params): void
     {
         $fromUser = $params['user']->id;
         $toUser = $params['to_user'];

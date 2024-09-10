@@ -73,14 +73,18 @@ class MomentService extends BaseService
         ];
         DB::beginTransaction();
         try {
+            if ($moment->user_id != $params['user']->id) {
+                ++$moment->unread;
+                $moment->save();
+            } else {
+                $likeData['is_read'] = 1;
+            }
             $likeData['id'] = MomentLikes::query()->insertGetId($likeData);
             $likeData['user'] = [
                 'id' => $params['user']->id,
                 'nickname' => $params['user']->nickname,
-                'avatar' => $params['user']->avatar,
+                'avatar' => $params['user']->avatar
             ];
-            ++$moment->unread;
-            $moment->save();
             $sendData = [
                 'who' => WorkerManEnum::WHO_MOMENT,
                 'action' => WorkerManEnum::ACTION_LIKE,
@@ -108,6 +112,41 @@ class MomentService extends BaseService
         }
         $like->delete();
         return ['id' => $params['id'], 'like_id' => $like->id];
+    }
+
+    public function unread(array $params): array
+    {
+        $userId = $params['user']->id;
+        $momentIds = Moment::query()->where('user_id', $userId)->pluck('id')->toArray();
+        $totalCnt = Moment::query()
+            ->where('user_id', $userId)
+            ->where('unread', '>', 0)
+            ->sum('unread');
+        $unread = [];
+        if ($totalCnt > 0) {
+            $likeQuery = MomentLikes::query()
+                ->selectRaw("id,user_id as from_user,0 as to_user,created_at")
+                ->where('is_read', 0)
+                ->whereIn('moment_id', $momentIds)
+                ->orderBy('created_at', 'desc')
+                ->limit(1);
+            $commentQuery = MomentComments::query()
+                ->where('is_read', 0)
+                ->whereIn('moment_id', $momentIds)
+                ->orderBy('created_at', 'desc')
+                ->limit(1);
+            $unread = $commentQuery->unionAll($likeQuery)
+                ->with(['from' => function ($query) {
+                    return $query->select(['id', 'nickname', 'avatar', 'wechat']);
+                }, 'to' => function ($query) {
+                    return $query->select(['id', 'nickname', 'avatar', 'wechat']);
+                }])
+                ->select(['id', 'from_user', 'to_user', 'created_at'])
+                ->where('from_user', '<>', $userId)
+                ->orderBy('created_at', 'desc')
+                ->first()->toArray();
+        }
+        return ['cnt' => $totalCnt, 'user' => $unread['from'] ?? []];
     }
 
     public function unreadList(array $params): array
