@@ -168,19 +168,27 @@ class AssistantService extends BaseService
                     $fileRealPath = Storage::disk('public')->path($filePath);
                     $thumbnailFilePath = "uploads/image/{$date}/thumbnail_{$fileName}";
                     Storage::disk('public')->put($filePath, (string)$response->getBody());
+                    $signature = md5_file($fileRealPath);
                     list($width, $height, $size) = (new FileService())->makeThumbnailImage($fileRealPath, $thumbnailFilePath);
-                    $file = new File();
-                    $file->name = $fileName;
-                    $file->path = $filePath;
-                    $file->thumbnail_path = $thumbnailFilePath;
-                    $file->size = $size;
-                    $file->width = $width;
-                    $file->height = $height;
-                    $file->duration = 0;
-                    $file->signature = md5_file($fileRealPath);
-                    $file->type = 'image';
-                    $file->format = 'png';
-                    $file->save();
+                    $file = File::query()->where('signature', $signature)->first();
+                    if (!$file) {
+                        $file = new File();
+                        $file->name = $fileName;
+                        $file->path = $filePath;
+                        $file->thumbnail_path = $thumbnailFilePath;
+                        $file->size = $size;
+                        $file->width = $width;
+                        $file->height = $height;
+                        $file->duration = 0;
+                        $file->signature = $signature;
+                        $file->type = 'image';
+                        $file->format = 'png';
+                        $file->save();
+                    } else {
+                        //已经存在了，删除多余的
+                        @unlink($fileRealPath);
+                        @unlink(Storage::disk('public')->path($thumbnailFilePath));
+                    }
 
                     $data['extends'] = [
                         'path' => $file->path,
