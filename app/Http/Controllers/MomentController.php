@@ -31,12 +31,6 @@ class MomentController extends Controller
         return $this->setPageInfo($data[0])->success($data[1], $request);
     }
 
-    public function unread(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $data = $this->momentService->unread($this->params);
-        return $this->success($data, $request);
-    }
-
     public function unreadList(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $this->momentService->unreadList($this->params);

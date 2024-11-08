@@ -83,7 +83,6 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
     //朋友圈模块
     $router->group(['prefix' => 'moment'], function ($router) {
         $router->get('/list', 'MomentController@list');
-        $router->get('/unread', 'MomentController@unread');
         $router->get('/unread-list', 'MomentController@unreadList');
         $router->post('/publish', 'MomentController@publish');
         $router->post('/like', 'MomentController@like');

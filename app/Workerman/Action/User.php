@@ -28,8 +28,8 @@ class User
         }
 //        $_SESSION[sprintf(UserEnum::BIND_UID, $clientId)] = $uid;
 //        $_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)] = json_encode($groupIds);
-        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::BIND_UID, $clientId), $uid);
-        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::JOIN_GROUPS, $clientId), $groupIds);
+//        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::BIND_UID, $clientId), $uid);
+//        Cache::store(UserEnum::STORE)->set(sprintf(UserEnum::JOIN_GROUPS, $clientId), $groupIds);
     }
 
     /**

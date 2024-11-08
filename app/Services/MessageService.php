@@ -390,13 +390,22 @@ class MessageService extends BaseService
             ->sum('unread');
         $unread = User::getUnreadById($userId);
         $apply = $unread['apply'];
-        $moment = $unread['moment']['num'];
+        $moment = $unread['moment'];
+
+        $from = [];
+        if ($moment['num'] > 0) {
+            $from = User::query()->find($moment['from'], ['id', 'nickname', 'avatar', 'wechat']);
+        }
+
         return [
             'chat' => $group + $private,
             'apply' => $apply,
             'friend' => $apply,
-            'moment' => $moment,
-            'discover' => $moment
+            'moment' => [
+                'num' => $moment['num'],
+                'from' => $from
+            ],
+            'discover' => $moment['num']
         ];
     }
 }

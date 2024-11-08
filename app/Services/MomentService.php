@@ -77,7 +77,8 @@ class MomentService extends BaseService
             $likeData['user'] = [
                 'id' => $params['user']->id,
                 'nickname' => $params['user']->nickname,
-                'avatar' => $params['user']->avatar
+                'avatar' => $params['user']->avatar,
+                'wechat' => $params['user']->wechat
             ];
             $sendData = [
                 'who' => WorkerManEnum::WHO_MOMENT,
@@ -166,18 +167,6 @@ class MomentService extends BaseService
             DB::rollBack();
             $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());
         }
-    }
-
-    public function unread(array $params): array
-    {
-        $userId = $params['user']->id;
-        $unread = User::getUnreadById($userId);
-        $moment = $unread['moment'];
-        $from = [];
-        if ($moment['num'] > 0) {
-            $from = User::query()->find($moment['from'], ['id', 'nickname', 'avatar', 'wechat']);
-        }
-        return ['cnt' => $moment['num'], 'user' => $from];
     }
 
     public function unreadList(array $params): array
