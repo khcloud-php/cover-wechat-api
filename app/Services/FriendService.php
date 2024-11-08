@@ -71,7 +71,7 @@ class FriendService extends BaseService
                 $threeDay[] = $apply;
             }
         }
-        Friend::query()->where('friend', $userId)->where('is_read', 0)->update(['is_read' => 1]);
+        User::clearUnread([$userId], 'apply');
         return ['three_day' => $threeDay, 'over_three_day' => $overThreeDay];
     }
 
@@ -139,52 +139,57 @@ class FriendService extends BaseService
         if (!$params['friend']) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         $friend = Friend::query()->where('owner', $params['user']->id)->where('friend', $params['friend'])->first();
         $owner = Friend::query()->where('owner', $params['friend'])->where('friend', $params['user']->id)->first();
+        DB::beginTransaction();
+        try {
+            if ($friend) {
+                //已经申请过了
+                //双方已是好友
+                if (!$friend->deleted_at && ($owner && !$owner->deleted_at)) {
+                    throw new BusinessException(ApiCodeEnum::SERVICE_FRIEND_ALREADY_EXISTS);
+                }
+                $friend->type = FriendEnum::TYPE_APPLY;
+                $friend->status = FriendEnum::STATUS_CHECK;
+                $friend->deleted_at = null;
+                $friend->hide = 0;
+                $friend->nickname = $params['nickname'];
+                $friend->remark = $params['remark'];
+                $friend->setting = $params['setting'];
+                //对方有你好友
+                if ($owner && !$owner->deleted_at) {
+                    $friend->type = FriendEnum::TYPE_VERIFY;
+                    $friend->status = FriendEnum::STATUS_PASS;
+                }
 
-        if ($friend) {
-            //已经申请过了
-            //双方已是好友
-            if (!$friend->deleted_at && ($owner && !$owner->deleted_at)) {
-                throw new BusinessException(ApiCodeEnum::SERVICE_FRIEND_ALREADY_EXISTS);
+                $friend->save();
+            } else {
+                //没申请过
+                $friend = new Friend($params);
+                $friend->owner = $params['user']->id;
+                $friend->friend = $params['friend'];
+                $friend->save();
             }
-            $friend->type = FriendEnum::TYPE_APPLY;
-            $friend->status = FriendEnum::STATUS_CHECK;
-            $friend->deleted_at = null;
-            $friend->hide = 0;
-            $friend->nickname = $params['nickname'];
-            $friend->remark = $params['remark'];
-            $friend->setting = $params['setting'];
-            $friend->is_read = 0;
-            //对方有你好友
-            if ($owner && !$owner->deleted_at) {
-                $friend->type = FriendEnum::TYPE_VERIFY;
-                $friend->status = FriendEnum::STATUS_PASS;
-            }
-
-            $friend->save();
-        } else {
-            //没申请过
-            $friend = new Friend($params);
-            $friend->owner = $params['user']->id;
-            $friend->friend = $params['friend'];
-            $friend->save();
-        }
-
+            User::incrUnread([$params['friend']], 'apply');
 //        $this->delCache($params);
-        $apply = $friend->toArray();
-        Gateway::sendToUid($params['friend'], json_encode([
-            'who' => WorkerManEnum::WHO_FRIEND,
-            'action' => WorkerManEnum::ACTION_APPLY,
-            'data' => [
-                'from' => [
-                    'id' => $params['user']->id,
-                    'nickname' => $params['user']->nickname,
-                    'avatar' => $params['user']->avatar,
-                ],
-                'content' => '请求添加您为好友',
-                'keywords' => $params['user']->$source
-            ]
-        ], JSON_UNESCAPED_UNICODE));
-        return $apply;
+            $apply = $friend->toArray();
+            Gateway::sendToUid($params['friend'], json_encode([
+                'who' => WorkerManEnum::WHO_FRIEND,
+                'action' => WorkerManEnum::ACTION_APPLY,
+                'data' => [
+                    'from' => [
+                        'id' => $params['user']->id,
+                        'nickname' => $params['user']->nickname,
+                        'avatar' => $params['user']->avatar,
+                    ],
+                    'content' => '请求添加您为好友',
+                    'keywords' => $params['user']->$source
+                ]
+            ], JSON_UNESCAPED_UNICODE));
+            DB::commit();
+            return $apply;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new BusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());
+        }
     }
 
     public function verify(array $params)

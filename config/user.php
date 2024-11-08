@@ -10,6 +10,13 @@ return [
                     "QRCode" => '1'
                 ]
             ]
+        ],
+        'unread' => [
+            'apply' => 0,
+            'moment' => [
+                'num' => 0,
+                'from' => 0
+            ]
         ]
     ],
     'friend' => [

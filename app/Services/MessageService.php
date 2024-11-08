@@ -15,7 +15,6 @@ use App\Models\Friend;
 use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\Message;
-use App\Models\Moment;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\DB;
@@ -368,19 +367,12 @@ class MessageService extends BaseService
     public function undo(array $params): bool
     {
         $id = $params['id'];
-        DB::beginTransaction();
-        try {
-            $message = Message::query()->find($id);
-            if (!$message) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
-            $message->is_undo = 1;
-            $message->is_tips = 1;
-            $message->updated_at = time();
-            $message->save();
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());
-        }
+        $message = Message::query()->find($id);
+        if (!$message) $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
+        $message->is_undo = 1;
+        $message->is_tips = 1;
+        $message->updated_at = time();
+        $message->save();
         return true;
     }
 
@@ -396,14 +388,9 @@ class MessageService extends BaseService
             ->where('display', 1)
             ->where('unread', '>', 0)
             ->sum('unread');
-        $apply = Friend::query()
-            ->where('friend', $userId)
-            ->where('is_read', 0)
-            ->count();
-        $moment = Moment::query()
-            ->where('user_id', $userId)
-            ->where('unread', '>', 0)
-            ->sum('unread');
+        $unread = User::getUnreadById($userId);
+        $apply = $unread['apply'];
+        $moment = $unread['moment']['num'];
         return [
             'chat' => $group + $private,
             'apply' => $apply,

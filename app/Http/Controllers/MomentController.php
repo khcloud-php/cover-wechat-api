@@ -88,6 +88,20 @@ class MomentController extends Controller
      * @throws BusinessException
      * @throws ValidationException
      */
+    public function comment(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'id' => 'required',
+            'content' => 'required'
+        ]);
+        $data = $this->momentService->comment($this->params);
+        return $this->success($data, $request);
+    }
+
+    /**
+     * @throws BusinessException
+     * @throws ValidationException
+     */
     public function delete(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [

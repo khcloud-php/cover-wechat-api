@@ -88,6 +88,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->post('/publish', 'MomentController@publish');
         $router->post('/like', 'MomentController@like');
         $router->delete('/unlike', 'MomentController@unlike');
+        $router->post('/comment', 'MomentController@comment');
         $router->delete('/delete', 'MomentController@delete');
     });
 });

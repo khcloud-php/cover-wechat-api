@@ -37,8 +37,7 @@ class MomentComments extends Base
         }, 'to' => function ($query) {
             return $query->select(['id', 'nickname', 'avatar', 'wechat']);
         }])
-            ->where('is_read', 'eq', 0)
-            ->whereRaw("moment_id IN (SELECT id FROM moments WHERE user_id = {$userId} AND deleted_at IS NULL AND unread > 0)")
+            ->where('to_user', 'eq', $userId)
             ->get()->toArray();
         foreach ($unreadComments as &$unreadComment) {
             $unreadComment['type'] = MomentEnum::COMMENT;

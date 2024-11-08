@@ -52,24 +52,27 @@ class Friend extends Base
         return $value;
     }
 
-    public static function getMomentCanSeeFriends(int|string $owner): array
+    public static function getMomentCanSeeFriendIds(int $owner, $reverse = false): array
     {
-        $canWatchMine = Friend::query()->where('owner', $owner)
+        $seeHimField = $reverse ? 'DontLetHimSeeIt' : 'DontSeeHim';
+        $letHimSeeField = $reverse ? 'DontSeeHim' : 'DontLetHimSeeIt';
+        $seeHim = Friend::query()->where('owner', $owner)
             ->where('status', FriendEnum::STATUS_PASS)
-            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => ['DontSeeHim' => '0']]])
+            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => [$seeHimField => '0']]])
             ->pluck('friend')->toArray();
-        $friends = Friend::query()->where('friend', $owner)
+        $letHimSee = Friend::query()->where('friend', $owner)
             ->where('status', FriendEnum::STATUS_PASS)
-            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => ['DontLetHimSeeIt' => '0']]])
-            ->get(['owner', 'setting'])->toArray();
-        $canWatchThem = array_column($friends, 'owner');
-        $canWatchFriends = array_intersect($canWatchThem, $canWatchMine);
-        $friends = array_column($friends, null, 'owner');
-        foreach ($friends as $key => $friend) {
-            if (!in_array($key, $canWatchFriends)) {
-                unset($friends[$key]);
-            }
-        }
-        return $friends;
+            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => [$letHimSeeField => '0']]])
+            ->pluck('owner')->toArray();
+        return array_intersect($seeHim, $letHimSee);
+    }
+
+    public static function getPublicFriendIds(int $owner, int $him): array
+    {
+        $ownerCanSee = self::getMomentCanSeeFriendIds($owner, true);
+        if ($owner == $him) return $ownerCanSee;
+        if (empty($ownerCanSee)) return [];
+        $himCanSee = self::getMomentCanSeeFriendIds($him, true);
+        return array_intersect($ownerCanSee, $himCanSee);
     }
 }

@@ -12,6 +12,7 @@ class WorkerManEnum
     const ACTION_AT = 'at';
     const ACTION_QUOTE = 'quote';
     const ACTION_LIKE = 'like';
+    const ACTION_COMMENT = 'comment';
 
     const WHO_MESSAGE = 'message';
     const WHO_FRIEND = 'friend';

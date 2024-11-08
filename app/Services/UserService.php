@@ -27,6 +27,7 @@ class UserService extends BaseService
         if ($user && $user->wechat == $params['wechat']) $this->throwBusinessException(ApiCodeEnum::SERVICE_WECHAT_ALREADY_EXISTS);
         $params['salt'] = Str::password(10);
         $params['setting'] = config('user.owner.setting');
+        $params['unread'] = config('user.owner.unread');
         $params['password'] = Hash::make($params['salt'] . $params['password']);
         empty($params['avatar']) && $params['avatar'] = rand_avatar($params['mobile']);
         $user = new User($params);
@@ -137,9 +138,6 @@ class UserService extends BaseService
             }
         }
         $homeInfo['relationship'] = $relationship;
-        if ($relationship != FriendEnum::RELATIONSHIP_FRIEND) {
-            Friend::query()->where('owner', $user->id)->where('friend', $userId)->where('is_read', 0)->update(['is_read' => 1]);
-        }
         $homeInfo['setting'] = $setting;
         return $homeInfo;
     }

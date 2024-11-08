@@ -31,8 +31,9 @@ class Moment extends Base
         return $this->hasMany(MomentComments::class, 'moment_id', 'id');
     }
 
-    public static function getMomentsPageByUserIds(array $friendIds, string|int $owner, int $page = 1, int $limit = 10): array
+    public static function getMomentsPageByUserIds(array $friendIds, int $owner, int $page = 1, int $limit = 10): array
     {
+        $friendIds = $friendIds ?: [-1];
         $friendIdsStr = implode(',', $friendIds);
         $userIds = array_merge($friendIds, [$owner]);
         $offset = ($page - 1) * $limit;
@@ -70,5 +71,33 @@ class Moment extends Base
             'current_page' => $page,
         ];
         return [$pageInfo, $moments];
+    }
+
+    public static function getNoticePublicFriendIds(int $id, int $owner, int $him, int $to = 0): array
+    {
+        //获取共同好友
+        $publicFriendIds = Friend::getPublicFriendIds($owner, $him);
+        //非本人点赞评论通知朋友圈作者
+        if ($owner != $him) $publicFriendIds[] = $him;
+
+        //朋友圈下回复他人评论
+        if ($to) {
+            $ids = Friend::getPublicFriendIds($owner, $to);
+            if ($owner != $him) $ids[] = $him;
+            if ($ids) {
+                $publicFriendIds = array_intersect($publicFriendIds, $ids);
+            }
+        }
+
+
+        if (empty($publicFriendIds)) return [];
+
+        //通知点赞或评论的人
+        $likeUserIds = MomentLikes::query()->where('moment_id', $id)->where('user_id', '<>', $owner)->pluck('user_id')->toArray();
+        $commentUserIds = MomentComments::query()->where('moment_id', $id)->where('from_user', '<>', $owner)->pluck('from_user')->toArray();
+        $userIds = array_merge($likeUserIds, $commentUserIds);
+        if ($owner != $him) $userIds[] = $him;
+
+        return array_intersect($publicFriendIds, $userIds);
     }
 }

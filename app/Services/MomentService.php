@@ -10,6 +10,7 @@ use App\Models\Moment;
 use App\Models\MomentComments;
 use App\Models\MomentFiles;
 use App\Models\MomentLikes;
+use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\DB;
 
@@ -20,8 +21,7 @@ class MomentService extends BaseService
         $owner = $params['user']->id;
         $page = $params['page'] ?? 1;
         $limit = $params['limit'] ?? 10;
-        $friends = Friend::getMomentCanSeeFriends($owner);
-        $friendIds = array_keys($friends);
+        $friendIds = Friend::getMomentCanSeeFriendIds($owner);
         return Moment::getMomentsPageByUserIds($friendIds, $owner, $page, $limit);
     }
 
@@ -73,12 +73,6 @@ class MomentService extends BaseService
         ];
         DB::beginTransaction();
         try {
-            if ($moment->user_id != $params['user']->id) {
-                ++$moment->unread;
-                $moment->save();
-            } else {
-                $likeData['is_read'] = 1;
-            }
             $likeData['id'] = MomentLikes::query()->insertGetId($likeData);
             $likeData['user'] = [
                 'id' => $params['user']->id,
@@ -90,9 +84,13 @@ class MomentService extends BaseService
                 'action' => WorkerManEnum::ACTION_LIKE,
                 'data' => $likeData
             ];
+            //获取并通知有评论或点赞过这条朋友圈的共同好友
+            $noticePublicFriendIds = Moment::getNoticePublicFriendIds($params['id'], $params['user']->id, $moment->user_id);
+            User::incrUnread($noticePublicFriendIds, 'moment.num', $params['user']->id);
+            foreach ($noticePublicFriendIds as $friendId) {
+                Gateway::sendToUid($friendId, json_encode($sendData, JSON_UNESCAPED_UNICODE));
+            }
             DB::commit();
-            if ($moment->user_id != $params['user']->id)
-                Gateway::sendToUid($moment->user_id, json_encode($sendData, JSON_UNESCAPED_UNICODE));
             return $likeData;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -111,42 +109,75 @@ class MomentService extends BaseService
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
         $like->delete();
-        return ['id' => $params['id'], 'like_id' => $like->id];
+        return ['moment_id' => $params['id'], 'like_id' => $like->id];
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    public function comment(array $params)
+    {
+        $moment = $this->getMomentById($params['id']);
+        $fromUser = $params['user']->id;
+        $toUser = $params['to_user'];
+        $content = $params['content'];
+        $commentData = [
+            'moment_id' => $params['id'],
+            'from_user' => $fromUser,
+            'to_user' => $toUser,
+            'content' => $content,
+            'created_at' => time(),
+        ];
+        DB::beginTransaction();
+        try {
+            $commentData['id'] = MomentComments::query()->insertGetId($commentData);
+            $commentData['from'] = [
+                'id' => $params['user']->id,
+                'nickname' => $params['user']->nickname,
+                'avatar' => $params['user']->avatar,
+                'wechat' => $params['user']->wechat
+            ];
+            $commentData['to'] = [];
+            if ($toUser) {
+                $user = User::query()->find($toUser);
+                $commentData['to'] = [
+                    'id' => $user->id,
+                    'nickname' => $user->nickname,
+                    'avatar' => $user->avatar,
+                    'wechat' => $user->wechat
+                ];
+            }
+            $sendData = [
+                'who' => WorkerManEnum::WHO_MOMENT,
+                'action' => WorkerManEnum::ACTION_COMMENT,
+                'data' => $commentData
+            ];
+
+
+            //获取并通知有评论或点赞过这条朋友圈的共同好友
+            $noticePublicFriendIds = Moment::getNoticePublicFriendIds($params['id'], $fromUser, $moment->user_id, $toUser);
+            User::incrUnread($noticePublicFriendIds, 'moment.num', $fromUser);
+            foreach ($noticePublicFriendIds as $friendId) {
+                Gateway::sendToUid($friendId, json_encode($sendData, JSON_UNESCAPED_UNICODE));
+            }
+            DB::commit();
+            return $commentData;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());
+        }
     }
 
     public function unread(array $params): array
     {
         $userId = $params['user']->id;
-        $momentIds = Moment::query()->where('user_id', $userId)->pluck('id')->toArray();
-        $totalCnt = Moment::query()
-            ->where('user_id', $userId)
-            ->where('unread', '>', 0)
-            ->sum('unread');
-        $unread = [];
-        if ($totalCnt > 0) {
-            $likeQuery = MomentLikes::query()
-                ->selectRaw("id,user_id as from_user,0 as to_user,created_at")
-                ->where('is_read', 0)
-                ->whereIn('moment_id', $momentIds)
-                ->orderBy('created_at', 'desc')
-                ->limit(1);
-            $commentQuery = MomentComments::query()
-                ->where('is_read', 0)
-                ->whereIn('moment_id', $momentIds)
-                ->orderBy('created_at', 'desc')
-                ->limit(1);
-            $unread = $commentQuery->unionAll($likeQuery)
-                ->with(['from' => function ($query) {
-                    return $query->select(['id', 'nickname', 'avatar', 'wechat']);
-                }, 'to' => function ($query) {
-                    return $query->select(['id', 'nickname', 'avatar', 'wechat']);
-                }])
-                ->select(['id', 'from_user', 'to_user', 'created_at'])
-                ->where('from_user', '<>', $userId)
-                ->orderBy('created_at', 'desc')
-                ->first()->toArray();
+        $unread = User::getUnreadById($userId);
+        $moment = $unread['moment'];
+        $from = [];
+        if ($moment['num'] > 0) {
+            $from = User::query()->find($moment['from'], ['id', 'nickname', 'avatar', 'wechat']);
         }
-        return ['cnt' => $totalCnt, 'user' => $unread['from'] ?? []];
+        return ['cnt' => $moment['num'], 'user' => $from];
     }
 
     public function unreadList(array $params): array
