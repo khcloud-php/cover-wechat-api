@@ -73,6 +73,9 @@ class FileService extends BaseService
             $realPath = $outputPath;
             $path = $filePath;
         }
+        if (!$path) {
+            $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, '文件上传失败！');
+        }
         if ($fileType == FileEnum::IMAGE) {
             // 生成缩略图
             $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
