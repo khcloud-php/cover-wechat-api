@@ -8,6 +8,7 @@ use App\Enums\Database\UserEnum;
 use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
+use App\Models\Moment;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\Crypt;
@@ -139,6 +140,7 @@ class UserService extends BaseService
         }
         $homeInfo['relationship'] = $relationship;
         $homeInfo['setting'] = $setting;
+        $homeInfo['moment'] = Moment::getHomeMoment();
         return $homeInfo;
     }
 
@@ -169,7 +171,7 @@ class UserService extends BaseService
         $updateData = [];
         foreach ($params as $key => $value) {
             if (in_array($key, $updateAllowFields)) {
-                $updateData[$key] = $value;
+                $updateData[$key] = is_array($value) ? json_encode($value) : $value;
             }
         }
         if ($updateData)
