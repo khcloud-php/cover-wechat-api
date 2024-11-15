@@ -3,11 +3,15 @@ return [
     'owner' => [
         'setting' => [
             'FriendPerm' => [
+                'Moment' => [
+                    'AllowStrangerTen' => '0',
+                    'FriendWatchRange' => 'ALLOW_ALL'
+                ],
                 'AddMyWay' => [
-                    "Mobile" => '1',
-                    "Wechat" => '1',
-                    "GroupChat" => '1',
-                    "QRCode" => '1'
+                    'Mobile' => '1',
+                    'Wechat' => '1',
+                    'GroupChat' => '1',
+                    'QRCode' => '1'
                 ]
             ]
         ],
@@ -24,8 +28,8 @@ return [
             'FriendPerm' => [
                 'SettingFriendPerm' => 'ALLOW_ALL',
                 'MomentAndStatus' => [
-                    "DontLetHimSeeIt" => '0',
-                    "DontSeeHim" => '0'
+                    'DontLetHimSeeIt' => '0',
+                    'DontSeeHim' => '0'
                 ]
             ]
 

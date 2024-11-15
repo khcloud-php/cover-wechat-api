@@ -35,7 +35,7 @@ class Friend extends Base
         return $this->belongsTo(User::class, 'owner', 'id');
     }
 
-    public static function checkIsFriend(int|string $owner, int|string $friend, $returnFriend = false): bool|array
+    public static function checkIsFriend(int $owner, int $friend, $returnFriend = false): bool|array
     {
         $friend = Friend::query()
             ->where('friend', $owner)
@@ -58,11 +58,11 @@ class Friend extends Base
         $letHimSeeField = $reverse ? 'DontSeeHim' : 'DontLetHimSeeIt';
         $seeHim = Friend::query()->where('owner', $owner)
             ->where('status', FriendEnum::STATUS_PASS)
-            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => [$seeHimField => '0']]])
+            ->whereJsonContains('setting', ['FriendPerm' => ['MomentAndStatus' => [$seeHimField => '0'], 'SettingFriendPerm' => 'ALLOW_ALL']])
             ->pluck('friend')->toArray();
         $letHimSee = Friend::query()->where('friend', $owner)
             ->where('status', FriendEnum::STATUS_PASS)
-            ->whereJsonContains('setting', ["FriendPerm" => ["MomentAndStatus" => [$letHimSeeField => '0']]])
+            ->whereJsonContains('setting', ['FriendPerm' => ['MomentAndStatus' => [$letHimSeeField => '0'], 'SettingFriendPerm' => 'ALLOW_ALL']])
             ->pluck('owner')->toArray();
         return array_intersect($seeHim, $letHimSee);
     }
@@ -74,5 +74,14 @@ class Friend extends Base
         if (empty($ownerCanSee)) return [];
         $himCanSee = self::getMomentCanSeeFriendIds($him, true);
         return array_intersect($ownerCanSee, $himCanSee);
+    }
+
+    public static function checkExistsBySetting(int $owner, int $friend, string $column, string $value): bool
+    {
+        return self::query()->where('owner', $owner)
+            ->where('friend', $friend)
+            ->whereRaw("JSON_EXTRACT(setting, '$.{$column}') = '{$value}'")
+            ->whereJsonContains('setting', ['FriendPerm' => ['SettingFriendPerm' => 'ALLOW_ALL']])
+            ->exists();
     }
 }

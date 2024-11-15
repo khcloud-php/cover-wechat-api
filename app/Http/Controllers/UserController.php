@@ -106,4 +106,15 @@ class UserController extends Controller
         $data = $this->userService->update($this->params);
         return $this->success($data, $request);
     }
+
+    public function moments(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'user_id' => 'required',
+            'page' => 'integer|min:1',
+            'limit' => 'integer|min:1|max:20',
+        ]);
+        $data = $this->userService->moments($this->params);
+        return $this->setPageInfo($data[0])->success($data[1], $request);
+    }
 }

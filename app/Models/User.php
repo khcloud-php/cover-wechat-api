@@ -86,4 +86,9 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
             'unread' => DB::raw("JSON_SET(unread, '$.{$field}', 0)")
         ]);
     }
+
+    public static function checkExistsBySetting(int $userId, string $column, string $value): bool
+    {
+        return self::query()->where('id', $userId)->whereRaw("JSON_EXTRACT(setting, '$.{$column}') = '{$value}'")->exists();
+    }
 }

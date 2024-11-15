@@ -87,3 +87,14 @@ if (!function_exists('get_assistant_ids')) {
         return array_keys(config('assistant'));
     }
 }
+
+if (!function_exists('get_page_info')) {
+    function get_page_info(int $page, int $limit, int $total): array
+    {
+        return [
+            'total' => $total,
+            'total_page' => ceil($total / $limit),
+            'current_page' => $page,
+        ];
+    }
+}

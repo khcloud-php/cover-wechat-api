@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FriendEnum;
+use App\Enums\Database\MomentEnum;
 use App\Enums\Database\UserEnum;
 use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
@@ -93,9 +94,10 @@ class UserService extends BaseService
     {
         $isMobile = is_mobile($params['keywords']);
         $field = $isMobile ? 'mobile' : 'wechat';
-        $user = User::query()->where($field, $params['keywords'])->first(['id', 'nickname', 'wechat', 'avatar', 'gender', 'sign']);;
+        $user = User::query()->where($field, $params['keywords'])->first(['id', 'nickname', 'wechat', 'avatar', 'gender', 'sign', 'moment_bg_file_path']);
 
         if (!$user) $this->throwBusinessException(ApiCodeEnum::CLIENT_DATA_NOT_FOUND);
+        $params['user_id'] = $user->id;
         $userId = $params['user']->id;
         $self = $user->id == $userId;
         $relationship = 'owner';
@@ -140,7 +142,12 @@ class UserService extends BaseService
         }
         $homeInfo['relationship'] = $relationship;
         $homeInfo['setting'] = $setting;
-        $homeInfo['moment'] = Moment::getHomeMoment();
+        list($pageInfo, $moments) = Moment::getMomentsByUserId($params);
+        foreach ($moments as $moment) {
+            if (in_array($moment['type'], [MomentEnum::IMAGE, MomentEnum::VIDEO]) && !empty($moment['files'][0]['file']['thumbnail_path']) && count($homeInfo['moment']) < 6) {
+                $homeInfo['moment'][] = $moment['files'][0]['file']['thumbnail_path'];
+            }
+        }
         return $homeInfo;
     }
 
@@ -177,5 +184,22 @@ class UserService extends BaseService
         if ($updateData)
             User::query()->where('id', $userId)->update($updateData);
         return $updateData;
+    }
+
+    public function moments(array $params): array
+    {
+        list($pageInfo, $moments) = Moment::getMomentsByUserId($params);
+        $list = [];
+        foreach ($moments as $moment) {
+            $date = date('Ymd', $moment['created_at']);
+            if (isset($list[$date])) {
+                $list[$date]['list'][] = $moment;
+            } else {
+                $list[$date]['ts'] = $moment['created_at'];
+                $list[$date]['list'] = [$moment];
+            }
+        }
+        unset($moments);
+        return [$pageInfo, array_values($list)];
     }
 }

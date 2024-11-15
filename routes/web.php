@@ -41,6 +41,7 @@ $router->group(['middleware' => 'auth:api'], function ($router) {
         $router->get('/info', 'UserController@info');
         $router->get('/{keywords}/home', 'UserController@home');
         $router->put('/update', 'UserController@update');
+        $router->get('/moments', 'UserController@moments');
     });
 
     // 消息模块
