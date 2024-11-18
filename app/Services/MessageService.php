@@ -280,8 +280,23 @@ class MessageService extends BaseService
                     ->increment('unread');
             }
 
-            $sendData['data']['id'] = Message::query()->insertGetId($data);
+            //通话处理
+            if (in_array($params['type'], [MessageEnum::VIDEO_CALL, MessageEnum::AUDIO_CALL])) {
+                $sendData['who'] = WorkerManEnum::WHO_USER;
+                $sendData['action'] = WorkerManEnum::ACTION_CALL;
+                $sendData['data']['action'] = $params['action'];
+                if (empty($params['id'])) {
+                    $data['deleted_users'] = "{$fromUser},{$toUser}";
+                    $data['content'] = '';
+                } else {
+                    $sendData['data']['id'] = $params['id'];
+                    Message::query()->where('id', $params['id'])->update(['content' => $data['content'], 'deleted_users' => '']);
+                }
+            }
 
+            if (empty($params['id'])) {
+                $sendData['data']['id'] = Message::query()->insertGetId($data);
+            }
             DB::commit();
 
             //at用户处理
