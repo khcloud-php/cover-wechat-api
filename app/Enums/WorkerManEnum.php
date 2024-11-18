@@ -13,6 +13,7 @@ class WorkerManEnum
     const ACTION_QUOTE = 'quote';
     const ACTION_LIKE = 'like';
     const ACTION_COMMENT = 'comment';
+    const ACTION_CALL = 'call';
 
     const WHO_MESSAGE = 'message';
     const WHO_FRIEND = 'friend';

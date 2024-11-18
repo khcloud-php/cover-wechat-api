@@ -3,6 +3,7 @@
 namespace App\Workerman\Action;
 
 use App\Enums\Redis\UserEnum;
+use App\Enums\WorkerManEnum;
 use GatewayWorker\Lib\Gateway;
 use App\Models\GroupUser;
 use Illuminate\Support\Facades\Cache;
@@ -69,5 +70,13 @@ class User
 //        $groupIds = json_decode($groupIds);
         $groupIds = Cache::store(UserEnum::STORE)->get(sprintf(UserEnum::JOIN_GROUPS, $clientId));
         return $groupIds ?: [];
+    }
+
+    public function call(string $clientId, $data)
+    {
+        $uid = Gateway::getUidByClientId($clientId);
+        $data['who'] = WorkerManEnum::WHO_USER;
+        $data['action'] = WorkerManEnum::ACTION_CALL;
+        Gateway::sendToUid($uid, $data);
     }
 }
