@@ -217,6 +217,7 @@ class Moment extends Base
             return $query->select(['id', 'nickname', 'avatar', 'wechat']);
         }])
             ->whereRaw($whereRaw)
+            ->orderBy('created_at', 'desc')
             ->offset($offset)->limit($limit)
             ->get()
             ->toArray();
