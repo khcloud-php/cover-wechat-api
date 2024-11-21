@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MomentMessages extends Model
+class MomentMessages extends Base
 {
     use SoftDeletes;
 

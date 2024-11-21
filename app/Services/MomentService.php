@@ -76,7 +76,7 @@ class MomentService extends BaseService
         DB::beginTransaction();
         try {
             $likeData['id'] = MomentMessages::query()->insertGetId($likeData);
-            $likeData['user'] = [
+            $likeData['from'] = [
                 'id' => $params['user']->id,
                 'nickname' => $params['user']->nickname,
                 'avatar' => $params['user']->avatar,
