@@ -191,15 +191,21 @@ class UserService extends BaseService
         list($pageInfo, $moments) = Moment::getMomentsPageByUserId($params);
         $list = [];
         foreach ($moments as $moment) {
+            $year = date('Y', $moment['created_at']);
             $date = date('Ymd', $moment['created_at']);
-            if (isset($list[$date])) {
-                $list[$date]['list'][] = $moment;
+            $list[$year]['year'] = $year;
+            $list[$year]['current_year'] = date('Y');
+            if (isset($list[$year]['moments'][$date])) {
+                $list[$year]['moments'][$date]['list'][] = $moment;
             } else {
-                $list[$date]['ts'] = $moment['created_at'];
-                $list[$date]['list'] = [$moment];
+                $list[$year]['moments'][$date]['ts'] = $moment['created_at'];
+                $list[$year]['moments'][$date]['list'] = [$moment];
             }
         }
         unset($moments);
+        foreach ($list as &$item) {
+            $item['moments'] = array_values($item['moments']);
+        }
         return [$pageInfo, array_values($list)];
     }
 }

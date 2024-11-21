@@ -213,11 +213,20 @@ class Moment extends Base
             }])->select(['id', 'user_id', 'type', 'content']);
         }, 'from' => function ($query) {
             return $query->select(['id', 'nickname', 'avatar', 'wechat']);
+        }, 'to' => function ($query) {
+            return $query->select(['id', 'nickname', 'avatar', 'wechat']);
         }])
             ->whereRaw($whereRaw)
             ->offset($offset)->limit($limit)
             ->get()
             ->toArray();
+        foreach ($message as &$item) {
+            if (date('Y') > date('Y', $item['created_at']))
+                $item['created_at'] = date('Y年n月j日 H:i:s', $item['created_at']);
+            else
+                $item['created_at'] = date('n月j日 H:i:s', $item['created_at']);
+        }
+        User::clearUnread([$owner],'moment.num');
         return [get_page_info($page, $limit, $total), $message];
     }
 }
