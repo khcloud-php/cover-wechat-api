@@ -142,7 +142,7 @@ class UserService extends BaseService
         }
         $homeInfo['relationship'] = $relationship;
         $homeInfo['setting'] = $setting;
-        list($pageInfo, $moments) = Moment::getMomentsByUserId($params);
+        list($pageInfo, $moments) = Moment::getMomentsPageByUserId($params);
         foreach ($moments as $moment) {
             if (in_array($moment['type'], [MomentEnum::IMAGE, MomentEnum::VIDEO]) && !empty($moment['files'][0]['file']['thumbnail_path']) && count($homeInfo['moment']) < 6) {
                 $homeInfo['moment'][] = $moment['files'][0]['file']['thumbnail_path'];
@@ -188,7 +188,7 @@ class UserService extends BaseService
 
     public function moments(array $params): array
     {
-        list($pageInfo, $moments) = Moment::getMomentsByUserId($params);
+        list($pageInfo, $moments) = Moment::getMomentsPageByUserId($params);
         $list = [];
         foreach ($moments as $moment) {
             $date = date('Ymd', $moment['created_at']);

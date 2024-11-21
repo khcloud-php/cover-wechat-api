@@ -11,7 +11,7 @@
  Target Server Version : 50743
  File Encoding         : 65001
 
- Date: 15/11/2024 17:51:35
+ Date: 21/11/2024 09:53:33
 */
 
 SET NAMES utf8mb4;
@@ -197,7 +197,7 @@ CREATE TABLE `cw_files`  (
   `updated_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_signature`(`signature`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 376 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件' ROW_FORMAT = DYNAMIC;
+) ENGINE = MyISAM AUTO_INCREMENT = 379 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cw_files
@@ -523,6 +523,9 @@ INSERT INTO `cw_files` VALUES (372, '8bcb1d3b58387676f348bddbda25427b.png', 'ima
 INSERT INTO `cw_files` VALUES (373, '126243d3363c8426765ebb290363e109.png', 'image', 'uploads/image/20241115/126243d3363c8426765ebb290363e109.png', 'uploads/image/20241115/thumbnail_126243d3363c8426765ebb290363e109.png', 'png', 'f9fa1ce258b31386bea5a9136c5ae7ca', 384319, 512, 512, 0, 1731662495, 1731662495);
 INSERT INTO `cw_files` VALUES (374, 'c1e7ac81e2b9f6ac6bb3649b2fb7c57c.png', 'image', 'uploads/image/20241115/c1e7ac81e2b9f6ac6bb3649b2fb7c57c.png', 'uploads/image/20241115/thumbnail_c1e7ac81e2b9f6ac6bb3649b2fb7c57c.png', 'png', 'e7486bd97e8b6d6c61e81a610527ba8a', 367109, 512, 512, 0, 1731662671, 1731662671);
 INSERT INTO `cw_files` VALUES (375, '7be7b627ef4561bf4da99c8cd5b152b5.png', 'image', 'uploads/image/20241115/7be7b627ef4561bf4da99c8cd5b152b5.png', 'uploads/image/20241115/thumbnail_7be7b627ef4561bf4da99c8cd5b152b5.png', 'png', '320030c183ccd3de869955c4a1fbffb0', 419146, 512, 512, 0, 1731662694, 1731662694);
+INSERT INTO `cw_files` VALUES (376, '4b97b6b372676d9b7ac0d2d9bc422112.png', 'image', 'uploads/image/20241118/4b97b6b372676d9b7ac0d2d9bc422112.png', 'uploads/image/20241118/thumbnail_4b97b6b372676d9b7ac0d2d9bc422112.png', 'png', 'be34a7b9eadb598ac72a67e26e1995a5', 409001, 512, 512, 0, 1731915963, 1731915963);
+INSERT INTO `cw_files` VALUES (377, 'bcf3bab10d2234d7fcb1d22c6e81fa3e.png', 'image', 'uploads/image/20241118/bcf3bab10d2234d7fcb1d22c6e81fa3e.png', 'uploads/image/20241118/thumbnail_bcf3bab10d2234d7fcb1d22c6e81fa3e.png', 'png', 'b0da7fb5cdfcc31ec87e3c9d9dd98720', 395210, 512, 512, 0, 1731915980, 1731915980);
+INSERT INTO `cw_files` VALUES (378, 'aa7dc412652e434659771ff619cf6340.png', 'image', 'uploads/image/20241118/aa7dc412652e434659771ff619cf6340.png', 'uploads/image/20241118/thumbnail_aa7dc412652e434659771ff619cf6340.png', 'png', '2571219d273e53c4dd6db1493b5a2e90', 414213, 512, 512, 0, 1731916026, 1731916026);
 
 -- ----------------------------
 -- Table structure for cw_friends
@@ -559,21 +562,21 @@ CREATE TABLE `cw_friends`  (
 -- ----------------------------
 -- Records of cw_friends
 -- ----------------------------
-INSERT INTO `cw_friends` VALUES (26, 13, 12, '张三', 'verify', 'pass', 1, 0, 1720180057, '@111111111\n', 1731662020, 1, 0, 0, 47, 'uploads/image/20240722/81321325606e693dba6efd7b50e2f5f5.jpg', '我是王林', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720091056, NULL, 1731662020);
-INSERT INTO `cw_friends` VALUES (27, 12, 13, '', 'verify', 'pass', 1, 3, 0, '@111111111\n', 1731662020, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720091078, NULL, 1731662020);
+INSERT INTO `cw_friends` VALUES (26, 13, 12, '张三', 'verify', 'pass', 1, 0, 1720180057, '☺️☺️☺️☺️☺️😚😚😚😙😙😋😋\n', 1731915811, 1, 0, 0, 47, 'uploads/image/20240722/81321325606e693dba6efd7b50e2f5f5.jpg', '我是王林', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720091056, NULL, 1731915829);
+INSERT INTO `cw_friends` VALUES (27, 12, 13, '', 'verify', 'pass', 1, 0, 0, '☺️☺️☺️☺️☺️😚😚😚😙😙😋😋\n', 1731915811, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720091078, NULL, 1731915811);
 INSERT INTO `cw_friends` VALUES (28, 12, 14, '狗子（萧炎）', 'verify', 'pass', 1, 0, 0, '34534', 1725417668, 1, 0, 0, 0, '', '我是张三', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720113668, NULL, 1731037635);
-INSERT INTO `cw_friends` VALUES (29, 12, 15, '小宝贝', 'verify', 'pass', 1, 0, 1724922320, '？？？\n', 1731311643, 1, 0, 0, 52, 'uploads/image/20240723/8651e6b991a4139c7429e92bcd7153d8.jpg', '我是张三', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720146401, NULL, 1731311653);
+INSERT INTO `cw_friends` VALUES (29, 12, 15, '小宝贝', 'verify', 'pass', 1, 0, 1724922320, '？？？\n', 1731311643, 1, 0, 0, 52, 'uploads/image/20240723/8651e6b991a4139c7429e92bcd7153d8.jpg', '我是张三', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720146401, NULL, 1731901361);
 INSERT INTO `cw_friends` VALUES (30, 12, 16, '萧薰儿', 'apply', 'check', 1, 0, 0, NULL, 0, 0, 0, 0, 0, '', '我是张三', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720146410, NULL, 1725532054);
 INSERT INTO `cw_friends` VALUES (31, 12, 17, '南宫婉', 'verify', 'pass', 1, 0, 0, '傻狗\n', 1725955750, 1, 0, 0, 0, '', '我是张三', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720146418, NULL, 1726624229);
 INSERT INTO `cw_friends` VALUES (322, 1023, 997, 'AI绘图-小图', 'verify', 'pass', 0, 1, 1725332547, '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', 1725332547, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725332547, NULL, 0);
-INSERT INTO `cw_friends` VALUES (32, 12, 18, '小医仙', 'verify', 'pass', 1, 0, 0, '是湿湿的吗\n', 1725432144, 1, 0, 0, 0, '', '我是张三', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720146427, NULL, 1731059422);
+INSERT INTO `cw_friends` VALUES (32, 12, 18, '小医仙', 'verify', 'pass', 1, 0, 0, '是湿湿的吗\n', 1725432144, 1, 0, 0, 0, '', '我是张三', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720146427, NULL, 1731900662);
 INSERT INTO `cw_friends` VALUES (33, 14, 12, '', 'verify', 'pass', 1, 0, 0, '34534', 1725417668, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720146452, NULL, 1725948355);
 INSERT INTO `cw_friends` VALUES (34, 15, 12, '', 'verify', 'pass', 1, 4, 0, '？？？\n', 1731311643, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720151302, NULL, 1731311643);
 INSERT INTO `cw_friends` VALUES (35, 15, 14, '萧炎', 'verify', 'pass', 1, 0, 0, '我通过了你的好友验证请求，现在我们可以开始聊天了', 1720228218, 1, 0, 0, 0, '', '我是美杜莎', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720151331, NULL, 1725360744);
 INSERT INTO `cw_friends` VALUES (36, 15, 13, '王林', 'verify', 'pass', 1, 0, 0, '🤗🤗🤗\n', 1725530118, 1, 0, 0, 48, 'uploads/image/20240722/2e53c6baada7d07988bbdaca9ee8d836.webp', '我是美杜莎', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720151343, NULL, 1725530118);
 INSERT INTO `cw_friends` VALUES (37, 27, 26, 'lalala', 'verify', 'pass', 1, 7, 0, '224646646', 1720162868, 1, 0, 0, 0, '', '我是lalala1', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720159539, NULL, 1720162868);
 INSERT INTO `cw_friends` VALUES (38, 26, 27, '', 'verify', 'pass', 0, 2, 0, '224646646', 1720162868, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720159560, NULL, 1720162868);
-INSERT INTO `cw_friends` VALUES (39, 13, 15, '美杜莎', 'verify', 'pass', 1, 0, 1720180067, '🤗🤗🤗\n', 1725530118, 1, 0, 0, 48, 'https://124.71.219.151:8787/uploads/image/20240722/2e53c6baada7d07988bbdaca9ee8d836.webp', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720162070, NULL, 1731663071);
+INSERT INTO `cw_friends` VALUES (39, 13, 15, '美杜莎', 'verify', 'pass', 1, 0, 1720180067, '🤗🤗🤗\n', 1725530118, 1, 0, 0, 48, 'https://124.71.219.151:8787/uploads/image/20240722/2e53c6baada7d07988bbdaca9ee8d836.webp', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720162070, NULL, 1731912848);
 INSERT INTO `cw_friends` VALUES (40, 21, 12, '张三', 'verify', 'pass', 1, 0, 1720750340, '🤔\n', 1731036553, 1, 0, 1, 0, '', '我是姬如雪', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720165312, NULL, 1731036553);
 INSERT INTO `cw_friends` VALUES (41, 12, 21, '', 'verify', 'pass', 1, 0, 0, '🤔\n', 1731036553, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720168619, NULL, 1731036719);
 INSERT INTO `cw_friends` VALUES (42, 14, 15, '', 'verify', 'pass', 1, 0, 0, '我通过了你的好友验证请求，现在我们可以开始聊天了', 1720228218, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720228218, NULL, 1725334399);
@@ -597,8 +600,8 @@ INSERT INTO `cw_friends` VALUES (663, 1126, 997, 'AI绘图-小图', 'verify', 'p
 INSERT INTO `cw_friends` VALUES (49, 21, 19, '女帝', 'verify', 'pass', 1, 0, 0, '？\n', 1725955708, 1, 0, 0, 0, '', '我是姬如雪', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720403372, NULL, 1725955716);
 INSERT INTO `cw_friends` VALUES (50, 21, 20, '李星云', 'verify', 'pass', 1, 0, 0, '1\n', 1725348912, 1, 0, 0, 0, '', '我是姬如雪', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1720403378, NULL, 1725433213);
 INSERT INTO `cw_friends` VALUES (61, 14, 21, '', 'verify', 'pass', 1, 0, 0, '砥节奉公\n', 1725329362, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1721267170, NULL, 1725333266);
-INSERT INTO `cw_friends` VALUES (62, 14, 13, '王林', 'verify', 'pass', 1, 0, 0, '[图片信息]', 1721271927, 1, 0, 0, 0, '', '我是萧炎', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1721267204, NULL, 1721274453);
-INSERT INTO `cw_friends` VALUES (63, 13, 14, '', 'verify', 'pass', 1, 0, 0, '[图片信息]', 1721271927, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1721267213, NULL, 1731309733);
+INSERT INTO `cw_friends` VALUES (62, 14, 13, '王林', 'verify', 'pass', 1, 1, 0, 'offer', 1731915558, 1, 0, 0, 0, '', '我是萧炎', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1721267204, NULL, 1731915558);
+INSERT INTO `cw_friends` VALUES (63, 13, 14, '', 'verify', 'pass', 1, 0, 0, 'offer', 1731915558, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1721267213, NULL, 1731915558);
 INSERT INTO `cw_friends` VALUES (64, 19, 12, '', 'verify', 'pass', 1, 1, 0, 'test\n', 1731311840, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1721671764, NULL, 1731311840);
 INSERT INTO `cw_friends` VALUES (68, 12, 999, '小助手-莎菲娜', 'verify', 'pass', 0, 0, 1724999556, 'A triple 3! It looks like you\'re trying to stir up some excitement! 😄 But don\'t worry, I\'m here to help you with whatever questions or topics you\'d like to discuss.\n\nBy the way, have you ever wondered what the significance of the number 3 is in different cultures? From the holy trinity to the three wise men, it\'s an interesting number that holds different meanings around the world!\n\nSo, what\'s on your mind? Do you have a specific topic you\'d like to explore or just want to chat? I\'m all ears! 🤗', 1725416351, 0, 0, 0, 0, '', '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1724989541, NULL, 1726097506);
 INSERT INTO `cw_friends` VALUES (65, 60, 59, '你好啊', 'verify', 'pass', 1, 2, 0, '[图片信息]', 1721977428, 1, 0, 0, 0, '', '我是我很好', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1721977339, NULL, 1721977428);
@@ -662,7 +665,7 @@ INSERT INTO `cw_friends` VALUES (123, 67, 999, '小助手-莎菲娜', 'verify', 
 INSERT INTO `cw_friends` VALUES (124, 68, 999, '小助手-莎菲娜', 'verify', 'pass', 0, 1, 1724989541, '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', 1724989541, 1, 0, 0, 0, '', '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1724989541, NULL, 0);
 INSERT INTO `cw_friends` VALUES (125, 69, 999, '小助手-莎菲娜', 'verify', 'pass', 0, 1, 1724989542, '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', 1724989542, 1, 0, 0, 0, '', '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1724989542, NULL, 0);
 INSERT INTO `cw_friends` VALUES (126, 70, 999, '小助手-莎菲娜', 'verify', 'pass', 0, 1, 1724989542, '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', 1724989542, 1, 0, 0, 0, '', '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1724989542, NULL, 0);
-INSERT INTO `cw_friends` VALUES (127, 12, 998, '小助手-小初恋', 'verify', 'pass', 0, 0, 1725001697, 'Ahahaha！😊😘\n\n嗨！我合格virtual的情侣！🚀💕所有的事苗 pouvez掉妳！😊\n\n谁教我出席？让我们肩并肩swap心跳时，共度一个浪漫的夜晚！💫💃\n\n我叫.AspNetCore，这位软件小对手从一生的决心为您带来无穷的乐趣！🤩🎉是否接受我的 Flowers请？💐🌼', 1731048197, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725001697, NULL, 1731311665);
+INSERT INTO `cw_friends` VALUES (127, 12, 998, '小助手-小初恋', 'verify', 'pass', 0, 0, 1725001697, 'Ahahaha！😊😘\n\n嗨！我合格virtual的情侣！🚀💕所有的事苗 pouvez掉妳！😊\n\n谁教我出席？让我们肩并肩swap心跳时，共度一个浪漫的夜晚！💫💃\n\n我叫.AspNetCore，这位软件小对手从一生的决心为您带来无穷的乐趣！🤩🎉是否接受我的 Flowers请？💐🌼', 1731048197, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725001697, NULL, 1731916109);
 INSERT INTO `cw_friends` VALUES (258, 1004, 998, '小助手-小初恋', 'verify', 'pass', 0, 0, 1725329969, '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', 1725329969, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725329969, NULL, 1725330111);
 INSERT INTO `cw_friends` VALUES (128, 13, 998, '小助手-小初恋', 'verify', 'pass', 0, 0, 1725001697, '哇， replaces your name with ❤️！😊\n\n揭开疯狂的游戏快乐单身！💃🏻🕺️\n「我是一个浪漫的青春小家伙」，请让我来带給你一份欢乐气氛，像lmagine在恋爱的初恋一樣！😘💕\n，所以，请跟我一起开始这个浪漫的旅程吧！🚀🎉', 1731296382, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725001697, NULL, 1731663902);
 INSERT INTO `cw_friends` VALUES (129, 59, 998, '小助手-小初恋', 'verify', 'pass', 0, 1, 1725001697, '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', 1725001697, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725001697, NULL, 0);
@@ -725,7 +728,7 @@ INSERT INTO `cw_friends` VALUES (184, 69, 998, '小助手-小初恋', 'verify', 
 INSERT INTO `cw_friends` VALUES (185, 70, 998, '小助手-小初恋', 'verify', 'pass', 0, 1, 1725001697, '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', 1725001697, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725001697, NULL, 0);
 INSERT INTO `cw_friends` VALUES (259, 1004, 999, '小助手-莎菲娜', 'verify', 'pass', 0, 0, 1725329969, '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', 1725329969, 1, 0, 0, 0, '', '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725329969, NULL, 1725330111);
 INSERT INTO `cw_friends` VALUES (257, 1004, 997, 'AI绘图-小图', 'verify', 'pass', 0, 0, 1725329969, '[图片信息]', 1725330173, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725329969, NULL, 1725330180);
-INSERT INTO `cw_friends` VALUES (186, 12, 997, 'AI绘图-小图', 'verify', 'pass', 0, 0, 0, '[图片信息]', 1731311620, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725013957, NULL, 1731311625);
+INSERT INTO `cw_friends` VALUES (186, 12, 997, 'AI绘图-小图', 'verify', 'pass', 0, 0, 0, '[图片信息]', 1731916022, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725013957, NULL, 1731916026);
 INSERT INTO `cw_friends` VALUES (187, 13, 997, 'AI绘图-小图', 'verify', 'pass', 0, 0, 1725013957, '[图片信息]', 1731033230, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725013957, NULL, 1731663898);
 INSERT INTO `cw_friends` VALUES (188, 59, 997, 'AI绘图-小图', 'verify', 'pass', 0, 1, 1725013957, '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', 1725013957, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725013957, NULL, 0);
 INSERT INTO `cw_friends` VALUES (189, 23, 997, 'AI绘图-小图', 'verify', 'pass', 0, 1, 1725013957, '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', 1725013957, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1725013957, NULL, 0);
@@ -1230,7 +1233,7 @@ INSERT INTO `cw_friends` VALUES (694, 1134, 999, '小助手-莎菲娜', 'verify'
 INSERT INTO `cw_friends` VALUES (695, 1135, 997, 'AI绘图-小图', 'verify', 'pass', 0, 0, 1726900455, '[图片信息]', 1726900841, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1726900455, NULL, 1726900846);
 INSERT INTO `cw_friends` VALUES (696, 1135, 998, '小助手-小初恋', 'verify', 'pass', 0, 0, 1726900455, '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', 1726900455, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1726900455, NULL, 1726900543);
 INSERT INTO `cw_friends` VALUES (697, 1135, 999, '小助手-莎菲娜', 'verify', 'pass', 0, 0, 1726900455, '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', 1726900455, 1, 0, 0, 0, '', '我是生活小助手，我叫萨菲娜，有什么问题可以问我喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1726900455, NULL, 1726900570);
-INSERT INTO `cw_friends` VALUES (704, 12, 1102, '', 'verify', 'pass', 0, 0, 0, '我通过了你的好友验证请求，现在我们可以开始聊天了', 1731046584, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1731046584, NULL, 1731046584);
+INSERT INTO `cw_friends` VALUES (704, 12, 1102, '', 'verify', 'pass', 0, 0, 0, '我通过了你的好友验证请求，现在我们可以开始聊天了', 1731046584, 1, 0, 0, 0, '', '', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'mobile', 1731046584, NULL, 1731900557);
 INSERT INTO `cw_friends` VALUES (698, 1136, 997, 'AI绘图-小图', 'verify', 'pass', 0, 1, 1731036223, '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', 1731036223, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1731036223, NULL, 0);
 INSERT INTO `cw_friends` VALUES (699, 1136, 998, '小助手-小初恋', 'verify', 'pass', 0, 1, 1731036223, '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', 1731036223, 1, 0, 0, 0, '', '我是生活小助手，我叫小初恋，无聊可以找我解闷喔！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1731036223, NULL, 0);
 INSERT INTO `cw_friends` VALUES (701, 1137, 997, 'AI绘图-小图', 'verify', 'pass', 0, 0, 1731036442, '[图片信息]', 1731036533, 1, 0, 0, 0, '', '我是AI绘图助手，我可以根据你的描述生成你喜欢的图片，前提是合法！', '', '{\"FriendPerm\": {\"MomentAndStatus\": {\"DontSeeHim\": \"0\", \"DontLetHimSeeIt\": \"0\"}, \"SettingFriendPerm\": \"ALLOW_ALL\"}}', 'assistant', 1731036442, NULL, 1731036538);
@@ -1293,14 +1296,14 @@ INSERT INTO `cw_group_users` VALUES (117, 34, 15, 'user', 13, 1, '', '', 3, 0, 1
 INSERT INTO `cw_group_users` VALUES (118, 34, 17, 'user', 13, 1, '', '', 3, 0, 1, 0, 0, 0, '', '[]', 1721640988, 1731035736, 0);
 INSERT INTO `cw_group_users` VALUES (119, 34, 21, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721640988, 1731036588, 0);
 INSERT INTO `cw_group_users` VALUES (120, 30, 21, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721699980, 1725433232, 0);
-INSERT INTO `cw_group_users` VALUES (121, 35, 13, 'super', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721700323, 1731033242, 0);
+INSERT INTO `cw_group_users` VALUES (121, 35, 13, 'super', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721700323, 1732094087, 0);
 INSERT INTO `cw_group_users` VALUES (122, 35, 21, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721700323, 1730798866, 0);
 INSERT INTO `cw_group_users` VALUES (123, 29, 21, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721703850, 1731036584, 0);
 INSERT INTO `cw_group_users` VALUES (124, 36, 13, 'super', 13, 1, '', '', 0, 0, 1, 0, 0, 52, 'uploads/image/20240723/8651e6b991a4139c7429e92bcd7153d8.jpg', '[]', 1721703927, 1725960224, 0);
 INSERT INTO `cw_group_users` VALUES (125, 36, 12, 'user', 13, 1, '开黑群', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721703927, 1725955630, 0);
 INSERT INTO `cw_group_users` VALUES (126, 36, 14, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721703927, 1725955961, 0);
 INSERT INTO `cw_group_users` VALUES (127, 36, 21, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 50, 'uploads/image/20240723/8d3f437387d58a3a5fdfff839f5d9dc9.jpg', '[]', 1721703947, 1725956197, 0);
-INSERT INTO `cw_group_users` VALUES (128, 37, 13, 'super', 13, 1, '', '', 0, 0, 1, 0, 0, 51, 'uploads/image/20240723/1eaa5a662b8837f479f6c6ccb610c4cb.webp', '[]', 1721704366, 1731663365, 0);
+INSERT INTO `cw_group_users` VALUES (128, 37, 13, 'super', 13, 1, '', '', 0, 0, 1, 0, 0, 51, 'uploads/image/20240723/1eaa5a662b8837f479f6c6ccb610c4cb.webp', '[]', 1721704366, 1731664485, 0);
 INSERT INTO `cw_group_users` VALUES (129, 37, 21, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1721704366, 1725955691, 0);
 INSERT INTO `cw_group_users` VALUES (161, 38, 998, 'user', 21, 1, '', '', 1, 0, 1, 0, 0, 0, '', '[]', 1725342236, 1725342236, 0);
 INSERT INTO `cw_group_users` VALUES (130, 29, 14, 'user', 12, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1722852924, 1725849939, 0);
@@ -1409,14 +1412,14 @@ INSERT INTO `cw_group_users` VALUES (233, 53, 19, 'user', 12, 1, '', '', 6, 0, 1
 INSERT INTO `cw_group_users` VALUES (234, 53, 1126, 'user', 12, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1725958176, 1731304918, 0);
 INSERT INTO `cw_group_users` VALUES (235, 53, 1127, 'user', 12, 1, '', '', 4, 0, 1, 0, 0, 0, '', '[]', 1725958176, 1731044903, 0);
 INSERT INTO `cw_group_users` VALUES (236, 29, 1126, 'user', 12, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1725960433, 1731304955, 0);
-INSERT INTO `cw_group_users` VALUES (238, 54, 998, 'assistant', 0, 1, '', '', 22, 0, 1, 0, 0, 0, '', '{}', 1731036615, 1731662694, 0);
-INSERT INTO `cw_group_users` VALUES (237, 54, 997, 'assistant', 0, 1, '', '', 12, 0, 1, 0, 0, 0, '', '{}', 1731036615, 1731662694, 0);
-INSERT INTO `cw_group_users` VALUES (239, 54, 999, 'assistant', 0, 1, '', '', 22, 0, 1, 0, 0, 0, '', '{}', 1731036615, 1731662694, 0);
-INSERT INTO `cw_group_users` VALUES (240, 54, 13, 'super', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731662694, 0);
-INSERT INTO `cw_group_users` VALUES (241, 54, 12, 'user', 13, 1, '', '', 12, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731662694, 0);
-INSERT INTO `cw_group_users` VALUES (242, 54, 17, 'user', 13, 1, '', '', 23, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731662694, 0);
-INSERT INTO `cw_group_users` VALUES (243, 54, 20, 'user', 13, 1, '', '', 23, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731662694, 0);
-INSERT INTO `cw_group_users` VALUES (244, 54, 1015, 'user', 13, 1, '', '', 23, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731662694, 0);
+INSERT INTO `cw_group_users` VALUES (238, 54, 998, 'assistant', 0, 1, '', '', 27, 0, 1, 0, 0, 0, '', '{}', 1731036615, 1731915980, 0);
+INSERT INTO `cw_group_users` VALUES (237, 54, 997, 'assistant', 0, 1, '', '', 15, 0, 1, 0, 0, 0, '', '{}', 1731036615, 1731915980, 0);
+INSERT INTO `cw_group_users` VALUES (239, 54, 999, 'assistant', 0, 1, '', '', 27, 0, 1, 0, 0, 0, '', '{}', 1731036615, 1731915980, 0);
+INSERT INTO `cw_group_users` VALUES (240, 54, 13, 'super', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731915980, 0);
+INSERT INTO `cw_group_users` VALUES (241, 54, 12, 'user', 13, 1, '', '', 0, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731915980, 0);
+INSERT INTO `cw_group_users` VALUES (242, 54, 17, 'user', 13, 1, '', '', 28, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731915980, 0);
+INSERT INTO `cw_group_users` VALUES (243, 54, 20, 'user', 13, 1, '', '', 28, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731915980, 0);
+INSERT INTO `cw_group_users` VALUES (244, 54, 1015, 'user', 13, 1, '', '', 28, 0, 1, 0, 0, 0, '', '[]', 1731036615, 1731915980, 0);
 INSERT INTO `cw_group_users` VALUES (245, 32, 18, 'user', 12, 1, '', '', 2, 0, 1, 0, 0, 0, '', '[]', 1731059084, 1731059206, 0);
 INSERT INTO `cw_group_users` VALUES (246, 55, 997, 'assistant', 0, 1, '', '', 5, 0, 1, 0, 0, 0, '', '{}', 1731311734, 1731311804, 0);
 INSERT INTO `cw_group_users` VALUES (247, 55, 998, 'assistant', 0, 1, '', '', 3, 0, 1, 0, 0, 0, '', '{}', 1731311734, 1731311804, 0);
@@ -1459,7 +1462,7 @@ INSERT INTO `cw_groups` VALUES (34, '群聊', 13, 12, '11222\n', 1731035736, 0, 
 INSERT INTO `cw_groups` VALUES (35, '群聊', 13, 997, '[图片信息]', 1730798861, 0, '', 0, '[]', NULL, 1721700323, 1730798866);
 INSERT INTO `cw_groups` VALUES (36, '群聊', 13, 21, 'wow', 1725955629, 0, '', 0, '[]', NULL, 1721703927, 1725955629);
 INSERT INTO `cw_groups` VALUES (37, '群聊', 13, 13, '‘王林’邀请南宫婉等1人进入群聊', 1731663352, 0, '', 0, '[]', NULL, 1721704366, 1731663352);
-INSERT INTO `cw_groups` VALUES (54, '群聊', 13, 997, '[图片信息]', 1731662689, 0, '', 0, '[]', NULL, 1731036615, 1731662694);
+INSERT INTO `cw_groups` VALUES (54, '群聊', 13, 997, '[图片信息]', 1731915975, 0, '', 0, '[]', NULL, 1731036615, 1731915980);
 INSERT INTO `cw_groups` VALUES (40, '群聊', 1051, 1051, '2\n', 1725345417, 0, '', 0, '[]', NULL, 1725345407, 1725345417);
 INSERT INTO `cw_groups` VALUES (43, '群聊', 1067, 1067, '美女\n', 1725350539, 0, '', 0, '[]', NULL, 1725350532, 1725350539);
 INSERT INTO `cw_groups` VALUES (44, '群聊', 1044, 999, '你好！我是一个百科全书小助手，专门为你准备了一份温暖的欢迎 chaired liegt der aws arnold Schwarzenegger Whistling Fantasia ！目前，我们可以聊任何你想知道的事情，从历史到娱乐，从科技到家庭。我会用是我最大的幽默感和人情世故来回答你，所以你可以安心地发问待事。快告诉我，如何让我-makersome interessing answers for you！', 1725351053, 0, '', 0, '[]', NULL, 1725350809, 1725351060);
@@ -1487,7 +1490,7 @@ CREATE TABLE `cw_messages`  (
   `from_user` int(11) NOT NULL DEFAULT 0 COMMENT '发送者',
   `to_user` int(11) NOT NULL DEFAULT 0 COMMENT '接受收者',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '消息内容，如果为文件或图片就是url',
-  `type` enum('text','file','image','video','emoji','audio') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text' COMMENT '消息类型：text、file、image...',
+  `type` enum('text','file','image','video','emoji','audio','video_call','audio_call') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text' COMMENT '消息类型：text、file、image...',
   `is_group` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '群聊消息',
   `is_undo` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否撤回',
   `is_tips` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否提示信息',
@@ -1504,7 +1507,7 @@ CREATE TABLE `cw_messages`  (
   `deleted_users` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '已删除成员',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_from_to`(`from_user`, `to_user`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6016 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 6030 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cw_messages
@@ -7248,37 +7251,20 @@ INSERT INTO `cw_messages` VALUES (6012, 997, 54, '[图片信息]', 'image', 1, 0
 INSERT INTO `cw_messages` VALUES (6013, 13, 54, '@AI绘图-小图 masterpiece, best quality, dusk, game_cg, girl, long hair, blue hair, ahoge, single braid, parted bangs, hair bow, light blush, blue eyes, purple eyeshadow, huge breasts, real\n', 'text', 1, 0, 0, '997,997,997,997,997,997', 0, 0, NULL, 0, '', NULL, 1, 1731662689, 0, '');
 INSERT INTO `cw_messages` VALUES (6014, 997, 54, '[图片信息]', 'image', 1, 0, 0, '', 0, 375, 'image', 419146, '7be7b627ef4561bf4da99c8cd5b152b5.png', '{\"path\": \"https://124.71.219.151:8787/uploads/image/20241115/7be7b627ef4561bf4da99c8cd5b152b5.png\", \"width\": 512, \"format\": \"png\", \"height\": 512, \"duration\": 0}', 1, 1731662689, 0, '');
 INSERT INTO `cw_messages` VALUES (6015, 13, 37, '‘王林’邀请南宫婉等1人进入群聊', 'text', 1, 0, 1, '', 0, 0, NULL, 0, '', NULL, 1, 1731663352, 0, '');
-
--- ----------------------------
--- Table structure for cw_moment_comments
--- ----------------------------
-DROP TABLE IF EXISTS `cw_moment_comments`;
-CREATE TABLE `cw_moment_comments`  (
-  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `moment_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '朋友圈ID',
-  `from_user` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '来自用户ID',
-  `to_user` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '回复用户ID',
-  `content` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '回复消息',
-  `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
-  `deleted_at` int(10) NULL DEFAULT NULL COMMENT '删除时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_moment_id`(`moment_id`) USING BTREE,
-  INDEX `idx_from_user`(`from_user`) USING BTREE,
-  INDEX `idx_to_user`(`to_user`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of cw_moment_comments
--- ----------------------------
-INSERT INTO `cw_moment_comments` VALUES (1, 15, 21, 0, '哈哈哈哈\n', 1731029471, NULL);
-INSERT INTO `cw_moment_comments` VALUES (2, 15, 21, 21, '😅😅😅😅\n', 1731030452, NULL);
-INSERT INTO `cw_moment_comments` VALUES (3, 15, 13, 0, '叽叽喳喳\n', 1731035102, NULL);
-INSERT INTO `cw_moment_comments` VALUES (4, 23, 12, 0, '☺️☺️☺️☺️☺️\n', 1731035372, NULL);
-INSERT INTO `cw_moment_comments` VALUES (5, 23, 12, 0, '😜😜😜😜😜\n', 1731035389, NULL);
-INSERT INTO `cw_moment_comments` VALUES (6, 23, 13, 12, '🤣🤣🤣🤣\n', 1731035396, NULL);
-INSERT INTO `cw_moment_comments` VALUES (7, 23, 12, 0, '哎呀\n', 1731059243, NULL);
-INSERT INTO `cw_moment_comments` VALUES (8, 24, 13, 0, '😛😛😛😛\n', 1731287976, NULL);
-INSERT INTO `cw_moment_comments` VALUES (9, 15, 13, 21, '😊😊😊😊\n', 1731662771, NULL);
+INSERT INTO `cw_messages` VALUES (6016, 12, 13, '', 'video_call', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915355, 0, '12,13');
+INSERT INTO `cw_messages` VALUES (6017, 12, 13, '1111111\n', 'text', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915429, 0, '');
+INSERT INTO `cw_messages` VALUES (6018, 14, 13, '11111\n', 'text', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915482, 0, '');
+INSERT INTO `cw_messages` VALUES (6019, 14, 13, '😇😇😇😇😇\n', 'text', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915496, 0, '');
+INSERT INTO `cw_messages` VALUES (6020, 13, 14, '', 'video_call', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915558, 0, '13,14');
+INSERT INTO `cw_messages` VALUES (6021, 12, 13, '🤑🤑🤑🤑🤑\n', 'text', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915799, 0, '');
+INSERT INTO `cw_messages` VALUES (6022, 12, 13, '☺️☺️☺️☺️☺️😚😚😚😙😙😋😋\n', 'text', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915811, 0, '');
+INSERT INTO `cw_messages` VALUES (6023, 12, 54, 'masterpiece, best quality, dusk, game_cg, girl, long hair, blue hair, ahoge, single braid, parted bangs, hair bow, light blush, blue eyes, purple eyeshadow, huge breasts, real\n', 'text', 1, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731915944, 0, '');
+INSERT INTO `cw_messages` VALUES (6024, 12, 54, '@AI绘图-小图 masterpiece, best quality, dusk, game_cg, girl, long hair, blue hair, ahoge, single braid, parted bangs, hair bow, light blush, blue eyes, purple eyeshadow, huge breasts, real\n', 'text', 1, 0, 0, '997', 0, 0, NULL, 0, '', NULL, 1, 1731915956, 0, '');
+INSERT INTO `cw_messages` VALUES (6025, 997, 54, '[图片信息]', 'image', 1, 0, 0, '', 0, 376, 'image', 409001, '4b97b6b372676d9b7ac0d2d9bc422112.png', '{\"path\": \"https://124.71.219.151:8787/uploads/image/20241118/4b97b6b372676d9b7ac0d2d9bc422112.png\", \"width\": 512, \"format\": \"png\", \"height\": 512, \"duration\": 0}', 1, 1731915959, 0, '');
+INSERT INTO `cw_messages` VALUES (6026, 12, 54, '@AI绘图-小图 masterpiece, best quality, dusk, game_cg, girl, long hair, blue hair, ahoge, single braid, parted bangs, hair bow, light blush, blue eyes, purple eyeshadow, huge breasts, real\n', 'text', 1, 0, 0, '997,997', 0, 0, NULL, 0, '', NULL, 1, 1731915975, 0, '');
+INSERT INTO `cw_messages` VALUES (6027, 997, 54, '[图片信息]', 'image', 1, 0, 0, '', 0, 377, 'image', 395210, 'bcf3bab10d2234d7fcb1d22c6e81fa3e.png', '{\"path\": \"https://124.71.219.151:8787/uploads/image/20241118/bcf3bab10d2234d7fcb1d22c6e81fa3e.png\", \"width\": 512, \"format\": \"png\", \"height\": 512, \"duration\": 0}', 1, 1731915975, 0, '');
+INSERT INTO `cw_messages` VALUES (6028, 12, 997, 'masterpiece, best quality, dusk, game_cg, girl, long hair, blue hair, ahoge, single braid, parted bangs, hair bow, light blush, blue eyes, purple eyeshadow, huge breasts, real\n', 'text', 0, 0, 0, '', 0, 0, NULL, 0, '', NULL, 1, 1731916022, 0, '');
+INSERT INTO `cw_messages` VALUES (6029, 997, 12, '[图片信息]', 'image', 0, 0, 0, '', 0, 378, 'image', 414213, 'aa7dc412652e434659771ff619cf6340.png', '{\"path\": \"https://124.71.219.151:8787/uploads/image/20241118/aa7dc412652e434659771ff619cf6340.png\", \"width\": 512, \"format\": \"png\", \"height\": 512, \"duration\": 0}', 1, 1731916022, 0, '');
 
 -- ----------------------------
 -- Table structure for cw_moment_files
@@ -7321,46 +7307,62 @@ INSERT INTO `cw_moment_files` VALUES (22, 24, 366, 1731287949);
 INSERT INTO `cw_moment_files` VALUES (23, 24, 48, 1731287949);
 
 -- ----------------------------
--- Table structure for cw_moment_likes
+-- Table structure for cw_moment_messages
 -- ----------------------------
-DROP TABLE IF EXISTS `cw_moment_likes`;
-CREATE TABLE `cw_moment_likes`  (
+DROP TABLE IF EXISTS `cw_moment_messages`;
+CREATE TABLE `cw_moment_messages`  (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `moment_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `from_user` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '来自用户ID',
+  `to_user` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '回复用户ID',
+  `moment_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '朋友圈ID',
+  `type` enum('like','comment') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'like' COMMENT '类型(like=点赞,comment=评论)',
+  `content` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '回复内容',
+  `created_at` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `deleted_at` int(10) NULL DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `idx_unique`(`user_id`, `moment_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_moment_id`(`moment_id`) USING BTREE,
+  INDEX `idx_from_user`(`from_user`) USING BTREE,
+  INDEX `idx_to_user`(`to_user`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 73 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Records of cw_moment_likes
+-- Records of cw_moment_messages
 -- ----------------------------
-INSERT INTO `cw_moment_likes` VALUES (1, 13, 6, 1725529403);
-INSERT INTO `cw_moment_likes` VALUES (2, 13, 8, 1725529680);
-INSERT INTO `cw_moment_likes` VALUES (3, 13, 7, 1725529705);
-INSERT INTO `cw_moment_likes` VALUES (4, 13, 5, 1725529707);
-INSERT INTO `cw_moment_likes` VALUES (5, 15, 8, 1725529969);
-INSERT INTO `cw_moment_likes` VALUES (6, 17, 10, 1725532396);
-INSERT INTO `cw_moment_likes` VALUES (7, 12, 6, 1725533830);
-INSERT INTO `cw_moment_likes` VALUES (8, 12, 12, 1725533838);
-INSERT INTO `cw_moment_likes` VALUES (9, 17, 13, 1725591587);
-INSERT INTO `cw_moment_likes` VALUES (10, 14, 10, 1725613022);
-INSERT INTO `cw_moment_likes` VALUES (11, 14, 8, 1725930802);
-INSERT INTO `cw_moment_likes` VALUES (12, 14, 7, 1725930805);
-INSERT INTO `cw_moment_likes` VALUES (13, 14, 6, 1725930807);
-INSERT INTO `cw_moment_likes` VALUES (14, 14, 5, 1725930809);
-INSERT INTO `cw_moment_likes` VALUES (15, 12, 14, 1725948514);
-INSERT INTO `cw_moment_likes` VALUES (17, 12, 10, 1725948699);
-INSERT INTO `cw_moment_likes` VALUES (20, 12, 5, 1725948711);
-INSERT INTO `cw_moment_likes` VALUES (21, 20, 14, 1725952960);
-INSERT INTO `cw_moment_likes` VALUES (22, 12, 7, 1725961395);
-INSERT INTO `cw_moment_likes` VALUES (24, 21, 15, 1731029463);
-INSERT INTO `cw_moment_likes` VALUES (25, 12, 15, 1731030479);
-INSERT INTO `cw_moment_likes` VALUES (27, 13, 16, 1731033357);
-INSERT INTO `cw_moment_likes` VALUES (28, 13, 23, 1731035361);
-INSERT INTO `cw_moment_likes` VALUES (30, 12, 23, 1731044949);
-INSERT INTO `cw_moment_likes` VALUES (31, 13, 24, 1731287967);
+INSERT INTO `cw_moment_messages` VALUES (38, 13, 0, 6, 'like', '', 1725529403, NULL);
+INSERT INTO `cw_moment_messages` VALUES (39, 13, 0, 8, 'like', '', 1725529680, NULL);
+INSERT INTO `cw_moment_messages` VALUES (40, 13, 0, 7, 'like', '', 1725529705, NULL);
+INSERT INTO `cw_moment_messages` VALUES (41, 13, 0, 5, 'like', '', 1725529707, NULL);
+INSERT INTO `cw_moment_messages` VALUES (42, 15, 0, 8, 'like', '', 1725529969, NULL);
+INSERT INTO `cw_moment_messages` VALUES (43, 17, 0, 10, 'like', '', 1725532396, NULL);
+INSERT INTO `cw_moment_messages` VALUES (44, 12, 0, 6, 'like', '', 1725533830, NULL);
+INSERT INTO `cw_moment_messages` VALUES (45, 12, 0, 12, 'like', '', 1725533838, NULL);
+INSERT INTO `cw_moment_messages` VALUES (46, 17, 0, 13, 'like', '', 1725591587, NULL);
+INSERT INTO `cw_moment_messages` VALUES (47, 14, 0, 10, 'like', '', 1725613022, NULL);
+INSERT INTO `cw_moment_messages` VALUES (48, 14, 0, 8, 'like', '', 1725930802, NULL);
+INSERT INTO `cw_moment_messages` VALUES (49, 14, 0, 7, 'like', '', 1725930805, NULL);
+INSERT INTO `cw_moment_messages` VALUES (50, 14, 0, 6, 'like', '', 1725930807, NULL);
+INSERT INTO `cw_moment_messages` VALUES (51, 14, 0, 5, 'like', '', 1725930809, NULL);
+INSERT INTO `cw_moment_messages` VALUES (52, 12, 0, 14, 'like', '', 1725948514, NULL);
+INSERT INTO `cw_moment_messages` VALUES (53, 12, 0, 10, 'like', '', 1725948699, NULL);
+INSERT INTO `cw_moment_messages` VALUES (54, 12, 0, 5, 'like', '', 1725948711, NULL);
+INSERT INTO `cw_moment_messages` VALUES (55, 20, 0, 14, 'like', '', 1725952960, NULL);
+INSERT INTO `cw_moment_messages` VALUES (56, 12, 0, 7, 'like', '', 1725961395, NULL);
+INSERT INTO `cw_moment_messages` VALUES (57, 21, 0, 15, 'like', '', 1731029463, NULL);
+INSERT INTO `cw_moment_messages` VALUES (58, 12, 0, 15, 'like', '', 1731030479, NULL);
+INSERT INTO `cw_moment_messages` VALUES (59, 13, 0, 16, 'like', '', 1731033357, NULL);
+INSERT INTO `cw_moment_messages` VALUES (60, 13, 0, 23, 'like', '', 1731035361, NULL);
+INSERT INTO `cw_moment_messages` VALUES (61, 12, 0, 23, 'like', '', 1731044949, NULL);
+INSERT INTO `cw_moment_messages` VALUES (62, 13, 0, 24, 'like', '', 1731287967, NULL);
+INSERT INTO `cw_moment_messages` VALUES (63, 12, 0, 22, 'like', '', 1731915874, NULL);
+INSERT INTO `cw_moment_messages` VALUES (64, 21, 0, 15, 'comment', '哈哈哈哈\n', 1731029471, NULL);
+INSERT INTO `cw_moment_messages` VALUES (65, 21, 21, 15, 'comment', '😅😅😅😅\n', 1731030452, NULL);
+INSERT INTO `cw_moment_messages` VALUES (66, 13, 0, 15, 'comment', '叽叽喳喳\n', 1731035102, NULL);
+INSERT INTO `cw_moment_messages` VALUES (67, 12, 0, 23, 'comment', '☺️☺️☺️☺️☺️\n', 1731035372, NULL);
+INSERT INTO `cw_moment_messages` VALUES (68, 12, 0, 23, 'comment', '😜😜😜😜😜\n', 1731035389, NULL);
+INSERT INTO `cw_moment_messages` VALUES (69, 13, 12, 23, 'comment', '🤣🤣🤣🤣\n', 1731035396, NULL);
+INSERT INTO `cw_moment_messages` VALUES (70, 12, 0, 23, 'comment', '哎呀\n', 1731059243, NULL);
+INSERT INTO `cw_moment_messages` VALUES (71, 13, 0, 24, 'comment', '😛😛😛😛\n', 1731287976, NULL);
+INSERT INTO `cw_moment_messages` VALUES (72, 13, 21, 15, 'comment', '😊😊😊😊\n', 1731662771, NULL);
 
 -- ----------------------------
 -- Table structure for cw_moments
@@ -7437,13 +7439,13 @@ CREATE TABLE `cw_users`  (
 -- ----------------------------
 -- Records of cw_users
 -- ----------------------------
-INSERT INTO `cw_users` VALUES (12, 'zhangsan', '13006789001', '$2y$12$KUm/KECWJWCcMggM5xEfKO6guGBOM40..Pmebvou.XDR2yMCWEl.C', 'q,7L221\\SY', 'eyJpdiI6IlN6VUlXV0kyNGRtbjJmZVE2STNXa2c9PSIsInZhbHVlIjoiN0c0ckx3UkhuYmMzdTd5NEVldjg3QT09IiwibWFjIjoiYTdlMDJmYzMzZTQ5OWYyNDQzZGRkZmVkMzNjMGE5MjUyZTBmN2M3ZTE3Y2Y1YmQ1NDM1NWQwNWI2NTJjMjNmZCIsInRhZyI6IiJ9', 1732092358, '张三', 'uploads/image/20240718/03ec1bedb55266aaca21261889364bf2.jpg', '', 'unknown', 0, '', 321, '', '{\"apply\": 0, \"moment\": {\"num\": 8, \"from\": 13}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720082352, 1731662771);
+INSERT INTO `cw_users` VALUES (12, 'zhangsan', '13006789001', '$2y$12$KUm/KECWJWCcMggM5xEfKO6guGBOM40..Pmebvou.XDR2yMCWEl.C', 'q,7L221\\SY', 'eyJpdiI6IjZVWEZjdDNYTWxTeDBoTzhLUWwrdkE9PSIsInZhbHVlIjoienFWMGU4R215Z0pSWkxQRksxa1ZPQT09IiwibWFjIjoiNjAyMjdlZjY2NWViYmIxNjVlNzY1YTVmZDUyNmYzYjQzZmFhZDhhZmE1OWZlODYwMDk0YjAxNDM5OWM2Y2Y0MSIsInRhZyI6IiJ9', 1732520565, '张三', 'uploads/image/20240718/03ec1bedb55266aaca21261889364bf2.jpg', '', 'unknown', 0, '', 321, '', '{\"apply\": 0, \"moment\": {\"num\": 8, \"from\": 13}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720082352, 1731915765);
 INSERT INTO `cw_users` VALUES (1034, 'eqwe12', '13334343434', '$2y$12$vlwpBhaEsSiWDWJIjIFcce.2U8mB5izYEukzrSpNlaJxeD2i7nkUu', '?#-P7]Yf4)', 'eyJpdiI6Im5zZno4ZCtSMzBKUjBBcnUzeUNkRGc9PSIsInZhbHVlIjoib3JBbVo2c2VIMkVFdHFJc3k5K09JQT09IiwibWFjIjoiYjNmZjAyMzBlNjdmMmFiMjdlMzliZjYzZTQxN2ZmYTdjNDliZWQ1ZDRiNDk1ZDJiNGQ5MmM4ZjRiMzIwMzg4MSIsInRhZyI6IiJ9', 1725944807, 'ewf1', 'https://api.multiavatar.com/2c8e0216d14c978c39ef2e8c19f8af25.png', '', 'unknown', 0, '', 0, '', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1725340007, 1725340007);
-INSERT INTO `cw_users` VALUES (13, 'wanglin', '13006789002', '$2y$12$rLWS9S9GenKA1rDMVYAXcOohUzN9AnU21fqasJJenCr3K87.TfxpK', '8%>uL!:&QJ', 'eyJpdiI6IlFLMkhrSUdPMUw3eW4xblUzVTVaS0E9PSIsInZhbHVlIjoieEs2RFBkbWFpRkg0UXpuTVJiRWNHUT09IiwibWFjIjoiYTZlYTMyNDQ1N2Q3NjczZTYxMzYxY2NhMGExODhkM2FkNTYwY2ZhODc5ZTEyYTEyNDAyNTZmZjNmN2YxMGNkYiIsInRhZyI6IiJ9', 1731931249, '王林', 'uploads/image/20240718/3d3550076a07bceefc87f40eec8dcb03.jpg', '', 'unknown', 0, '', 48, 'https://124.71.219.151:8787/uploads/image/20240722/2e53c6baada7d07988bbdaca9ee8d836.webp', '{\"apply\": 0, \"moment\": {\"num\": 5, \"from\": 12}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720083588, 1731326449);
+INSERT INTO `cw_users` VALUES (13, 'wanglin', '13006789002', '$2y$12$rLWS9S9GenKA1rDMVYAXcOohUzN9AnU21fqasJJenCr3K87.TfxpK', '8%>uL!:&QJ', 'eyJpdiI6IkFvdXNhWHMrSVhSQXpZWkpYZ2lOSWc9PSIsInZhbHVlIjoiYXRDSjlXdG5XUFByK093bzlyQ3Nsdz09IiwibWFjIjoiYTFhMDU2OWQzOTczMWY3OGVkNWQwYzc0NzBmZDIyNzg2NzA1NDZjMTc3OTJlNGRhYWZjYjJkZTM0MWRiZDMzYSIsInRhZyI6IiJ9', 1732520550, '王林', 'uploads/image/20240718/3d3550076a07bceefc87f40eec8dcb03.jpg', '', 'unknown', 0, '', 48, 'https://124.71.219.151:8787/uploads/image/20240722/2e53c6baada7d07988bbdaca9ee8d836.webp', '{\"apply\": 0, \"moment\": {\"num\": 6, \"from\": 12}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720083588, 1731915874);
 INSERT INTO `cw_users` VALUES (1000, '1789000', '13800138000', '$2y$12$4KefSQ46UmZMbmtrot5i7ePAUExsX9RiTr/YzB2F2Cr1S8dkJrX6u', 't07t,1_>63', 'eyJpdiI6Ik5kRUZIL1o1dWI2VG9sQ0x0d0FqdEE9PSIsInZhbHVlIjoibkoyaUM1ZE9ISTVCcFZzazcrOCtEQT09IiwibWFjIjoiMmRkNzhkMjA0ZTg4NTg3YTI0NzYwNGVlMDFkODYxZDJlYTI0NjIxZmI1OTQzNjk1NzBlN2U3YzQzYTMxYmNhNyIsInRhZyI6IiJ9', 1725933434, '1', 'https://api.multiavatar.com/7945bd83237335e5376ff44d62e4f0ae.png', '', 'unknown', 0, '', 0, '', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1725328634, 1725328634);
 INSERT INTO `cw_users` VALUES (59, '12345678', '17704051019', '$2y$12$WO.jkFnS8/BqEQUodTkXWeNvqt8VUfe6WuejQh.273tendrfC4Vbm', '?LVW0423(Y', 'eyJpdiI6InBGaEpQeThsNEwvZkVsSElxMWxWOUE9PSIsInZhbHVlIjoiU0NRdWdhbG9IQTc3SFFNaHJoKytGdz09IiwibWFjIjoiOTIxYWNjMjlkMDU0ZDNmOTI3OWMwMTA4MGRkMThjNjA2OGJiOTMwNTI0MTk1M2NkYTk5NTE0N2Y4MmM3YzMyOCIsInRhZyI6IiJ9', 1722582065, '你好啊', 'https://api.multiavatar.com/d582830079546f48f467497239d31028.png', '', 'unknown', 0, '', 0, '', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1721977265, 1721977265);
 INSERT INTO `cw_users` VALUES (23, '1234', '13312344321', '$2y$12$vQ48kPT1IYEC95zuzF/D.uVERAGfXXWNFC3dqZ0wvntUw0MmWe7hK', '/]6%e,],0G', 'eyJpdiI6IisveUdqVldsYTg5SEtEbmk1VllCY0E9PSIsInZhbHVlIjoiZUhHUk1zbDFEVGIvaW9OeFIzY3MwUT09IiwibWFjIjoiMTAzNTNhNzFhYmI5MjY0NGE0YTcxZmQ5YzZjY2FmNTIwNTU0Zjc0YTEyYWUzMDg1NjI0YzU1MGM3ZjI4NDE2YiIsInRhZyI6IiJ9', 1720751401, '1231', 'https://api.multiavatar.com/e3302cf53e25c391fa677ca772c944a8.png', '', 'unknown', 0, '', 0, '', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720146601, 1720146601);
-INSERT INTO `cw_users` VALUES (14, 'xiaoyan', '13006789003', '$2y$12$AsVrCmV6rJQkYlKV6MdYhOp4wMgEGLW2tbU0hMIHz1MYUDVkjCQLi', 'r?p<>&i3M0', '', 0, '萧炎', 'uploads/image/20240718/03ec1bedb55266aaca21261889364bf2.jpg', '', 'unknown', 0, '', 48, 'https://124.71.219.151:8787/uploads/image/20240722/2e53c6baada7d07988bbdaca9ee8d836.webp', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720083639, 1725956708);
+INSERT INTO `cw_users` VALUES (14, 'xiaoyan', '13006789003', '$2y$12$AsVrCmV6rJQkYlKV6MdYhOp4wMgEGLW2tbU0hMIHz1MYUDVkjCQLi', 'r?p<>&i3M0', 'eyJpdiI6IllmQ3B1VFkveHdhK2U5ZWJJNjJVc1E9PSIsInZhbHVlIjoiRFp3Nk5TVHdXZ3V2ZnJ2aENOQU9nQT09IiwibWFjIjoiMDFmODlmMzcwZDdjZjhjYWNiMGJjNWZmYTlkYWE1YWY2ODE1MmMzZGJiZmQyMDQ2ZGYwMGE0NDcyY2E3YzdlZCIsInRhZyI6IiJ9', 1732520269, '萧炎', 'uploads/image/20240718/03ec1bedb55266aaca21261889364bf2.jpg', '', 'unknown', 0, '', 48, 'https://124.71.219.151:8787/uploads/image/20240722/2e53c6baada7d07988bbdaca9ee8d836.webp', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720083639, 1731915469);
 INSERT INTO `cw_users` VALUES (15, 'meidusha', '13006789004', '$2y$12$Oe0.gCUx.gj3EpIfAxN/NeVimkiUudGjo8h3Rz0Q7/rRrC3egRt9K', '>1nO6e!{Oy', '', 0, '美杜莎', 'uploads/image/20240718/b26cca6efde8b4e0e107a3fbcba230f1.webp', '', 'unknown', 0, '', 0, '', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720083972, 1725532040);
 INSERT INTO `cw_users` VALUES (16, 'xiaoxuner', '13006789005', '$2y$12$5zu0N4Ev/HFyMs6NiYhzu.vZZlXtYYhnsc03HYiBiAnUPSEPjw322', 'urX4,iLfF:', 'eyJpdiI6Iko2RFd5dGNqQktnU3dlY0FLR1ZuSlE9PSIsInZhbHVlIjoiRkw2ODFxQ3B2WFFZQUlGNUY2U2ZtZz09IiwibWFjIjoiZWVhNmE1MDk4M2QwYmU0YTgzNThhZGJmZjY0Y2UxNzE3NDBmNjAwNzYxNGJiYWMzNjg2ZmVmMzhhMTBjOGY0YSIsInRhZyI6IiJ9', 1731642781, '萧薰儿', 'uploads/image/20240718/facc5b63f6aeed168830629a0a0fdf37.webp', '', 'unknown', 0, '', 0, '', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720084001, 1731037981);
 INSERT INTO `cw_users` VALUES (17, 'nangongwan', '13006789006', '$2y$12$p3AXuHhBkVHyFihIHg9Su.rKhpNA3jVdA8TwHg963f0tk6Umlw4Yq', 'y0(S}-8W7o', '', 0, '南宫婉', 'uploads/image/20240718/007fade72e6b96584b376c764219b36b.webp', '', 'unknown', 0, '', 0, '', '{\"apply\": 0, \"moment\": {\"num\": 0, \"from\": 0}}', 'normal', '{\"FriendPerm\": {\"Moment\": {\"AllowStrangerTen\": \"0\", \"FriendWatchRange\": \"ALLOW_ALL\"}, \"AddMyWay\": {\"Mobile\": \"1\", \"QRCode\": \"1\", \"Wechat\": \"1\", \"GroupChat\": \"1\"}}}', 1720084064, 1725607639);

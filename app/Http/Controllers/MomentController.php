@@ -31,12 +31,6 @@ class MomentController extends Controller
         return $this->setPageInfo($data[0])->success($data[1], $request);
     }
 
-    public function unreadList(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $data = $this->momentService->unreadList($this->params);
-        return $this->success($data, $request);
-    }
-
     /**
      * 发朋友圈
      * @throws ValidationException
@@ -92,6 +86,11 @@ class MomentController extends Controller
         return $this->success($data, $request);
     }
 
+    public function message(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $this->momentService->message($this->params);
+        return $this->setPageInfo($data[0])->success($data[1], $request);
+    }
     /**
      * @throws BusinessException
      * @throws ValidationException

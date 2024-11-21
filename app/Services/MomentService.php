@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use App\Enums\ApiCodeEnum;
+use App\Enums\Database\MomentEnum;
 use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Friend;
 use App\Models\Moment;
-use App\Models\MomentComments;
 use App\Models\MomentFiles;
-use App\Models\MomentLikes;
+use App\Models\MomentMessages;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\DB;
@@ -21,9 +21,9 @@ class MomentService extends BaseService
         $owner = $params['user']->id;
         $page = $params['page'] ?? 1;
         $limit = $params['limit'] ?? 10;
-        $friendIds = Friend::getMomentCanSeeFriendIds($owner);
-        $friendIds[] = $owner;
-        return Moment::getMomentsPageByUserIds($friendIds, $page, $limit);
+        $userIds = Friend::getMomentCanSeeFriendIds($owner);
+        $userIds[] = $owner;
+        return Moment::getMomentsPageByUserIds($userIds, $page, $limit);
     }
 
     /**
@@ -69,12 +69,13 @@ class MomentService extends BaseService
         $moment = $this->getMomentById($params['id']);
         $likeData = [
             'moment_id' => $params['id'],
-            'user_id' => $params['user']->id,
+            'from_user' => $params['user']->id,
+            'type' => MomentEnum::LIKE,
             'created_at' => time(),
         ];
         DB::beginTransaction();
         try {
-            $likeData['id'] = MomentLikes::query()->insertGetId($likeData);
+            $likeData['id'] = MomentMessages::query()->insertGetId($likeData);
             $likeData['user'] = [
                 'id' => $params['user']->id,
                 'nickname' => $params['user']->nickname,
@@ -105,8 +106,8 @@ class MomentService extends BaseService
      */
     public function unlike(array $params): array
     {
-        $like = MomentLikes::query()->where('moment_id', $params['id'])
-            ->where('user_id', $params['user']->id)->first();
+        $like = MomentMessages::query()->where('type', MomentEnum::LIKE)->where('moment_id', $params['id'])
+            ->where('from_user', $params['user']->id)->first();
         if (!$like) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
@@ -117,7 +118,7 @@ class MomentService extends BaseService
     /**
      * @throws BusinessException
      */
-    public function comment(array $params)
+    public function comment(array $params): array
     {
         $moment = $this->getMomentById($params['id']);
         $fromUser = $params['user']->id;
@@ -127,12 +128,13 @@ class MomentService extends BaseService
             'moment_id' => $params['id'],
             'from_user' => $fromUser,
             'to_user' => $toUser,
+            'type' => MomentEnum::COMMENT,
             'content' => $content,
             'created_at' => time(),
         ];
         DB::beginTransaction();
         try {
-            $commentData['id'] = MomentComments::query()->insertGetId($commentData);
+            $commentData['id'] = MomentMessages::query()->insertGetId($commentData);
             $commentData['from'] = [
                 'id' => $params['user']->id,
                 'nickname' => $params['user']->nickname,
@@ -170,29 +172,19 @@ class MomentService extends BaseService
         }
     }
 
-    public function unreadList(array $params): array
+    /**
+     * 获取朋友圈点赞、评论消息列表
+     * @param array $params
+     * @return array
+     */
+    public function message(array $params): array
     {
-        $unreadLikes = MomentLikes::getUnreadLikesByUserId($params['user']->id);
-        $unreadComments = MomentComments::getUnreadCommentsByUserId($params['user']->id);
-        DB::beginTransaction();
-        try {
-            if ($unreadLikes) {
-                $momentIds = array_column($unreadLikes, 'moment_id');
-                MomentLikes::query()->whereIn('moment_id', $momentIds)->update(['is_read' => 1]);
-            }
-            if ($unreadComments) {
-                $momentIds = array_column($unreadComments, 'moment_id');
-                MomentComments::query()->whereIn('moment_id', $momentIds)->update(['is_read' => 1]);
-            }
-            DB::commit();
-        } catch (\Exception) {
-            DB::rollBack();
-        }
-        $unreadList = array_merge($unreadLikes, $unreadComments);
-        usort($unreadList, function ($a, $b) {
-            return $b['created_at'] <=> $a['created_at'];
-        });
-        return $unreadList;
+        $owner = $params['user']->id;
+        $page = $params['page'] ?? 1;
+        $limit = $params['limit'] ?? 10;
+        $userIds = Friend::getMomentCanSeeFriendIds($owner);
+        $userIds[] = $owner;
+        return Moment::getMomentsMessagePageByUserId($userIds, $page, $limit);
     }
 
     /**
