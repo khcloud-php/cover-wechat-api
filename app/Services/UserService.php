@@ -144,7 +144,7 @@ class UserService extends BaseService
         $homeInfo['setting'] = $setting;
         list($pageInfo, $moments) = Moment::getMomentsPageByUserId($params);
         foreach ($moments as $moment) {
-            if (in_array($moment['type'], [MomentEnum::IMAGE, MomentEnum::VIDEO]) && !empty($moment['files'][0]['file']['thumbnail_path']) && count($homeInfo['moment']) < 6) {
+            if (in_array($moment['type'], [MomentEnum::IMAGE, MomentEnum::VIDEO]) && !empty($moment['files'][0]['file']['thumbnail_path']) && count($homeInfo['moment']) < 4) {
                 $homeInfo['moment'][] = $moment['files'][0]['file']['thumbnail_path'];
             }
         }

@@ -32,6 +32,18 @@ class MomentController extends Controller
     }
 
     /**
+     * @throws ValidationException
+     */
+    public function detail(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request, [
+            'id' => 'required',
+        ]);
+        $data = $this->momentService->detail($this->params);
+        return $this->success($data, $request);
+    }
+
+    /**
      * 发朋友圈
      * @throws ValidationException
      * @throws BusinessException
@@ -91,6 +103,7 @@ class MomentController extends Controller
         $data = $this->momentService->message($this->params);
         return $this->setPageInfo($data[0])->success($data[1], $request);
     }
+
     /**
      * @throws BusinessException
      * @throws ValidationException

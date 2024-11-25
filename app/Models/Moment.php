@@ -159,6 +159,42 @@ class Moment extends Base
         return $empty;
     }
 
+    public static function getMomentById(int $id, array $userIds): array
+    {
+        $friendIds = $userIds;
+        $owner = array_pop($friendIds);
+        $condition = str_replace('__OWNER__', $owner, self::$condition);
+        $whereRaw = "((cw_u.id = {$owner} AND cw_moments.id = {$id}) OR (cw_moments.id = {$id} AND {$condition}))";
+        $moment = self::query()
+            ->join('users as u', 'u.id', '=', 'moments.user_id')
+            ->with(['user' => function ($query) {
+                return $query->select(['id', 'nickname', 'avatar', 'wechat']);
+            }, 'files' => function ($query) {
+                return $query->with(['file' => function ($query) {
+                    return $query->select(['id', 'name', 'type', 'path', 'thumbnail_path']);
+                }])->orderBy('created_at', 'asc');
+            }, 'likes' => function ($query) use ($userIds) {
+                return $query->with(['from' => function ($query) {
+                    return $query->select(['id', 'nickname', 'wechat', 'avatar']);
+                }])->where('type', MomentEnum::LIKE)->whereIn('from_user', $userIds)->orderBy('created_at', 'asc');
+            }, 'comments' => function ($query) use ($userIds) {
+                return $query->with(['from' => function ($query) {
+                    return $query->select(['id', 'nickname', 'wechat', 'avatar']);
+                }, 'to' => function ($query) {
+                    return $query->select(['id', 'nickname', 'wechat', 'avatar']);
+                }])->where('type', MomentEnum::COMMENT)->whereIn('from_user', $userIds)->orderBy('created_at', 'asc');
+            }])
+            ->whereRaw($whereRaw)
+            ->first(self::$columns);
+        $moment = $moment ? $moment->toArray() : [];
+        if (!empty($moment['files'])) {
+            foreach ($moment['files'] as &$file) {
+                $file['url'] = $file['file']['path'];
+            }
+        }
+        return $moment;
+    }
+
     /**
      * 获取朋友圈点赞、评论消息列表
      * @param array $userIds
@@ -227,7 +263,7 @@ class Moment extends Base
             else
                 $item['created_at'] = date('n月j日 H:i:s', $item['created_at']);
         }
-        User::clearUnread([$owner],'moment.num');
+        User::clearUnread([$owner], 'moment.num');
         return [get_page_info($page, $limit, $total), $message];
     }
 }

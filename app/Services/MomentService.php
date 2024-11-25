@@ -26,6 +26,14 @@ class MomentService extends BaseService
         return Moment::getMomentsPageByUserIds($userIds, $page, $limit);
     }
 
+    public function detail(array $params): array
+    {
+        $owner = $params['user']->id;
+        $userIds = Friend::getMomentCanSeeFriendIds($owner);
+        $userIds[] = $owner;
+        return Moment::getMomentById($params['id'], $userIds);
+    }
+
     /**
      * @throws BusinessException
      */
