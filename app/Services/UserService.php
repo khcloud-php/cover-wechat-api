@@ -13,6 +13,7 @@ use App\Models\Moment;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,6 +21,9 @@ class UserService extends BaseService
 {
 
     /**
+     * 注册
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function register(array $params): array
@@ -47,6 +51,10 @@ class UserService extends BaseService
     }
 
     /**
+     * 登录
+     * @param array $params
+     * @param bool $auto
+     * @return array
      * @throws BusinessException
      */
     public function login(array $params, bool $auto = false): array
@@ -82,12 +90,20 @@ class UserService extends BaseService
         return $user;
     }
 
+    /**
+     * 退出登录
+     * @param int $userId
+     * @return int
+     */
     public function logout(int $userId): int
     {
         return User::query()->where('id', $userId)->update(['token' => '', 'token_expire_in' => 0]);
     }
 
     /**
+     * 主页
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function home(array $params): array
@@ -151,6 +167,11 @@ class UserService extends BaseService
         return $homeInfo;
     }
 
+    /**
+     * 用户信息
+     * @param array $params
+     * @return array
+     */
     public function info(array $params): array
     {
         $id = $params['id'];
@@ -186,6 +207,11 @@ class UserService extends BaseService
         return $updateData;
     }
 
+    /**
+     * 用户个人朋友圈
+     * @param array $params
+     * @return array
+     */
     public function moments(array $params): array
     {
         list($pageInfo, $moments) = Moment::getMomentsPageByUserId($params);
@@ -207,5 +233,15 @@ class UserService extends BaseService
             $item['moments'] = array_values($item['moments']);
         }
         return [$pageInfo, array_values($list)];
+    }
+
+    /**
+     * 充值
+     * @param array $params
+     * @throws BusinessException
+     */
+    public function charge(array $params): void
+    {
+        User::changeMoney($params['user']->id, $params['money']);
     }
 }

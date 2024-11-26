@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\ApiCodeEnum;
+use App\Enums\Database\UserEnum;
+use App\Exceptions\BusinessException;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -61,12 +64,25 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
         return $value;
     }
 
+    /**
+     * 获取消息未读数
+     * @param int $id
+     * @return array
+     */
     public static function getUnreadById(int $id): array
     {
         $user = self::query()->find($id, ['unread']);
         return $user->unread;
     }
 
+    /**
+     * 增加信息未读数
+     * @param array $ids
+     * @param string $field
+     * @param int $from
+     * @param $num
+     * @return int
+     */
     public static function incrUnread(array $ids, string $field, int $from = 0, $num = 1): int
     {
         if (empty($ids)) return 0;
@@ -80,6 +96,12 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
         ]);
     }
 
+    /**
+     * 清空消息未读数
+     * @param array $ids
+     * @param string $field
+     * @return int
+     */
     public static function clearUnread(array $ids, string $field): int
     {
         return self::query()->whereIn('id', $ids)->update([
@@ -90,5 +112,52 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
     public static function checkExistsBySetting(int $userId, string $column, string $value): bool
     {
         return self::query()->where('id', $userId)->whereRaw("JSON_EXTRACT(setting, '$.{$column}') = '{$value}'")->exists();
+    }
+
+    /**
+     * 充值
+     * @param int|object $userId
+     * @param string $money
+     * @param string $type
+     * @param array $extend
+     * @return void
+     * @throws BusinessException
+     */
+    public static function changeMoney(int|object $userId, string $money, string $type = UserEnum::MONEY_INCR, array $extend = []): void
+    {
+        DB::beginTransaction();
+        try {
+            if (is_int($userId))
+                $user = self::query()->findOrFail($userId);
+            else
+                $user = $userId;
+            $money = $money * 100;
+            $beforeMoney = $user->money;
+            if ($type === UserEnum::MONEY_INCR)
+                $user->money = $user->money + $money;
+            elseif ($type === UserEnum::MONEY_DECR) {
+                if ($money * 100 > $user->money)
+                    throw new BusinessException(ApiCodeEnum::SERVICE_ACCOUNT_MONEY_NOT_ENOUGH);
+                $user->money = $user->money - $money;
+            }
+            $afterMoney = $user->money;
+            if ($user->save() && isset($extend['money_flow_type'])) {
+                $data = [
+                    'type' => $extend['money_flow_type'],
+                    'from_id' => $extend['from_id'] ?? 0,
+                    'user_id' => $user->id,
+                    'before_money' => $beforeMoney,
+                    'after_money' => $afterMoney,
+                    'money' => $money,
+                    'remark' => $extend['remark'] ?? '',
+                    'created_at' => time()
+                ];
+                MoneyFlowLog::query()->insert($data);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new BusinessException(ApiCodeEnum::SYSTEM_ERROR, $e->getMessage());
+        }
     }
 }
