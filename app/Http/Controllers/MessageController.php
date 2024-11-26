@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\BusinessException;
 use App\Services\MessageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -18,10 +19,10 @@ class MessageController extends Controller
     }
 
     /**
-     * 消息列表
-     * @throws ValidationException
+     * 聊天消息列表
+     * @throws ValidationException|BusinessException
      */
-    public function list(Request $request): \Illuminate\Http\JsonResponse
+    public function list(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
@@ -36,7 +37,7 @@ class MessageController extends Controller
      * @throws BusinessException
      * @throws ValidationException
      */
-    public function send(Request $request): \Illuminate\Http\JsonResponse
+    public function send(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
@@ -49,10 +50,12 @@ class MessageController extends Controller
     }
 
     /**
-     * 消息已读
+     * 聊天消息已读
+     * @param Request $request
+     * @return JsonResponse
      * @throws ValidationException
      */
-    public function read(Request $request): \Illuminate\Http\JsonResponse
+    public function read(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
@@ -63,10 +66,12 @@ class MessageController extends Controller
     }
 
     /**
-     * 消息撤回
-     * @throws ValidationException
+     * 聊天消息撤回
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException|BusinessException
      */
-    public function undo(Request $request): \Illuminate\Http\JsonResponse
+    public function undo(Request $request): JsonResponse
     {
         $this->validate($request, [
             'id' => 'required'
@@ -75,7 +80,12 @@ class MessageController extends Controller
         return $this->success([], $request);
     }
 
-    public function unread(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * 未读聊天消息
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function unread(Request $request): JsonResponse
     {
         $data = $this->messageService->unread($request->user()->id);
         return $this->success($data, $request);

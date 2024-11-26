@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\DB;
 
 class ChatService extends BaseService
 {
+    /**
+     * 聊天列表
+     * @param array $params
+     * @return array
+     */
     public function list(array $params): array
     {
         $fromUser = $params['user']->id;
@@ -97,6 +102,11 @@ class ChatService extends BaseService
         return array_merge($privateChatList, $groupChatList);
     }
 
+    /**
+     * 聊天详情
+     * @param array $params
+     * @return array
+     */
     public function info(array $params): array
     {
         $fromUser = $params['user']->id;
@@ -155,6 +165,11 @@ class ChatService extends BaseService
         return $chatInfo;
     }
 
+    /**
+     * 置顶聊天
+     * @param array $params
+     * @return array
+     */
     public function top(array $params): array
     {
         $isGroup = $params['is_group'];
@@ -182,6 +197,11 @@ class ChatService extends BaseService
         ];
     }
 
+    /**
+     * 隐藏聊天
+     * @param array $params
+     * @return array
+     */
     public function hide(array $params): array
     {
         $isGroup = $params['is_group'];
@@ -207,6 +227,8 @@ class ChatService extends BaseService
     }
 
     /**
+     * 设置聊天
+     * @param array $params
      * @throws BusinessException
      */
     public function update(array $params): void
@@ -263,6 +285,12 @@ class ChatService extends BaseService
         }
     }
 
+    /**
+     * 删除聊天
+     * @param array $params
+     * @return array
+     * @throws BusinessException
+     */
     public function delete(array $params): array
     {
         $isGroup = $params['is_group'];

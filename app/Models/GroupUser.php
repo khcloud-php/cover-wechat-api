@@ -19,6 +19,13 @@ class GroupUser extends Base
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    /**
+     * 是否群成员
+     * @param $userId
+     * @param $groupId
+     * @param $returnGroup
+     * @return bool|array
+     */
     public static function checkIsGroupMember($userId, $groupId, $returnGroup = false): bool|array
     {
         $group = self::query()

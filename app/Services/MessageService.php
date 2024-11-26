@@ -23,7 +23,9 @@ class MessageService extends BaseService
 {
 
     /**
-     * @throws BusinessException
+     * 聊天消息列表
+     * @param array $params
+     * @return array
      */
     public function list(array $params): array
     {
@@ -175,6 +177,8 @@ class MessageService extends BaseService
 
     /**
      * 发送消息
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function send(array $params): array
@@ -368,6 +372,11 @@ class MessageService extends BaseService
         return $sendData['data'];
     }
 
+    /**
+     * 聊天消息已读
+     * @param array $params
+     * @return int
+     */
     public function read(array $params): int
     {
         $fromUser = $params['user']->id;
@@ -379,6 +388,12 @@ class MessageService extends BaseService
         return Friend::query()->where('owner', $fromUser)->where('friend', $toUser)->update(['unread' => 0]);
     }
 
+    /**
+     * 聊天消息撤回
+     * @param array $params
+     * @return bool
+     * @throws BusinessException
+     */
     public function undo(array $params): bool
     {
         $id = $params['id'];
@@ -391,6 +406,11 @@ class MessageService extends BaseService
         return true;
     }
 
+    /**
+     * 未读聊天消息
+     * @param int $userId
+     * @return array
+     */
     public function unread(int $userId): array
     {
         $group = GroupUser::query()

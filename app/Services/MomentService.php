@@ -12,10 +12,18 @@ use App\Models\MomentFiles;
 use App\Models\MomentMessages;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class MomentService extends BaseService
 {
+    /**
+     * 朋友圈列表
+     * @param array $params
+     * @return array
+     */
     public function list(array $params): array
     {
         $owner = $params['user']->id;
@@ -26,6 +34,11 @@ class MomentService extends BaseService
         return Moment::getMomentsPageByUserIds($userIds, $page, $limit);
     }
 
+    /**
+     * 朋友圈详情
+     * @param array $params
+     * @return array
+     */
     public function detail(array $params): array
     {
         $owner = $params['user']->id;
@@ -35,6 +48,9 @@ class MomentService extends BaseService
     }
 
     /**
+     * 发朋友圈
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function publish(array $params): array
@@ -70,6 +86,9 @@ class MomentService extends BaseService
     }
 
     /**
+     * 喜欢朋友圈
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function like(array $params): array
@@ -110,6 +129,9 @@ class MomentService extends BaseService
     }
 
     /**
+     * 取消喜欢
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function unlike(array $params): array
@@ -124,6 +146,9 @@ class MomentService extends BaseService
     }
 
     /**
+     * 评论朋友圈
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function comment(array $params): array
@@ -196,6 +221,9 @@ class MomentService extends BaseService
     }
 
     /**
+     * 删除朋友圈
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function delete(array $params): array
@@ -204,11 +232,21 @@ class MomentService extends BaseService
         if ($params['user']->id != $moment->user_id) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
-        Moment::query()->where('id', $params['id'])->delete();
+        DB::beginTransaction();
+        try {
+            Moment::query()->where('id', $params['id'])->delete();
+            MomentMessages::query()->where('moment_id', $params['id'])->delete();
+            MomentFiles::query()->where('moment_id', $params['id'])->delete();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+        }
         return ['id' => $params['id']];
     }
 
     /**
+     * @param int $id
+     * @return Model|Collection|Builder|array|null
      * @throws BusinessException
      */
     private function getMomentById(int $id): \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array|null

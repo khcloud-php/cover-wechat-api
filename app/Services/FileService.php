@@ -7,12 +7,16 @@ use App\Enums\Database\FileEnum;
 use App\Exceptions\BusinessException;
 use App\Models\File;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
 class FileService extends BaseService
 {
     /**
+     * 上传文件
+     * @param Request $request
+     * @return array
      * @throws BusinessException
      */
     public function upload(Request $request): array
@@ -25,12 +29,12 @@ class FileService extends BaseService
 
     /**
      * 上传文件
-     * @param $file
-     * @param $avatar
+     * @param UploadedFile $file
+     * @param mixed $avatar
      * @return bool|array
      * @throws BusinessException
      */
-    public function uploadFile($file, $avatar): bool|array
+    public function uploadFile(UploadedFile $file, mixed $avatar): bool|array
     {
         if (!$file->isValid()) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
@@ -125,6 +129,9 @@ class FileService extends BaseService
     }
 
     /**
+     * 上传文件base64
+     * @param string $base64Image
+     * @return bool|array
      * @throws BusinessException
      */
     public function uploadBase64(string $base64Image): bool|array
@@ -178,6 +185,11 @@ class FileService extends BaseService
         return $data;
     }
 
+    /**
+     * 文件是否存在
+     * @param string $signature
+     * @return bool|array
+     */
     private function checkFileExists(string $signature): bool|array
     {
         $file = File::query()->where('signature', $signature)->first();
@@ -191,6 +203,10 @@ class FileService extends BaseService
     }
 
     /**
+     * 生成缩略图
+     * @param string $filePath
+     * @param string $thumbnailFilePath
+     * @return array
      * @throws BusinessException
      */
     public function makeThumbnailImage(string $filePath, string $thumbnailFilePath): array
@@ -209,6 +225,10 @@ class FileService extends BaseService
     }
 
     /**
+     * 裁剪成正方形
+     * @param string $filePath
+     * @param string $outputPath
+     * @return bool
      * @throws BusinessException
      */
     private function cropSquare(string $filePath, string $outputPath): bool
@@ -233,9 +253,12 @@ class FileService extends BaseService
     }
 
     /**
+     * 限制上传文件大小
+     * @param string $fileType
+     * @param int $size
      * @throws BusinessException
      */
-    private function limitFileSIze($fileType, $size): void
+    private function limitFileSIze(string $fileType, int $size): void
     {
         switch ($fileType) {
             case FileEnum::IMAGE:

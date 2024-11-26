@@ -52,6 +52,12 @@ class Friend extends Base
         return $value;
     }
 
+    /**
+     * 获取朋友圈可见好友
+     * @param int $owner
+     * @param $reverse
+     * @return array
+     */
     public static function getMomentCanSeeFriendIds(int $owner, $reverse = false): array
     {
         $seeHimField = $reverse ? 'DontLetHimSeeIt' : 'DontSeeHim';
@@ -67,6 +73,12 @@ class Friend extends Base
         return array_intersect($seeHim, $letHimSee);
     }
 
+    /**
+     * 获取共同好友
+     * @param int $owner
+     * @param int $him
+     * @return array
+     */
     public static function getPublicFriendIds(int $owner, int $him): array
     {
         $ownerCanSee = self::getMomentCanSeeFriendIds($owner, true);
@@ -76,6 +88,14 @@ class Friend extends Base
         return array_intersect($ownerCanSee, $himCanSee);
     }
 
+    /**
+     * 好友设置是否存在
+     * @param int $owner
+     * @param int $friend
+     * @param string $column
+     * @param string $value
+     * @return bool
+     */
     public static function checkExistsBySetting(int $owner, int $friend, string $column, string $value): bool
     {
         return self::query()->where('owner', $owner)

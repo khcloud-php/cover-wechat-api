@@ -13,6 +13,10 @@ class ApplyOverdue extends Command
 
     protected $description = 'Friend apply auto overdue.';
 
+    /**
+     * 好友申请自动过期
+     * @return void
+     */
     public function handle(): void
     {
         Friend::query()

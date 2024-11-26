@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\BusinessException;
 use App\Services\ChatService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -17,16 +18,24 @@ class ChatController extends Controller
         $this->chatService = new ChatService();
     }
 
-    public function list(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * 聊天列表
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $data = $this->chatService->list($this->params);
         return $this->success($data, $request);
     }
 
     /**
+     * 聊天详情
+     * @param Request $request
+     * @return JsonResponse
      * @throws ValidationException
      */
-    public function info(Request $request): \Illuminate\Http\JsonResponse
+    public function info(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
@@ -37,9 +46,12 @@ class ChatController extends Controller
     }
 
     /**
+     * 置顶聊天
+     * @param Request $request
+     * @return JsonResponse
      * @throws ValidationException
      */
-    public function top(Request $request): \Illuminate\Http\JsonResponse
+    public function top(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
@@ -51,9 +63,12 @@ class ChatController extends Controller
     }
 
     /**
+     * 隐藏聊天
+     * @param Request $request
+     * @return JsonResponse
      * @throws ValidationException
      */
-    public function hide(Request $request): \Illuminate\Http\JsonResponse
+    public function hide(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
@@ -64,10 +79,13 @@ class ChatController extends Controller
     }
 
     /**
+     * 设置聊天
+     * @param Request $request
+     * @return JsonResponse
      * @throws BusinessException
      * @throws ValidationException
      */
-    public function update(Request $request): \Illuminate\Http\JsonResponse
+    public function update(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',
@@ -78,9 +96,13 @@ class ChatController extends Controller
     }
 
     /**
+     * 删除聊天
+     * @param Request $request
+     * @return JsonResponse
+     * @throws BusinessException
      * @throws ValidationException
      */
-    public function delete(Request $request): \Illuminate\Http\JsonResponse
+    public function delete(Request $request): JsonResponse
     {
         $this->validate($request, [
             'to_user' => 'required',

@@ -35,6 +35,14 @@ class Moment extends Base
         return $this->hasMany(MomentMessages::class, 'moment_id', 'id');
     }
 
+    /**
+     * 获取需要通知消息的好友
+     * @param int $id
+     * @param int $owner
+     * @param int $him
+     * @param int $to
+     * @return array
+     */
     public static function getNoticePublicFriendIds(int $id, int $owner, int $him, int $to = 0): array
     {
         //获取共同好友
@@ -159,6 +167,12 @@ class Moment extends Base
         return $empty;
     }
 
+    /**
+     * 朋友圈详情
+     * @param int $id
+     * @param array $userIds
+     * @return array
+     */
     public static function getMomentById(int $id, array $userIds): array
     {
         $friendIds = $userIds;

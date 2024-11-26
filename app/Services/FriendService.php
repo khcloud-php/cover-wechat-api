@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\DB;
 
 class FriendService extends BaseService
 {
+    /**
+     * 好友列表
+     * @param array $params
+     * @return array
+     */
     public function list(array $params): array
     {
         $userId = $params['user']->id;
@@ -37,6 +42,11 @@ class FriendService extends BaseService
         return group_by_first_char($friendList, 'nickname');
     }
 
+    /**
+     * 好友申请列表
+     * @param array $params
+     * @return array
+     */
     public function applyList(array $params): array
     {
         $userId = $params['user']->id;
@@ -75,7 +85,13 @@ class FriendService extends BaseService
         return ['three_day' => $threeDay, 'over_three_day' => $overThreeDay];
     }
 
-    public function deleteApply($id, $userId): int
+    /**
+     * 删除好友申请
+     * @param int $id
+     * @param int $userId
+     * @return int
+     */
+    public function deleteApply(int $id, int $userId): int
     {
 //        $delKeys = [
 //            sprintf(RedisFriendEnum::APPLY_LIST, $userId)
@@ -84,6 +100,11 @@ class FriendService extends BaseService
         return Friend::query()->where('id', $id)->update(['hide' => 1]);
     }
 
+    /**
+     * 查找好友
+     * @param array $params
+     * @return array
+     */
     public function search(array $params): array
     {
         $keywords = $params['keywords'];
@@ -101,6 +122,9 @@ class FriendService extends BaseService
     }
 
     /**
+     * 好友验证信息
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function showConfirm(array $params): array
@@ -129,6 +153,12 @@ class FriendService extends BaseService
         return $confirm;
     }
 
+    /**
+     * 申请添加好友
+     * @param array $params
+     * @return array
+     * @throws BusinessException
+     */
     public function apply(array $params): array
     {
         //黑名单
@@ -192,7 +222,13 @@ class FriendService extends BaseService
         }
     }
 
-    public function verify(array $params)
+    /**
+     * 通过好友申请
+     * @param array $params
+     * @return array|null
+     * @throws BusinessException
+     */
+    public function verify(array $params): array|null
     {
         $fromUser = $params['user']->id;
         $toUser = $params['friend'];
@@ -276,6 +312,9 @@ class FriendService extends BaseService
     }
 
     /**
+     * 更新好友设置
+     * @param array $params
+     * @return array
      * @throws BusinessException
      */
     public function update(array $params): array

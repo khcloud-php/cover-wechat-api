@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\BusinessException;
 use App\Services\MomentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -19,9 +20,10 @@ class MomentController extends Controller
 
 
     /**
+     * 朋友圈列表
      * @throws ValidationException
      */
-    public function list(Request $request): \Illuminate\Http\JsonResponse
+    public function list(Request $request): JsonResponse
     {
         $this->validate($request, [
             'page' => 'integer|min:1',
@@ -32,9 +34,10 @@ class MomentController extends Controller
     }
 
     /**
+     * 朋友圈详情
      * @throws ValidationException
      */
-    public function detail(Request $request): \Illuminate\Http\JsonResponse
+    public function detail(Request $request): JsonResponse
     {
         $this->validate($request, [
             'id' => 'required',
@@ -48,7 +51,7 @@ class MomentController extends Controller
      * @throws ValidationException
      * @throws BusinessException
      */
-    public function publish(Request $request): \Illuminate\Http\JsonResponse
+    public function publish(Request $request): JsonResponse
     {
         $this->validate($request, [
             'type' => 'required',
@@ -59,10 +62,11 @@ class MomentController extends Controller
     }
 
     /**
+     * 喜欢朋友圈
      * @throws BusinessException
      * @throws ValidationException
      */
-    public function like(Request $request): \Illuminate\Http\JsonResponse
+    public function like(Request $request): JsonResponse
     {
         $this->validate($request, [
             'id' => 'required'
@@ -72,10 +76,11 @@ class MomentController extends Controller
     }
 
     /**
+     * 取消喜欢
      * @throws BusinessException
      * @throws ValidationException
      */
-    public function unlike(Request $request): \Illuminate\Http\JsonResponse
+    public function unlike(Request $request): JsonResponse
     {
         $this->validate($request, [
             'id' => 'required'
@@ -85,10 +90,11 @@ class MomentController extends Controller
     }
 
     /**
+     * 评论朋友圈
      * @throws BusinessException
      * @throws ValidationException
      */
-    public function comment(Request $request): \Illuminate\Http\JsonResponse
+    public function comment(Request $request): JsonResponse
     {
         $this->validate($request, [
             'id' => 'required',
@@ -98,17 +104,23 @@ class MomentController extends Controller
         return $this->success($data, $request);
     }
 
-    public function message(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * 朋友圈消息列表
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function message(Request $request): JsonResponse
     {
         $data = $this->momentService->message($this->params);
         return $this->setPageInfo($data[0])->success($data[1], $request);
     }
 
     /**
+     * 删除朋友圈
      * @throws BusinessException
      * @throws ValidationException
      */
-    public function delete(Request $request): \Illuminate\Http\JsonResponse
+    public function delete(Request $request): JsonResponse
     {
         $this->validate($request, [
             'id' => 'required'

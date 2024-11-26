@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class SystemController extends Controller
 {
+    /**
+     * 获取验证码
+     * @return array
+     */
     public function get(): array
     {
         try {
@@ -22,6 +26,7 @@ class SystemController extends Controller
 
     /**
      * 一次验证
+     * @param Request $request
      * @return array
      */
     public function check(Request $request): array
@@ -41,6 +46,7 @@ class SystemController extends Controller
 
     /**
      * 二次验证
+     * @param Request $request
      * @return array
      */
     public function verification(Request $request): array

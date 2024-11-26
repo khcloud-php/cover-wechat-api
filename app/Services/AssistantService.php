@@ -107,6 +107,9 @@ class AssistantService extends BaseService
     }
 
     /**
+     * ai回复信息
+     * @param array $data
+     * @return void
      * @throws GuzzleException
      */
     public function replyMessage(array $data): void

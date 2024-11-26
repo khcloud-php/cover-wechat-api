@@ -15,6 +15,10 @@ class FixData extends Command
 
     protected $description = 'Fix assistant data.';
 
+    /**
+     * 修复历史ai助手数据
+     * @return void
+     */
     public function handle(): void
     {
         DB::beginTransaction();

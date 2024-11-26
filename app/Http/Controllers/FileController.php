@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\BusinessException;
 use App\Services\FileService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -18,8 +19,11 @@ class FileController extends Controller
     }
 
     /**
-     * @throws ValidationException
+     * 上传文件
+     * @param Request $request
+     * @return JsonResponse
      * @throws BusinessException
+     * @throws ValidationException
      */
     public function upload(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -31,8 +35,11 @@ class FileController extends Controller
     }
 
     /**
-     * @throws ValidationException
+     * 上传文件base64
+     * @param Request $request
+     * @return JsonResponse
      * @throws BusinessException
+     * @throws ValidationException
      */
     public function uploadBase64(Request $request): \Illuminate\Http\JsonResponse
     {
