@@ -41,7 +41,8 @@ class Friend extends Base
             ->where('friend', $owner)
             ->where('owner', $friend)
             ->where('status', FriendEnum::STATUS_PASS)
-            ->first(['nickname'])->toArray();
+            ->first(['nickname']);
+        $friend = $friend ? $friend->toArray() : [];
         return $returnFriend ? [(bool)$friend, $friend] : (bool)$friend;
     }
 
