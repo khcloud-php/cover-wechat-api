@@ -29,6 +29,9 @@ class FriendService extends BaseService
             $query->select(['id', 'nickname', 'avatar', 'wechat', 'mobile']);
         }])->where('owner', $userId)
             ->where('status', FriendEnum::STATUS_PASS)
+            ->when(!empty($params['type']) && $params['type'] == 'only_chat', function ($query) {
+                $query->whereJsonContains('setting', ["FriendPerm" => ["SettingFriendPerm" => 'ONLY_CHAT']]);
+            })
             ->get(['id', 'owner', 'friend', 'nickname', 'source'])->toArray();
 
         foreach ($friendList as &$friend) {
@@ -56,7 +59,7 @@ class FriendService extends BaseService
             $query->select(['id', 'nickname', 'avatar', 'mobile', 'wechat']);
         }])
             ->where('hide', 0)
-            ->whereRaw("owner = {$userId} OR (friend = {$userId} and type = '" . FriendEnum::TYPE_APPLY . "')")
+            ->whereRaw("owner = {$userId} OR friend = {$userId}")
             ->get()->toArray();
 
         $day = 86400;
@@ -67,14 +70,13 @@ class FriendService extends BaseService
                 $friend = $apply['friend'];
                 $apply['owner'] = $friend;
                 $apply['friend'] = $owner;
-                $apply['status'] = 'go_check';
-            } elseif ($apply['status'] == FriendEnum::STATUS_CHECK) {
-                $apply['status'] = 'wait_check';
+            }
+            if ($apply['type'] == FriendEnum::TYPE_APPLY) {
+                $apply['status'] = $apply['friend']['id'] == $userId ? 'go_check' : 'wait_check';
             }
             $apply['keywords'] = $apply['friend'][$apply['source']] ?? $apply['friend']['wechat'];
             unset($apply['friend']['mobile'], $apply['friend']['wechat'], $apply['owner']['mobile'], $apply['owner']['wechat']);
-            $field = $apply['updated_at'] ? 'updated_at' : 'created_at';
-            $days = (time() - strtotime($apply[$field])) / $day;
+            $days = (time() - strtotime($apply['created_at'])) / $day;
             if ($days > 3) {
                 $overThreeDay[] = $apply;
             } else {
@@ -180,11 +182,12 @@ class FriendService extends BaseService
                 $friend->type = FriendEnum::TYPE_APPLY;
                 $friend->status = FriendEnum::STATUS_CHECK;
                 $friend->deleted_at = null;
+                $friend->created_at = time();
                 $friend->hide = 0;
                 $friend->nickname = $params['nickname'];
                 $friend->remark = $params['remark'];
                 $friend->setting = $params['setting'];
-                //对方有你好友
+                //对方有你好友直接通过
                 if ($owner && !$owner->deleted_at) {
                     $friend->type = FriendEnum::TYPE_VERIFY;
                     $friend->status = FriendEnum::STATUS_PASS;
