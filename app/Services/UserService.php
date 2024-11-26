@@ -13,7 +13,6 @@ use App\Models\Moment;
 use App\Models\User;
 use GatewayWorker\Lib\Gateway;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 
@@ -133,7 +132,7 @@ class UserService extends BaseService
                 $relationship = FriendEnum::RELATIONSHIP_GO_CHECK;
                 $homeInfo['source_text'] = '对方通过' . $sourceConfig[$friend->source] . '搜索';
                 $homeInfo['remark'] = $friend->remark;
-                $homeInfo['check_msg'] = "{$friend->nickname}：{$friend->remark}";
+                $homeInfo['check_msg'] = "{$user->nickname}：{$friend->remark}";
             }
             if ($owner && $owner->status == FriendEnum::STATUS_PASS) {
                 $relationship = FriendEnum::RELATIONSHIP_FRIEND;
