@@ -52,56 +52,22 @@ class MessageService extends BaseService
         $parentIds = array_filter($parentIds);
         $parentMessages = [];
         if ($parentIds) {
-            $parentMessages = Message::query()->whereIn('id', $parentIds)->get(['id', 'content'])->toArray();
-            $parentMessages = array_column($parentMessages, 'content', 'id');
+            $parentMessages = Message::with(['from' => function ($query) {
+                return $query->select(['id', 'nickname', 'avatar', 'wechat']);
+            }])->whereIn('id', $parentIds)->get()->toArray();
+            $parentMessages = array_column($parentMessages, null, 'id');
+            $files = $this->getFiles($parentMessages);
+            foreach ($parentMessages as $pk => $parentMessage) {
+                $parentMessages[$pk] = $this->handleMessage($parentMessage, $toUser, 0, $files);
+            }
         }
 
-        $fileIds = array_column($messages, 'file_id');
-        $fileIds = array_filter($fileIds);
-        $files = [];
-        if ($fileIds) {
-            $files = File::query()->whereIn('id', $fileIds)->get()->toArray();
-            $files = array_column($files, null, 'id');
-        }
+        $files = $this->getFiles($messages);
 
         foreach ($messages as $message) {
-            $item = [
-                'id' => $message['id'],
-                'from_user' => $message['from_user'],
-                'to_user' => $toUser,
-                'content' => $message['content'],
-                'type' => $message['type'],
-                'is_undo' => $message['is_undo'],
-                'is_tips' => $message['is_tips'],
-                'created_at' => $message['created_at'],
-                'file' => [],
-                'extends' => [],
-                'pid' => 0,
-                'pcontent' => '',
-                'at_users' => []
-            ];
-            if (in_array($message['type'], FileEnum::TYPE)) {
-                $fileId = $message['file_id'];
-                $file = $files[$fileId] ?? [];
-                if ($file) {
-                    $item['content'] = $file['path'];
-                    $item['extends'] = [
-                        'thumbnail' => $file['thumbnail_path'] ?: '',
-                        'format' => $file['format'],
-                        'width' => $file['width'],
-                        'height' => $file['height'],
-                        'duration' => $file['duration']
-                    ];
-                    $item['file'] = [
-                        'id' => $fileId,
-                        'name' => $file['name'],
-                        'type' => $file['type'],
-                        'size' => $file['size']
-                    ];
-                }
-            }
+            $item = $this->handleMessage($message, $toUser, 0, $files);
             !empty($message['at_users']) && $item['at_users'] = explode(',', $message['at_users']);
-            !empty($parentMessages[$message['pid']]) && $item['pcontent'] = $parentMessages[$message['pid']];
+            !empty($parentMessages[$message['pid']]) && $item['parent'] = $parentMessages[$message['pid']];
             $item['right'] = $message['from_user'] == $fromUser;
             $list[] = $item;
         }
@@ -189,28 +155,14 @@ class MessageService extends BaseService
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
         $time = time();
+        $message = $this->handleMessage($params, $toUser, $fromUser, []);
+        $message['time'] = $time;
         $assistantIds = get_assistant_ids();
         $atUsers = [];
         $sendData = [
             'who' => WorkerManEnum::WHO_MESSAGE,
             'action' => WorkerManEnum::ACTION_SEND,
-            'data' => [
-                'from' => $params['from'],
-                'from_user' => $fromUser,
-                'to_user' => $toUser,
-                'content' => $params['content'],
-                'type' => $params['type'],
-                'file' => [],
-                'extends' => [],
-                'pid' => 0,
-                'is_tips' => 0,
-                'is_undo' => 0,
-                'pcontent' => '',
-                'at_users' => [],
-                'is_group' => $params['is_group'],
-                'right' => false,
-                'time' => $time,
-            ]
+            'data' => $message
         ];
 
         $data = [
@@ -235,7 +187,7 @@ class MessageService extends BaseService
                 $data['file_type'] = $file->type;
                 $data['file_size'] = $file->size;
                 $sendData['data']['extends'] = [
-                    'path' => $file->path,
+                    'path' => str_replace(env('STATIC_FILE_URL'), '', $file->path),
                     'format' => $file->format,
                     'width' => $file->width,
                     'height' => $file->height,
@@ -247,7 +199,7 @@ class MessageService extends BaseService
                     'type' => $file->type,
                     'size' => $file->size
                 ];
-                $data['extends'] = json_encode($sendData['data']['extends']);
+                $data['extends'] = json_encode([]);
                 $data['content'] = FileEnum::CONTENT[$file->type] ?? '[文件信息]';
                 $sendData['data']['content'] = $file->path;
             }
@@ -317,15 +269,19 @@ class MessageService extends BaseService
 
             //引用消息处理
             if (!empty($params['pid'])) {
-                $message = Message::query()->find($params['pid'], ['content']);
-                $sendData['data']['pcontent'] = $message->content;
+                $parentMessage = Message::with(['from' => function ($query) {
+                    return $query->select(['id', 'nickname', 'avatar', 'wechat']);
+                }])->find($params['pid']);
+                $parentMessage = $parentMessage ? $parentMessage->toArray() : [];
+                $files = $this->getFiles([$parentMessage]);
+                $sendData['data']['parent'] = $this->handleMessage($parentMessage, $toUser, 0, $files);
                 $sendQuoteData = [
                     'who' => WorkerManEnum::WHO_MESSAGE,
                     'action' => WorkerManEnum::ACTION_QUOTE,
                     'data' => []
                 ];
                 //通知被引用消息的用户
-                Gateway::sendToUid($message->from_user, json_encode(
+                Gateway::sendToUid($parentMessage['from_user'], json_encode(
                     $sendQuoteData,
                     JSON_UNESCAPED_UNICODE
                 ));
@@ -442,5 +398,74 @@ class MessageService extends BaseService
             ],
             'discover' => $moment['num']
         ];
+    }
+
+    /**
+     * 通用获取消息里的关联文件方法
+     * @param array $messages
+     * @return array
+     */
+    private function getFiles(array $messages): array
+    {
+        $fileIds = array_column($messages, 'file_id');
+        $fileIds = array_filter($fileIds);
+        $files = [];
+        if ($fileIds) {
+            $files = File::query()->whereIn('id', $fileIds)->get()->toArray();
+            $files = array_column($files, null, 'id');
+        }
+        return $files;
+    }
+
+    /**
+     * 通用处理消息方法
+     * @param array $message
+     * @param int $toUser
+     * @param int $fromUser
+     * @param array $files
+     * @return array
+     */
+    private function handleMessage(array $message, int $toUser, int $fromUser, array $files): array
+    {
+
+        $item = [
+            'id' => $message['id'] ?? 0,
+            'from' => $message['from'] ?? [],
+            'from_user' => $message['from_user'] ?? $fromUser,
+            'to_user' => $toUser,
+            'content' => $message['content'],
+            'type' => $message['type'],
+            'is_undo' => $message['is_undo'] ?? 0,
+            'is_tips' => $message['is_tips'] ?? 0,
+            'time' => !empty($message['created_at']) ? strtotime($message['created_at']) : 0,
+            'file' => [],
+            'extends' => [],
+            'pid' => 0,
+            'parent' => [],
+            'at_users' => [],
+            'is_group' => $message['is_group'],
+            'right' => false
+        ];
+        if (in_array($message['type'], FileEnum::TYPE)) {
+            $fileId = $message['file_id'];
+            $file = $files[$fileId] ?? [];
+            if ($file) {
+                $item['content'] = $file['path'];
+                $item['extends'] = [
+                    'thumbnail' => $file['thumbnail_path'] ?: '',
+                    'format' => $file['format'],
+                    'width' => $file['width'],
+                    'height' => $file['height'],
+                    'duration' => $file['duration']
+                ];
+                $item['file'] = [
+                    'id' => $fileId,
+                    'name' => $file['name'],
+                    'type' => $file['type'],
+                    'size' => $file['size']
+                ];
+            }
+        }
+        return $item;
     }
 }
