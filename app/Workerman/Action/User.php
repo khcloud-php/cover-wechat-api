@@ -54,8 +54,14 @@ class User
 //            unset($_SESSION[sprintf(UserEnum::BIND_UID, $clientId)]);
             Cache::store(UserEnum::STORE)->forget(sprintf(UserEnum::BIND_UID, $clientId));
         }
+    }
 
-
+    public function call(string $clientId, $data): void
+    {
+        $uid = Gateway::getUidByClientId($clientId);
+        $data['who'] = WorkerManEnum::WHO_USER;
+        $data['action'] = WorkerManEnum::ACTION_CALL;
+        Gateway::sendToUid($uid, $data);
     }
 
     private function getJoinGroupIds(int|string $uid): array
@@ -64,19 +70,11 @@ class User
         return $groups ? array_column($groups, 'group_id') : [];
     }
 
-    public function getJoinGroupIdsByClientId(string $clientId): array
+    private function getJoinGroupIdsByClientId(string $clientId): array
     {
 //        $groupIds = $_SESSION[sprintf(UserEnum::JOIN_GROUPS, $clientId)];
 //        $groupIds = json_decode($groupIds);
         $groupIds = Cache::store(UserEnum::STORE)->get(sprintf(UserEnum::JOIN_GROUPS, $clientId));
         return $groupIds ?: [];
-    }
-
-    public function call(string $clientId, $data)
-    {
-        $uid = Gateway::getUidByClientId($clientId);
-        $data['who'] = WorkerManEnum::WHO_USER;
-        $data['action'] = WorkerManEnum::ACTION_CALL;
-        Gateway::sendToUid($uid, $data);
     }
 }
