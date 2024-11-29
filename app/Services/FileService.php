@@ -40,8 +40,8 @@ class FileService extends BaseService
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
         // 已存在直接返回
-        $realPath = $file->getPathname();
-        $signature = md5_file($realPath);
+        $tmpPath = $file->getPathname();
+        $signature = md5_file($tmpPath);
         if ($data = $this->checkFileExists($signature)) {
             return $data;
         }
@@ -62,54 +62,59 @@ class FileService extends BaseService
         $height = 0;
         $duration = 0;
         $date = date('Ymd');
-        $filePath = "uploads/{$fileType}/{$date}/{$newFileName}";
+        $fileDir = "uploads/{$fileType}/{$date}";
+        $filePath = "{$fileDir}/{$newFileName}";
         $outputPath = Storage::disk('public')->path($filePath);
-        $thumbnailPath = '';
+        $thumbnailFilePath = '';
         $needCropSquare = false;
         //头像的话需要截图
         if ($avatar) {
-            $needCropSquare = $this->cropSquare($realPath, $outputPath);
+            $needCropSquare = $this->cropSquare($tmpPath, $outputPath);
         }
         // 指定上传路径并重命名文件
         if (!$needCropSquare)
-            $path = $file->storeAs("uploads/{$fileType}/{$date}", $newFileName, 'public');
+            $filePath = $file->storeAs("{$fileDir}", $newFileName, 'public');
         else {
-            $realPath = $outputPath;
-            $path = $filePath;
+            $tmpPath = $outputPath;
         }
-        if (!$path) {
+        if (!$filePath) {
             $this->throwBusinessException(ApiCodeEnum::SYSTEM_ERROR, '文件上传失败！');
         }
+
+
+        $configuration = [];
+        if (is_linux()) {
+            $configuration = [
+                'ffmpeg.binaries' => env('FFMPEG_PATH'),
+                'ffprobe.binaries' => env('FFPROBE_PATH')
+            ];
+        }
+        $ffmpeg = \FFMpeg\FFMpeg::create($configuration);
+        $ffprobe = \FFMpeg\FFProbe::create($configuration);
+
         if ($fileType == FileEnum::IMAGE) {
             // 生成缩略图
-            $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
-            list($width, $height, $size) = $this->makeThumbnailImage($realPath, $thumbnailPath);
+            $thumbnailFilePath = "{$fileDir}/{$newThumbnailFileName}";
+            list($width, $height, $size) = $this->makeThumbnailImage($tmpPath, $thumbnailFilePath);
         } elseif ($fileType == FileEnum::VIDEO) {
             // 获取视频时长和封面图
-            $configuration = [];
-            if (is_linux()) {
-                $configuration = [
-                    'ffmpeg.binaries' => env('FFMPEG_PATH'),
-                    'ffprobe.binaries' => env('FFPROBE_PATH')
-                ];
-            }
-            $ffmpeg = \FFMpeg\FFMpeg::create($configuration);
-            $video = $ffmpeg->open($realPath);
-            $ffprobe = \FFMpeg\FFProbe::create($configuration);
-            $duration = (int)$ffprobe->format($realPath)->get('duration');
-            $width = (int)$ffprobe->format($realPath)->get('width');
-            $height = (int)$ffprobe->format($realPath)->get('height');
+            $video = $ffmpeg->open($tmpPath);
+            $duration = (int)$ffprobe->format($tmpPath)->get('duration');
+            $width = (int)$ffprobe->format($tmpPath)->get('width');
+            $height = (int)$ffprobe->format($tmpPath)->get('height');
             $newThumbnailFileName = str_replace($extension, 'jpg', $newThumbnailFileName);
-            $thumbnailPath = "uploads/{$fileType}/{$date}/{$newThumbnailFileName}";
+            $thumbnailFilePath = "{$fileDir}/{$newThumbnailFileName}";
             $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1))
-                ->save(storage_path('app/public/' . $thumbnailPath));
+                ->save(storage_path('app/public/' . $thumbnailFilePath));
+        } elseif ($fileType == FileEnum::AUDIO) {
+            // 获取音频时长
         }
 
         // 将文件信息存储到数据库
         $fileRecord = new File();
         $fileRecord->name = $newFileName;
-        $fileRecord->path = $path;
-        $fileRecord->thumbnail_path = $thumbnailPath;
+        $fileRecord->path = $filePath;
+        $fileRecord->thumbnail_path = $thumbnailFilePath;
         $fileRecord->size = $size;
         $fileRecord->width = $width;
         $fileRecord->height = $height;
@@ -119,11 +124,11 @@ class FileService extends BaseService
         $fileRecord->format = $extension;
         $fileRecord->save();
         $fileRecord->path = $filePath;
-        $fileRecord->thumbnail_path = $thumbnailPath;
+        $fileRecord->thumbnail_path = $thumbnailFilePath;
         // 获取文件的 URL
         $data = $fileRecord->toArray();
-        $data['url'] = env('STATIC_FILE_URL') . $path;
-        $data['thumbnail_url'] = env('STATIC_FILE_URL') . $thumbnailPath;
+        $data['url'] = env('STATIC_FILE_URL') . $filePath;
+        $data['thumbnail_url'] = env('STATIC_FILE_URL') . $thumbnailFilePath;
 
         return $data;
     }
@@ -150,7 +155,8 @@ class FileService extends BaseService
         };
         // 生成唯一文件名
         $fileName = uniqid() . '.' . $extension;
-        $filePath = "uploads/image/{$date}/{$fileName}";
+        $fileDir = "uploads/image/{$date}";
+        $filePath = "$fileDir/{$fileName}";
         Storage::disk('public')->put($filePath, $imageData);
         $fileRealPath = Storage::disk('public')->path($filePath);
         $signature = md5_file($fileRealPath);
@@ -160,7 +166,7 @@ class FileService extends BaseService
         }
         $size = Storage::disk('public')->size($filePath);
         // 生成缩略图
-        $thumbnailFilePath = "uploads/image/{$date}/thumbnail_{$fileName}";
+        $thumbnailFilePath = "$fileDir/thumbnail_{$fileName}";
         list($width, $height) = $this->makeThumbnailImage($fileRealPath, $thumbnailFilePath);
         // 将文件信息存储到数据库
         $fileRecord = new File();
