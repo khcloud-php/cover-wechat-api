@@ -206,7 +206,7 @@ class AssistantService extends BaseService
                         'type' => $file->type,
                         'size' => $file->size
                     ];
-                    $replyMessage = FileEnum::CONTENT[$aiType] ?? '[文件信息]';
+                    $replyMessage = MessageEnum::SIMPLE_CONTENT[$aiType];
                 }
             } catch (\Exception $e) {
                 $replyMessage = $e->getMessage();

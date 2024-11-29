@@ -21,7 +21,10 @@ class FileEnum
         self::FILE => '[文件信息]',
         self::IMAGE => '[图片信息]',
         self::VIDEO => '[视频信息]',
-        self::AUDIO => '[语音消息]'
+        self::AUDIO => '[语音消息]',
+        MessageEnum::VIDEO_CALL => '[视频通话]',
+        MessageEnum::AUDIO_CALL => '[语音通话]',
+
     ];
 
     const FILE_LIMIT_SIZE = 5 * 1024 * 1024;

@@ -151,7 +151,8 @@ class MessageService extends BaseService
     {
         $fromUser = $params['user']->id;
         $toUser = $params['to_user'];
-        if (!in_array($params['is_group'], MessageEnum::IS_GROUP)) {
+        if (!in_array($params['type'], MessageEnum::TYPE)
+            || !in_array($params['is_group'], MessageEnum::IS_GROUP)) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
         $time = time();
@@ -200,9 +201,13 @@ class MessageService extends BaseService
                     'size' => $file->size
                 ];
 //                $data['extends'] = json_encode([]);
-                $data['content'] = FileEnum::CONTENT[$file->type] ?? '[文件信息]';
                 $sendData['data']['content'] = $file->path;
             }
+        }
+
+        //消息内容简称处理
+        if ($params['type'] !== MessageEnum::TEXT) {
+            $data['content'] = MessageEnum::SIMPLE_CONTENT[$params['type']];
         }
 
         DB::beginTransaction();
