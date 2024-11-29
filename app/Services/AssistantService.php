@@ -261,7 +261,7 @@ class AssistantService extends BaseService
                         $messageData['file_name'] = $file->name;
                         $messageData['file_type'] = $file->type;
                         $messageData['file_size'] = $file->size;
-                        $messageData['extends'] = json_encode($data['extends']);
+//                        $messageData['extends'] = json_encode([]);
                         $data['content'] = $file->path;
                     } else {
                         $data['content'] = $replyMessage;

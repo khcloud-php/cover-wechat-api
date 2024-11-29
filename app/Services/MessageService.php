@@ -199,7 +199,7 @@ class MessageService extends BaseService
                     'type' => $file->type,
                     'size' => $file->size
                 ];
-                $data['extends'] = json_encode([]);
+//                $data['extends'] = json_encode([]);
                 $data['content'] = FileEnum::CONTENT[$file->type] ?? '[文件信息]';
                 $sendData['data']['content'] = $file->path;
             }
@@ -297,9 +297,8 @@ class MessageService extends BaseService
                 $sendToAi = true;
             }
 
-            if (array_intersect($assistantIds, $atUsers)) {
+            if ($aiIds = array_intersect($assistantIds, $atUsers)) {
                 //群聊@ai小助手回复消息
-                $aiIds = array_intersect($assistantIds, $atUsers);
                 foreach ($aiIds as $aiId) {
                     $aiData['to_ai'] = $aiId;
                     $job = new AssistantReplyJob($aiData);
