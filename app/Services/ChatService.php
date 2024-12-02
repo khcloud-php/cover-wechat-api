@@ -42,6 +42,7 @@ class ChatService extends BaseService
             $item['to_user'] = $item['to']['id'];
             $item['is_group'] = MessageEnum::PRIVATE;
             $item['muted'] = false;
+            $item['at'] = false;
             unset($item['from']['avatar'], $item['friend']);
         }
         unset($item);
@@ -53,7 +54,7 @@ class ChatService extends BaseService
                     $query->select(['id', 'nickname']);
                 }, 'friend' => function ($query) {
                     $query->select(['friend', 'nickname']);
-                }])->select(['id', 'content', 'time', 'send_user', 'name']);
+                }])->select(['id', 'content', 'time', 'send_user', 'name', 'at_users']);
             }])
             ->select(['unread', 'top', 'group_id', 'user_id', 'name', 'nickname'])
             ->where('user_id', $fromUser)
@@ -91,11 +92,18 @@ class ChatService extends BaseService
             $item['time'] = $item['group']['time'];
             $item['to_user'] = $item['group_id'];
             $item['is_group'] = MessageEnum::GROUP;
-            $item['muted'] = false;
             $item['to'] = [
                 'id' => $item['group_id'],
                 'avatars' => $groupAvatars[$item['group_id']] ?? []
             ];
+            $item['muted'] = false;
+            $item['at'] = false;
+            //被@了
+            $atUsers = explode(',', $item['group']['at_users']);
+            if (in_array($fromUser, $atUsers)) {
+                $item['content'] = '[有人@你了]';
+                $item['at'] = true;
+            }
             unset($item['send'], $item['group'], $item['group_id'], $item['from_user'], $item['user_id'], $item['name']);
         }
 

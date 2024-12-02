@@ -66,7 +66,9 @@ class MessageService extends BaseService
 
         foreach ($messages as $message) {
             $item = $this->handleMessage($message, $toUser, 0, $files);
-            !empty($message['at_users']) && $item['at_users'] = explode(',', $message['at_users']);
+            $atUsers = explode(',', $message['at_users']);
+            $atUsers = array_filter($atUsers);
+            $item['at_users'] = array_map('intval', $atUsers);
             !empty($parentMessages[$message['pid']]) && $item['parent'] = $parentMessages[$message['pid']];
             $item['right'] = $message['from_user'] == $fromUser;
             $list[] = $item;
@@ -149,17 +151,20 @@ class MessageService extends BaseService
      */
     public function send(array $params): array
     {
-        $fromUser = $params['user']->id;
-        $toUser = $params['to_user'];
+        $isGroup = intval($params['is_group']);
         if (!in_array($params['type'], MessageEnum::TYPE)
-            || !in_array($params['is_group'], MessageEnum::IS_GROUP)) {
+            || !in_array($isGroup, MessageEnum::IS_GROUP)) {
             $this->throwBusinessException(ApiCodeEnum::CLIENT_PARAMETER_ERROR);
         }
+        $fromUser = $params['user']->id;
+        $toUser = $params['to_user'];
         $time = time();
         $message = $this->handleMessage($params, $toUser, $fromUser, []);
         $message['time'] = $time;
         $assistantIds = get_assistant_ids();
-        $atUsers = [];
+        $atUserStr = $params['at_users'] ?? '';
+        $atUsers = explode(',', $atUserStr);
+        $atUsers = array_filter($atUsers);
         $sendData = [
             'who' => WorkerManEnum::WHO_MESSAGE,
             'action' => WorkerManEnum::ACTION_SEND,
@@ -170,10 +175,10 @@ class MessageService extends BaseService
             'from_user' => $fromUser,
             'to_user' => $toUser,
             'content' => $params['content'],
-            'is_group' => $params['is_group'],
+            'is_group' => $isGroup,
             'type' => $params['type'],
             'pid' => $params['pid'] ?? 0,
-            'at_users' => $params['at_users'] ?? '',
+            'at_users' => $atUserStr,
             'created_at' => $time
         ];
 
@@ -212,13 +217,18 @@ class MessageService extends BaseService
 
         DB::beginTransaction();
         try {
-            if ($params['is_group'] == MessageEnum::GROUP) {
-                Group::query()->where('id', $toUser)
-                    ->update([
-                        'send_user' => $fromUser,
-                        'content' => $data['content'],
-                        'time' => $time
-                    ]);
+            if ($isGroup == MessageEnum::GROUP) {
+                $group = Group::query()->find($toUser);
+                if ($atUsers) {
+                    $atUsers = array_map('intval', $atUsers);
+                    $originAtUsers = explode(',', $group->at_users);
+                    $updateAtUsers = array_unique(array_merge($originAtUsers, $atUsers));
+                    $group->at_users = implode(',', $updateAtUsers);
+                }
+                $group->send_user = $fromUser;
+                $group->content = $data['content'];
+                $group->time = $time;
+                $group->save();
                 GroupUser::query()
                     ->where('group_id', $toUser)
                     ->update([
@@ -261,15 +271,15 @@ class MessageService extends BaseService
             DB::commit();
 
             //at用户处理
-            if (!empty($params['at_users'])) {
-                $sendAtData = [
-                    'who' => WorkerManEnum::WHO_MESSAGE,
-                    'action' => WorkerManEnum::ACTION_AT,
-                    'data' => []
-                ];
-                $sendData['data']['at_users'] = $atUsers = explode(',', $params['at_users']);
+            if ($atUsers) {
+                $sendData['data']['at_users'] = $atUsers;
+                $sendAtData = $sendData;
+                $sendAtData['action'] = WorkerManEnum::ACTION_AT;
                 //通知被at的用户
-                Gateway::sendToUid($atUsers, json_encode($sendAtData, JSON_UNESCAPED_UNICODE));
+                foreach ($atUsers as $atUser) {
+                    $sendAtData['data']['to_user'] = $atUser;
+                    Gateway::sendToUid($atUser, json_encode($sendAtData, JSON_UNESCAPED_UNICODE));
+                }
             }
 
             //引用消息处理
@@ -292,34 +302,34 @@ class MessageService extends BaseService
                 ));
             }
 
-            $sendToAi = false;
+            //ai小助手处理
             $aiData = $sendData['data'];
-            if (($params['is_group'] == MessageEnum::PRIVATE && in_array($toUser, $assistantIds))) {
-                //私聊ai小助手回复消息
-                $aiData['to_ai'] = $toUser;
-                $job = new AssistantReplyJob($aiData);
-                dispatch($job->onQueue(ChatEnum::ASSISTANT_REPLY));
-                $sendToAi = true;
+            $aiIds = [];
+            if ($isGroup == MessageEnum::PRIVATE && in_array($toUser, $assistantIds)) {
+                //私聊ai小助手
+                $aiIds[] = $toUser;
             }
 
-            if ($aiIds = array_intersect($assistantIds, $atUsers)) {
-                //群聊@ai小助手回复消息
+            if ($atAiIds = array_intersect($assistantIds, $atUsers)) {
+                //群聊@ai小助手
+                $aiIds = array_merge($aiIds, $atAiIds);
+            }
+
+            if ($aiIds) {
+                //ai小助手回复消息
                 foreach ($aiIds as $aiId) {
                     $aiData['to_ai'] = $aiId;
                     $job = new AssistantReplyJob($aiData);
                     dispatch($job->onQueue(ChatEnum::ASSISTANT_REPLY));
                 }
-                $sendToAi = true;
             }
 
-            if (!$sendToAi) {
-                //向用户发送消息通知
-                if ($params['is_group'] == MessageEnum::GROUP) {
-                    $excludeClientId = Gateway::getClientIdByUid($fromUser);
-                    Gateway::sendToGroup($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE), $excludeClientId);
-                } else {
-                    Gateway::sendToUid($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE));
-                }
+            //向用户发送消息通知
+            if ($isGroup == MessageEnum::GROUP) {
+                $excludeClientId = Gateway::getClientIdByUid($fromUser);
+                Gateway::sendToGroup($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE), $excludeClientId);
+            } else {
+                Gateway::sendToUid($toUser, json_encode($sendData, JSON_UNESCAPED_UNICODE));
             }
 
         } catch (\Exception $e) {
@@ -342,6 +352,32 @@ class MessageService extends BaseService
         $fromUser = $params['user']->id;
         $toUser = $params['to_user'];
         $isGroup = $params['is_group'];
+        if (!empty($params['id'])) {
+            //单条at/引用消息标记已读
+            $field = $params['type'] ?? 'at_users';
+            $message = Message::query()->findOrFail($params['id']);
+            $origin = explode(',', $message->$field);
+            $update = array_diff($origin, [$fromUser]);
+            $message->$field = implode(',', $update);
+            $message->save();
+            if (Message::query()->whereRaw("FIND_IN_SET($fromUser, {$field})")->count() <= 0) {
+                //所有at/引用消息标记已读
+                if ($isGroup == MessageEnum::GROUP) {
+                    $group = Group::query()->findOrFail($toUser);
+                    $origin = explode(',', $group->$field);
+                    $update = array_diff($origin, [$fromUser]);
+                    $group->$field = implode(',', $update);
+                    $group->save();
+                } else {
+                    $friend = Friend::query()->where('owner', $fromUser)->where('friend', $toUser)->first();
+                    $origin = explode(',', $friend->$field);
+                    $update = array_diff($origin, [$fromUser]);
+                    $friend->$field = implode(',', $update);
+                    $friend->save();
+                }
+            }
+            return 1;
+        }
         if ($isGroup == MessageEnum::GROUP) {
             return GroupUser::query()->where('user_id', $fromUser)->where('group_id', $toUser)->update(['unread' => 0]);
         }
@@ -447,7 +483,7 @@ class MessageService extends BaseService
             'pid' => 0,
             'parent' => [],
             'at_users' => [],
-            'is_group' => $message['is_group'],
+            'is_group' => intval($message['is_group']),
             'right' => false
         ];
         if (in_array($message['type'], FileEnum::TYPE)) {
