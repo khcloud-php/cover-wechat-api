@@ -360,7 +360,7 @@ class MessageService extends BaseService
             $update = array_diff($origin, [$fromUser]);
             $message->$field = implode(',', $update);
             $message->save();
-            if (Message::query()->whereRaw("FIND_IN_SET($fromUser, {$field})")->count() <= 0) {
+            if (Message::query()->whereRaw("FIND_IN_SET($fromUser, {$field})")->count() > 0) {
                 //所有at/引用消息标记已读
                 if ($isGroup == MessageEnum::GROUP) {
                     $group = Group::query()->findOrFail($toUser);
