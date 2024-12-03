@@ -83,7 +83,10 @@ class Moment extends Base
         $friendIdsStr = implode(',', $friendIds);
         $offset = ($page - 1) * $limit;
         $condition = str_replace('__OWNER__', $owner, self::$condition);
-        $whereRaw = "(cw_u.id = {$owner} OR (cw_u.id IN($friendIdsStr) AND {$condition}))";
+        if ($friendIdsStr)
+            $whereRaw = "(cw_u.id = {$owner} OR (cw_u.id IN($friendIdsStr) AND {$condition}))";
+        else
+            $whereRaw = "cw_u.id = {$owner}";
         $total = self::query()->leftJoin('users as u', 'u.id', '=', 'moments.user_id')->whereRaw($whereRaw)->count();
         $moments = self::query()
             ->join('users as u', 'u.id', '=', 'moments.user_id')
