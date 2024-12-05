@@ -118,8 +118,8 @@ class ChatService extends BaseService
     public function info(array $params): array
     {
         $fromUser = $params['user']->id;
-        $isGroup = $params['is_group'];
-        $toUser = $params['to_user'];
+        $isGroup = intval($params['is_group']);
+        $toUser = intval($params['to_user']);
         $chatInfo = [
             'from_user' => $fromUser,
             'to_user' => $toUser,
