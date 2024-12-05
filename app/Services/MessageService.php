@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Enums\ApiCodeEnum;
 use App\Enums\Database\FileEnum;
-use App\Enums\Database\MessageEnum;
 use App\Enums\Database\FriendEnum;
+use App\Enums\Database\MessageEnum;
 use App\Enums\Redis\ChatEnum;
 use App\Enums\WorkerManEnum;
 use App\Exceptions\BusinessException;
@@ -211,57 +211,62 @@ class MessageService extends BaseService
         }
 
         //消息内容简称处理
-        if ($params['type'] !== MessageEnum::TEXT) {
+        if (in_array($params['type'], FileEnum::TYPE)) {
             $data['content'] = MessageEnum::SIMPLE_CONTENT[$params['type']];
         }
 
         DB::beginTransaction();
         try {
-            if ($isGroup == MessageEnum::GROUP) {
-                $group = Group::query()->find($toUser);
-                if ($atUsers) {
-                    $atUsers = array_map('intval', $atUsers);
-                    $originAtUsers = explode(',', $group->at_users);
-                    $updateAtUsers = array_unique(array_merge($originAtUsers, $atUsers));
-                    $group->at_users = implode(',', $updateAtUsers);
+            if (empty($params['id'])) {
+                if ($isGroup == MessageEnum::GROUP) {
+                    $group = Group::query()->find($toUser);
+                    if ($atUsers) {
+                        $atUsers = array_map('intval', $atUsers);
+                        $originAtUsers = explode(',', $group->at_users);
+                        $updateAtUsers = array_unique(array_merge($originAtUsers, $atUsers));
+                        $group->at_users = implode(',', $updateAtUsers);
+                    }
+                    $group->send_user = $fromUser;
+                    $group->content = $data['content'];
+                    $group->time = $time;
+                    $group->save();
+                    GroupUser::query()
+                        ->where('group_id', $toUser)
+                        ->update([
+                            'display' => 1
+                        ]);
+                    GroupUser::query()
+                        ->where('group_id', $toUser)
+                        ->where('user_id', '<>', $fromUser)
+                        ->increment('unread');
+                } else {
+                    Friend::query()
+                        ->whereRaw("((owner = $fromUser AND friend = $toUser) OR (friend = $fromUser AND owner = $toUser))")
+                        ->update([
+                            'display' => 1,
+                            'content' => $data['content'],
+                            'time' => $time
+                        ]);
+                    Friend::query()
+                        ->whereRaw("(friend = $fromUser AND owner = $toUser)")
+                        ->increment('unread');
                 }
-                $group->send_user = $fromUser;
-                $group->content = $data['content'];
-                $group->time = $time;
-                $group->save();
-                GroupUser::query()
-                    ->where('group_id', $toUser)
-                    ->update([
-                        'display' => 1
-                    ]);
-                GroupUser::query()
-                    ->where('group_id', $toUser)
-                    ->where('user_id', '<>', $fromUser)
-                    ->increment('unread');
-            } else {
-                Friend::query()
-                    ->whereRaw("((owner = $fromUser AND friend = $toUser) OR (friend = $fromUser AND owner = $toUser))")
-                    ->update([
-                        'display' => 1,
-                        'content' => $data['content'],
-                        'time' => $time
-                    ]);
-                Friend::query()
-                    ->whereRaw("(friend = $fromUser AND owner = $toUser)")
-                    ->increment('unread');
             }
+
 
             //通话处理
             if (in_array($params['type'], [MessageEnum::VIDEO_CALL, MessageEnum::AUDIO_CALL])) {
                 $sendData['who'] = WorkerManEnum::WHO_USER;
                 $sendData['action'] = WorkerManEnum::ACTION_CALL;
-                $sendData['data']['action'] = $params['action'];
+                !empty($params['action']) && $sendData['data']['action'] = $params['action'];
+                !empty($params['offer']) && $sendData['data']['offer'] = $params['offer'];
+                !empty($params['answer']) && $sendData['data']['answer'] = $params['answer'];
+                !empty($params['candidate']) && $sendData['data']['candidate'] = $params['candidate'];
                 if (empty($params['id'])) {
-                    $data['deleted_users'] = "{$fromUser},{$toUser}";
-                    $data['content'] = '';
-                } else {
+                    $data['deleted_users'] = "{$toUser}";
+                } elseif ($params['id'] > 0 && empty($params['candidate'])) {
                     $sendData['data']['id'] = $params['id'];
-                    Message::query()->where('id', $params['id'])->update(['content' => $data['content'], 'deleted_users' => '']);
+                    Message::query()->where('id', $params['id'])->update(['content' => $data['content']]);
                 }
             }
 
