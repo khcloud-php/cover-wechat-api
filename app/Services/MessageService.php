@@ -211,35 +211,35 @@ class MessageService extends BaseService
         }
 
         //消息内容简称处理
-        if (in_array($params['type'], FileEnum::TYPE)) {
+        if ($params['type'] !== MessageEnum::TEXT) {
             $data['content'] = MessageEnum::SIMPLE_CONTENT[$params['type']];
         }
 
         DB::beginTransaction();
         try {
-            if (empty($params['id'])) {
-                if ($isGroup == MessageEnum::GROUP) {
-                    $group = Group::query()->find($toUser);
-                    if ($atUsers) {
-                        $atUsers = array_map('intval', $atUsers);
-                        $originAtUsers = explode(',', $group->at_users);
-                        $updateAtUsers = array_unique(array_merge($originAtUsers, $atUsers));
-                        $group->at_users = implode(',', $updateAtUsers);
-                    }
-                    $group->send_user = $fromUser;
-                    $group->content = $data['content'];
-                    $group->time = $time;
-                    $group->save();
-                    GroupUser::query()
-                        ->where('group_id', $toUser)
-                        ->update([
-                            'display' => 1
-                        ]);
-                    GroupUser::query()
-                        ->where('group_id', $toUser)
-                        ->where('user_id', '<>', $fromUser)
-                        ->increment('unread');
-                } else {
+            if ($isGroup == MessageEnum::GROUP) {
+                $group = Group::query()->find($toUser);
+                if ($atUsers) {
+                    $atUsers = array_map('intval', $atUsers);
+                    $originAtUsers = explode(',', $group->at_users);
+                    $updateAtUsers = array_unique(array_merge($originAtUsers, $atUsers));
+                    $group->at_users = implode(',', $updateAtUsers);
+                }
+                $group->send_user = $fromUser;
+                $group->content = $data['content'];
+                $group->time = $time;
+                $group->save();
+                GroupUser::query()
+                    ->where('group_id', $toUser)
+                    ->update([
+                        'display' => 1
+                    ]);
+                GroupUser::query()
+                    ->where('group_id', $toUser)
+                    ->where('user_id', '<>', $fromUser)
+                    ->increment('unread');
+            } else {
+                if (empty($params['id'])) {
                     Friend::query()
                         ->whereRaw("((owner = $fromUser AND friend = $toUser) OR (friend = $fromUser AND owner = $toUser))")
                         ->update([
@@ -253,9 +253,9 @@ class MessageService extends BaseService
                 }
             }
 
-
             //通话处理
             if (in_array($params['type'], [MessageEnum::VIDEO_CALL, MessageEnum::AUDIO_CALL])) {
+                $data['content'] = $params['content'];
                 $sendData['who'] = WorkerManEnum::WHO_USER;
                 $sendData['action'] = WorkerManEnum::ACTION_CALL;
                 !empty($params['action']) && $sendData['data']['action'] = $params['action'];
@@ -266,7 +266,11 @@ class MessageService extends BaseService
                     $data['deleted_users'] = "{$toUser}";
                 } elseif ($params['id'] > 0 && empty($params['candidate'])) {
                     $sendData['data']['id'] = $params['id'];
-                    Message::query()->where('id', $params['id'])->update(['content' => $data['content']]);
+                    $updateData = ['content' => $data['content']];
+                    if (!empty($params['duration'])) {
+                        $updateData['extends'] = json_encode(['duration' => $params['duration']]);
+                    }
+                    Message::query()->where('id', $params['id'])->update($updateData);
                 }
             }
 
